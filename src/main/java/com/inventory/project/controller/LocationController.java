@@ -39,7 +39,7 @@ public class LocationController {
     }
 
     private void createInventories(Location location) {
-        // Logic to create inventories based on the location
+
     }
 
     @PutMapping("/update/{id}")
