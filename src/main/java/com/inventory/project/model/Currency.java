@@ -4,15 +4,14 @@ import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
 @Entity
-@Table(name="unit")
-public class Unit {
-
+@Table(name="currency")
+public class Currency {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name="unit_name")
-    private String name;
+    @Column (name="currency_name")
+    String currencyName;
 
     public Long getId() {
         return id;
@@ -22,11 +21,13 @@ public class Unit {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCurrencyName() {
+        return currencyName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCurrencyName(String currencyName) {
+        this.currencyName = currencyName;
     }
+
+
 }

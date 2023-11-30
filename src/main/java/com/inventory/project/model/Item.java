@@ -1,6 +1,9 @@
 package com.inventory.project.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+
 @Entity
 @Table(name="item")
 
@@ -11,13 +14,15 @@ public class Item {
 
     private String itemName;
     @Column(name="minimum_stock")
-    String MinimumStock;
+    String minimumStock;
 
     @Column(name="description")
     String description;
 
 
     @ManyToOne
+    @JoinColumn(name = "category_id") // Adjust this annotation based on your database schema
+    @JsonProperty("category")
     Category category;
 
     @ManyToOne
@@ -33,7 +38,7 @@ public class Item {
     public Item(Long id, String itemName, String minimumStock, String description, Category category, Unit unit) {
         this.id = id;
         this.itemName = itemName;
-        MinimumStock = minimumStock;
+        minimumStock = minimumStock;
         this.description = description;
         this.category = category;
         this.unit = unit;
@@ -48,24 +53,6 @@ public class Item {
         this.id = id;
     }
 
-    public String getItemCode() {
-        return MinimumStock;
-    }
-
-    public void setItemCode(String itemCode) {
-        this.MinimumStock = itemCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-
     public String getItemName() {
         return itemName;
     }
@@ -75,11 +62,19 @@ public class Item {
     }
 
     public String getMinimumStock() {
-        return MinimumStock;
+        return minimumStock;
     }
 
     public void setMinimumStock(String minimumStock) {
-        MinimumStock = minimumStock;
+        this.minimumStock = minimumStock;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Category getCategory() {

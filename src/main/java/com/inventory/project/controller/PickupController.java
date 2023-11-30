@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/pickup")
@@ -18,65 +20,61 @@ public class PickupController {
     @Autowired
     private PickupRepository pickupRepository;
 
-    @GetMapping("/add")
-    public ResponseEntity<Map<String, Object>> addPickup() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("pickup", new Pickup());
-        return ResponseEntity.ok(response);
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Pickup> getPickupById(@PathVariable("id") Long id) {
+        Optional<Pickup> pickup = pickupRepository.findById(id);
+        return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/save")
-    public ResponseEntity<String> savePickup(@RequestBody Pickup pickup) {
-        try {
-            pickupRepository.save(pickup);
-            return ResponseEntity.ok("Pickup saved successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error saving pickup");
+    @GetMapping("/list")
+    public ResponseEntity<List<Pickup>> getAllPickups(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Pickup> pagedResult = pickupRepository.findAll(paging);
+
+        if (pagedResult.hasContent()) {
+            return ResponseEntity.ok(pagedResult.getContent());
+        } else {
+            return ResponseEntity.noContent().build();
         }
     }
 
-    @GetMapping("/edit/{id}")
-    public ResponseEntity<Pickup> editPickup(@PathVariable("id") Long id) {
-        return pickupRepository.findById(id)
-                .map(pickup -> ResponseEntity.ok().body(pickup))
-                .orElse(ResponseEntity.notFound().build());
+    @PostMapping("/add")
+    public ResponseEntity<Pickup> createPickup(@RequestBody Pickup pickup) {
+        Pickup newPickup = pickupRepository.save(pickup);
+        return ResponseEntity.ok(newPickup);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> updatePickup(@RequestBody Pickup pickup) {
-        try {
-            if (pickup.getId() != null && pickupRepository.existsById(pickup.getId())) {
-                pickupRepository.save(pickup);
-                return ResponseEntity.ok("Pickup updated successfully");
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error updating pickup");
+    @PutMapping("/{id}")
+    public ResponseEntity<Pickup> updatePickup(@PathVariable("id") Long id, @RequestBody Pickup pickupDetails) {
+        Optional<Pickup> optionalPickup = pickupRepository.findById(id);
+
+        if (optionalPickup.isPresent()) {
+            Pickup existingPickup = optionalPickup.get();
+            existingPickup.setPickupAddress(pickupDetails.getPickupAddress());
+            existingPickup.setpIC(pickupDetails.getpIC());
+            // Set other properties similarly
+
+            Pickup updatedPickup = pickupRepository.save(existingPickup);
+            return ResponseEntity.ok(updatedPickup);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/view/pageno={page}")
-    public ResponseEntity<Map<String, Object>> view(@PathVariable("page") int page) {
-        Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Pickup> list = pickupRepository.findAll(pageable);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePickup(@PathVariable("id") Long id) {
+        Optional<Pickup> optionalPickup = pickupRepository.findById(id);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("pickupList", list.getContent());
-        response.put("currentPage", page);
-        response.put("totalPages", list.getTotalPages());
-        response.put("totalItems", list.getTotalElements());
-
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePickup(@PathVariable(value = "id") Long id) {
-        try {
+        if (optionalPickup.isPresent()) {
             pickupRepository.deleteById(id);
-            return ResponseEntity.ok("Pickup deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error deleting pickup");
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

@@ -1,18 +1,17 @@
 package com.inventory.project.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 
-@Entity
-@Table(name="unit")
-public class Unit {
-
+@jakarta.persistence.Entity
+@Table(name="entity")
+public class Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="id")
     private Long id;
 
-    @Column(name="unit_name")
-    private String name;
+    @Column(name="name")
+    String name;
 
     public Long getId() {
         return id;
@@ -29,4 +28,5 @@ public class Unit {
     public void setName(String name) {
         this.name = name;
     }
+
 }

@@ -1,6 +1,7 @@
 package com.inventory.project.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 
 @Entity
 @Table(name="category")
@@ -11,7 +12,15 @@ public class Category {
 
     @Column(name="name")
     String name;
+    public Category(Long id, String name) {
+        super();
+        this.id = id;
+        this.name = name;
+    }
 
+    public Category() {
+
+    }
     public Long getId() {
         return id;
     }
@@ -28,14 +37,6 @@ public class Category {
         this.name = name;
     }
 
-    public Category(Long id, String name) {
-        super();
-        this.id = id;
-        this.name = name;
-    }
 
-    public Category() {
-
-    }
 
 }

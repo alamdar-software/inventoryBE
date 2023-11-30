@@ -12,12 +12,10 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     Page<Item> findAllById(Long itemId, Pageable pageable);
 
-
     Item findByDescription(String description);
 
-    @Query("SELECT i FROM Item i WHERE i.description =:description AND i.id !=:id")
-    Item alreadyExistsByDescription(String description,Long id);
+    @Query("SELECT i FROM Item i WHERE i.description = :description AND i.id != :id")
+    Item alreadyExistsByDescription(String description, Long id);
 
-    Item findById(Item item);
     Item findByItemName(String itemName);
 }
