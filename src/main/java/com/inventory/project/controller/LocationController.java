@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @RequestMapping("/location")
-
+@CrossOrigin(value = "*")
 public class LocationController {
     @Autowired
     LocationRepository locationRepo;
