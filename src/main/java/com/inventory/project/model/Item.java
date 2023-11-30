@@ -23,29 +23,21 @@ public class Item {
     @ManyToOne
     Unit unit;
 
-    @Column(name="selling_price")
-    Double sellingPrice;
 
-    @Column(name="total_quantity")
-    int totalQuantity;
 
-    @Column(name="minimum")
-    int minimum;
 
     public Item() {
 
     }
 
-    public Item(Long id, String itemName, String minimumStock, String description, Category category, Unit unit, Double sellingPrice, int totalQuantity, int minimum) {
+    public Item(Long id, String itemName, String minimumStock, String description, Category category, Unit unit) {
         this.id = id;
         this.itemName = itemName;
         MinimumStock = minimumStock;
         this.description = description;
         this.category = category;
         this.unit = unit;
-        this.sellingPrice = sellingPrice;
-        this.totalQuantity = totalQuantity;
-        this.minimum = minimum;
+
     }
 
     public Long getId() {
@@ -73,29 +65,6 @@ public class Item {
     }
 
 
-    public Double getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(Double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public int getTotalQuantity() {
-        return totalQuantity;
-    }
-
-    public void setTotalQuantity(int totalQuantity) {
-        this.totalQuantity = totalQuantity;
-    }
-
-    public int getMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(int minimum) {
-        this.minimum = minimum;
-    }
 
     public String getItemName() {
         return itemName;

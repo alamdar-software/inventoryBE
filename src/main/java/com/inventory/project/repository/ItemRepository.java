@@ -19,4 +19,5 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     Item alreadyExistsByDescription(String description,Long id);
 
     Item findById(Item item);
+    Item findByItemName(String itemName);
 }

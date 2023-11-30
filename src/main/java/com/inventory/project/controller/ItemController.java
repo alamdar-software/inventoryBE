@@ -1,9 +1,13 @@
 package com.inventory.project.controller;
 
+import com.inventory.project.model.Category;
 import com.inventory.project.model.Item;
 import com.inventory.project.model.Location;
+import com.inventory.project.model.Unit;
+import com.inventory.project.repository.CategoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
+import com.inventory.project.repository.UnitRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @RequestMapping("/item")
 @RestController
 public class ItemController {
@@ -20,17 +27,32 @@ public class ItemController {
 
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    CategoryRepository categoryRepository;
 
-    @GetMapping("/add")
-    public ResponseEntity<String> add(Model model, HttpSession session) {
-        if (!model.asMap().containsKey("item")) {
-            model.addAttribute("item", new Item());
+    @Autowired
+    UnitRepository unitRepository;
+
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> addItem() {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Item newItem = new Item();
+            List<Category> categoryList = categoryRepository.findAll();
+            List<Unit> unitList = unitRepository.findAll();
+
+            response.put("item", newItem);
+            response.put("categoryList", categoryList);
+            response.put("unitList", unitList);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "Error fetching data: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
-        List<Location> locations = locationRepository.findAll();
-
-        return ResponseEntity.ok("Add item operation.");
     }
+
 
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody Item item) {
