@@ -21,7 +21,7 @@ public class Item {
 
 
     @ManyToOne
-    @JoinColumn(name = "category_id") // Adjust this annotation based on your database schema
+    @JoinColumn(name = "category_id")
     @JsonProperty("category")
     Category category;
 
@@ -38,11 +38,10 @@ public class Item {
     public Item(Long id, String itemName, String minimumStock, String description, Category category, Unit unit) {
         this.id = id;
         this.itemName = itemName;
-        minimumStock = minimumStock;
+        this.minimumStock = minimumStock;
         this.description = description;
         this.category = category;
         this.unit = unit;
-
     }
 
     public Long getId() {

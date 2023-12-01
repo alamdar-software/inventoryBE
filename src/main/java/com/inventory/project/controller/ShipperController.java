@@ -1,5 +1,6 @@
 package com.inventory.project.controller;
 
+import com.inventory.project.model.Location;
 import com.inventory.project.model.Shipper;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.repository.ShipperRepository;
@@ -15,10 +16,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/shipper")
+@CrossOrigin("*")
 public class ShipperController {
     @Autowired
     private ShipperRepository shipperRepository;
@@ -26,48 +29,70 @@ public class ShipperController {
     @Autowired
     private LocationRepository locationRepository;
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addShipper(HttpSession session) {
+    public ResponseEntity<Map<String, Object>> addAndSaveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         int page = 1;
 
         try {
-            Shipper shipper = new Shipper();
+            if (result.hasErrors()) {
+                response.put("error", "Please fill all fields correctly");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (shipperRepository.existsByName(shipper.getName())) {
+                response.put("error", "Shipper already exists!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            shipperRepository.save(shipper);
             response.put("shipper", shipper);
-            response.put("locationList", locationRepository.findAll());
+
+            // Fetch locations and handle the case when it returns null or empty
+            List<Location> locations = locationRepository.findAll();
+            if (locations == null || locations.isEmpty()) {
+                response.put("error", "No locations found or error fetching locations");
+                // You might handle this scenario as per your application logic
+            } else {
+                response.put("locationList", locations);
+            }
+
             pagination(response, session, page);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
+            response.put("error", "Error saving shipper: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
+                                                                    @RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        int page = 1; // Default value for page if not found in session
 
-    @PostMapping("/save")
-    public ResponseEntity<String> saveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
         try {
             if (result.hasErrors()) {
-                return ResponseEntity.badRequest().body("Please fill all fields correctly");
+                response.put("error", "Please enter all fields correctly");
+                return ResponseEntity.badRequest().body(response);
             }
-            if (shipperRepository.existsByName(shipper.getName())) {
-                return ResponseEntity.badRequest().body("Shipper already exists!");
+
+            Shipper existingShipper = shipperRepository.findById(id).orElse(null);
+            if (existingShipper == null) {
+                response.put("error", "Shipper not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
+
+            // Check if the shipper's name is being changed to an existing name
+            if (!existingShipper.getName().equals(shipper.getName()) &&
+                    shipperRepository.existsByName(shipper.getName())) {
+                response.put("error", "Shipper with this name already exists");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            shipper.setId(id);
             shipperRepository.save(shipper);
-            return ResponseEntity.ok("Shipper saved successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving shipper: " + e.getMessage());
-        }
-    }
 
-
-    @GetMapping("/edit/{id}")
-    public ResponseEntity<Map<String, Object>> editShipper(@PathVariable("id") Long id, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        int page = (int) session.getAttribute("page");
-
-        try {
-            Shipper shipper = shipperRepository.findById(id).orElse(null);
             response.put("shipper", shipper);
             response.put("edit", true);
             response.put("locationList", locationRepository.findAll());
@@ -75,28 +100,11 @@ public class ShipperController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
+            response.put("error", "Error updating shipper: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-    @PostMapping("/update")
-    public ResponseEntity<String> updateShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
-        try {
-            if (result.hasErrors()) {
-                return ResponseEntity.badRequest().body("Please enter all fields correctly");
-            } else if (shipperRepository.alreadyExists(shipper.getId(), shipper.getName()) != null) {
-                return ResponseEntity.badRequest().body("Shipper with this name already exists");
-            } else {
-                shipperRepository.save(shipper);
-                int page = (int) session.getAttribute("page");
-                return ResponseEntity.ok("Shipper Updated Successfully!");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating shipper: " + e.getMessage());
-        }
-    }
 
 
     @GetMapping("/view")

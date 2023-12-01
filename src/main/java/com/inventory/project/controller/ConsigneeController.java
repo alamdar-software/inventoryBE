@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/consignee")
+@CrossOrigin("*")
 public class ConsigneeController {
     @Autowired
     private ConsigneeRepository consigneeRepo;

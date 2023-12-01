@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/pickup")
+@CrossOrigin("*")
 public class PickupController {
     @Autowired
     private PickupRepository pickupRepository;

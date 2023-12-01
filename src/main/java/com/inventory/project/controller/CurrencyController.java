@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/currency")
-
+@CrossOrigin("*")
 public class CurrencyController {
 
     @Autowired
@@ -26,9 +26,16 @@ public class CurrencyController {
 
     @PostMapping("/add")
     public ResponseEntity<Currency> create(@RequestBody Currency currency) {
-        Currency  currency1 = currencyRepo.save(currency);
+        if (currency.getCurrencyName() == null || currency.getCurrencyName().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Currency currency1 = currencyRepo.save(currency);
         return ResponseEntity.ok(currency1);
     }
+
+
+
 
 
     @PostMapping(value = "/save")

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/unit")
+@CrossOrigin("*")
 public class UnitController {
 
     @Autowired

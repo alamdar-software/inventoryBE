@@ -22,19 +22,19 @@ public class Consignee {
     @Column(name="consignee_contact_number")
     private String phoneNumber;
 
-    private String ContactNumber1;
+//    private String ContactNumber1;
+//
+//    private String ContactNumber2;
 
-    private String ContactNumber2;
-
-    private String picName1;
-
-    private String picName2;
+//    private String picName1;
+//
+//    private String picName2;
 
     private String NotifyParty;
 
     private String deliveryAddress;
 
-    private String countryCode;
+//    private String countryCode;
 
 
     @ManyToOne
@@ -107,44 +107,44 @@ public class Consignee {
     }
 
 
-    public String getContactNumber1() {
-        return ContactNumber1;
-    }
-
-
-    public void setContactNumber1(String contactNumber1) {
-        ContactNumber1 = contactNumber1;
-    }
-
-
-    public String getContactNumber2() {
-        return ContactNumber2;
-    }
-
-
-    public void setContactNumber2(String contactNumber2) {
-        ContactNumber2 = contactNumber2;
-    }
-
-
-    public String getPicName1() {
-        return picName1;
-    }
-
-
-    public void setPicName1(String picName1) {
-        this.picName1 = picName1;
-    }
-
-
-    public String getPicName2() {
-        return picName2;
-    }
-
-
-    public void setPicName2(String picName2) {
-        this.picName2 = picName2;
-    }
+//    public String getContactNumber1() {
+//        return ContactNumber1;
+//    }
+//
+//
+//    public void setContactNumber1(String contactNumber1) {
+//        ContactNumber1 = contactNumber1;
+//    }
+//
+//
+//    public String getContactNumber2() {
+//        return ContactNumber2;
+//    }
+//
+//
+//    public void setContactNumber2(String contactNumber2) {
+//        ContactNumber2 = contactNumber2;
+//    }
+//
+//
+//    public String getPicName1() {
+//        return picName1;
+//    }
+//
+//
+//    public void setPicName1(String picName1) {
+//        this.picName1 = picName1;
+//    }
+//
+//
+//    public String getPicName2() {
+//        return picName2;
+//    }
+//
+//
+//    public void setPicName2(String picName2) {
+//        this.picName2 = picName2;
+//    }
 
     public String getNotifyParty() {
         return NotifyParty;
@@ -176,12 +176,12 @@ public class Consignee {
     }
 
 
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
+//    public String getCountryCode() {
+//        return countryCode;
+//    }
+//
+//
+//    public void setCountryCode(String countryCode) {
+//        this.countryCode = countryCode;
+//    }
 }

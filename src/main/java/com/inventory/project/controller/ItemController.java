@@ -1,9 +1,6 @@
 package com.inventory.project.controller;
 
-import com.inventory.project.model.Category;
-import com.inventory.project.model.Item;
-import com.inventory.project.model.Location;
-import com.inventory.project.model.Unit;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.CategoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
@@ -24,6 +21,7 @@ import java.util.Map;
 
 @RequestMapping("/item")
 @RestController
+@CrossOrigin("*")
 public class ItemController {
     @Autowired
     private ItemRepository itemRepository;
@@ -34,51 +32,45 @@ public class ItemController {
     @Autowired
     private UnitRepository unitRepository;
 
-    @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item newItem,
-                                                       @RequestParam Long categoryId,
-                                                       @RequestParam Long unitId) {
+    @GetMapping("/add")
+    public ResponseEntity<Map<String, Object>> add() {
         Map<String, Object> response = new HashMap<>();
-
-        try {
-            Category category = categoryRepository.findById(categoryId).orElse(null);
-            Unit unit = unitRepository.findById(unitId).orElse(null);
-
-            if (category == null || unit == null) {
-                response.put("error", "Invalid Category or Unit ID");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            newItem.setCategory(category);
-            newItem.setUnit(unit);
-
-            Item savedItem = itemRepository.save(newItem);
-
-            List<Category> categoryList = categoryRepository.findAll();
-            List<Unit> unitList = unitRepository.findAll();
-
-            response.put("item", savedItem);
-            response.put("categoryList", categoryList);
-            response.put("unitList", unitList);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error saving item: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        response.put("item", new Item());
+        response.put("categoryList", categoryRepository.findAll());
+        response.put("unitList", unitRepository.findAll());
+        return ResponseEntity.ok(response);
     }
-    @PostMapping("/save")
+
+    @PostMapping("/add")
     public ResponseEntity<String> save(@RequestBody Item item) {
         try {
-            Item savedItem = itemRepository.save(item);
-            if (savedItem != null) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
+            if (itemRepository.findByItemName(item.getItemName()) != null) {
+                return ResponseEntity.badRequest().body("Item Description already exists");
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to save item");
+            itemRepository.save(item);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
         }
     }
+
+    private void createInventories(Item item) {
+
+
+    }
+//    @PostMapping("/save")
+//    public ResponseEntity<String> save(@RequestBody Item item) {
+//        try {
+//            Item savedItem = itemRepository.save(item);
+//            if (savedItem != null) {
+//                return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
+//            }
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to save item");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
+//        }
+//    }
 
     @GetMapping("/view")
     public ResponseEntity<List<Item>> viewItems() {
@@ -105,21 +97,34 @@ public class ItemController {
         }
     }
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<Item> editItem(@PathVariable("id") Long id) {
-        Item item = itemRepository.findById(id).orElse(null);
-        if (item != null) {
-            return ResponseEntity.ok(item);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody Item item) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateItem(@PathVariable("id") Long id, @RequestBody Item itemDetails) {
         try {
-            Item updatedItem = itemRepository.save(item);
-            if (updatedItem != null) {
-                return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
+            Item item = itemRepository.findById(id).orElse(null);
+            if (item != null) {
+                if (itemDetails.getItemName() != null) {
+                    item.setItemName(itemDetails.getItemName());
+                }
+                if (itemDetails.getMinimumStock() != null) {
+                    item.setMinimumStock(itemDetails.getMinimumStock());
+                }
+                if (itemDetails.getDescription() != null) {
+                    item.setDescription(itemDetails.getDescription());
+                }
+                if (itemDetails.getUnit() != null) {
+                    Unit unit = unitRepository.findById(itemDetails.getUnit().getId()).orElse(null);
+                    item.setUnit(unit);
+                }
+                if (itemDetails.getCategory() != null) {
+                    Category category = categoryRepository.findById(itemDetails.getCategory().getId()).orElse(null);
+                    item.setCategory(category);
+                }
+
+                Item updatedItem = itemRepository.save(item);
+                if (updatedItem != null) {
+                    return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
         } catch (Exception e) {

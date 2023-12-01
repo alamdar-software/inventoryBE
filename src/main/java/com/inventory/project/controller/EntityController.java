@@ -16,82 +16,76 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/entity")
+@CrossOrigin("*")
 public class EntityController {
     @Autowired
     private EntityRepository entityRepository;
 
 
-    @PostMapping ("/add")
-    public ResponseEntity<Map<String, Object>> addEntityModel(HttpSession session) {
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> addAndSaveEntityModel(@RequestBody Entity entityModel, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         int page = 1;
 
         try {
-            Entity entityModel = new Entity();
+            if (entityRepository.findByName(entityModel.getName()) != null) {
+                response.put("error", "Entity already exists");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            } else {
+                entityRepository.save(entityModel);
+                response.put("entityModel", entityModel);
 
-            response.put("entityModel", entityModel);
+                pagination(response, session, page);
 
-            pagination(response, session, page);
-
-            return ResponseEntity.ok(response);
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
         } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
+            response.put("error", "Error saving entity: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
 
-    @PostMapping("/save")
-    public ResponseEntity<String> saveEntityModel(@RequestBody Entity entityModel) {
-        try {
-            if (entityRepository.findByName(entityModel.getName()) != null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entity already exists");
-            } else {
-                entityRepository.save(entityModel);
-                return ResponseEntity.status(HttpStatus.CREATED).body("Entity saved successfully");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving entity: " + e.getMessage());
-        }
-    }
 
-
-    @GetMapping("/edit/{id}")
-    public ResponseEntity<Map<String, Object>> editEntityModel(@PathVariable("id") Long id, HttpSession session) {
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<String> updateEntityById(@PathVariable("id") Long id, @RequestBody Entity entityModel, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        int page = (int) session.getAttribute("page");
+        Integer page = (Integer) session.getAttribute("page");
 
         try {
-            Entity entityModel = entityRepository.findById(id).orElse(null);
+            if (page == null) {
+
+                page = 1;
+            }
+
+            Entity existingEntity = entityRepository.findById(id).orElse(null);
+
+            if (existingEntity == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found");
+            }
+
+            if (!existingEntity.getName().equals(entityModel.getName()) &&
+                    entityRepository.findByName(entityModel.getName()) != null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entity with this name already exists");
+            }
+
+            entityModel.setId(id);
+            entityRepository.save(entityModel);
+
             response.put("entityModel", entityModel);
             response.put("edit", true);
-            pagination(response, session, page);
+            pagination(response, session, page.intValue()); // Ensure to use intValue()
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
-
-    @PutMapping ("/update")
-    public ResponseEntity<String> updateEntityModel(@RequestBody Entity entityModel) {
-        try {
-            if (entityRepository.findByNameAndId(entityModel.getName(), entityModel.getId()) != null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entity with this name already exists");
-            } else {
-                entityRepository.save(entityModel);
-                return ResponseEntity.ok("Entity Updated Successfully!");
-            }
+            return ResponseEntity.ok("Entity Updated Successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating entity: " + e.getMessage());
         }
     }
 
 
+
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewEntityModels(@RequestParam(defaultValue = "0") int page, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> viewEntityModels(@RequestParam(defaultValue = "1") int page, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         try {

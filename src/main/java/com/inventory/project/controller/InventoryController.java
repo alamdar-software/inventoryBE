@@ -22,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/inventory")
+@CrossOrigin("*")
 public class InventoryController {
     @Autowired
     private InventoryRepository inventoryRepo;
@@ -33,7 +34,7 @@ public class InventoryController {
     private LocationRepository locationRepo;
 
 
-    @GetMapping("/add")
+    @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory() {
         Map<String, Object> response = new HashMap<>();
         response.put("inventory", new Inventory());
