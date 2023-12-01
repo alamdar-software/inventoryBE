@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -35,30 +37,35 @@ public class InventoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addInventory() {
+    public ResponseEntity<Object> addAndSaveInventory(
+            @ModelAttribute("inventory") @Validated Inventory inventory,
+            BindingResult result,
+            HttpSession session
+    ) {
         Map<String, Object> response = new HashMap<>();
-        response.put("inventory", new Inventory());
-        response.put("itemList", itemRepo.findAll());
-        response.put("locationList", locationRepo.findUniqueLocationName());
-        return ResponseEntity.ok(response);
-    }
 
-
-    @PostMapping("/save")
-    public ResponseEntity<String> saveInventory(@RequestBody Inventory inventory) {
         try {
-            if (inventoryRepo.findByItemAndLocation(inventory.getItem(), inventory.getLocation()) != null) {
-                return ResponseEntity.badRequest().body("Inventory already exists");
-            } else {
-
-                inventoryRepo.save(inventory);
-                return ResponseEntity.ok("Inventory saved successfully");
+            if (result.hasErrors()) {
+                response.put("error", "Enter fields correctly");
+                return ResponseEntity.badRequest().body(response);
             }
+
+            Inventory existingInventory = inventoryRepo.findByItemAndLocation(inventory.getItem(), inventory.getLocation());
+            if (existingInventory != null) {
+                response.put("error", "Inventory already exists");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+
+            inventoryRepo.save(inventory);
+
+            response.put("success", "Inventory saved successfully");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error saving inventory");
+            response.put("error", "Error saving inventory: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Inventory inventory) {
         try {

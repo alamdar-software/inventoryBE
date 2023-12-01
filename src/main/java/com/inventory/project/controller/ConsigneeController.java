@@ -49,12 +49,12 @@ public class ConsigneeController {
             consigneeRepo.save(consignee);
             response.put("consignee", consignee);
 
-            // Fetch locations and handle the case when it returns null or empty
+
             List<Location> locations = locationRepo.findAll();
 
             if (locations == null) {
                 response.put("error", "Location list is null");
-                // You might handle this scenario as per your application logic
+
             } else if (locations.isEmpty()) {
                 response.put("error", "Location list is empty");
 

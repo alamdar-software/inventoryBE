@@ -57,7 +57,7 @@ public class PickupController {
         if (optionalPickup.isPresent()) {
             Pickup existingPickup = optionalPickup.get();
             existingPickup.setPickupAddress(pickupDetails.getPickupAddress());
-            existingPickup.setpIC(pickupDetails.getpIC());
+            existingPickup.setpic(pickupDetails.getpic());
             // Set other properties similarly
 
             Pickup updatedPickup = pickupRepository.save(existingPickup);

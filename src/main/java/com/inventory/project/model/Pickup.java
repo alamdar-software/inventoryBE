@@ -10,7 +10,7 @@ public class Pickup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String pickupAddress;
-    private String pIC;
+    private String pic;
     private String companyName;
     private Long contactNumber;
     private String countryCode;
@@ -38,11 +38,11 @@ public class Pickup {
     public void setPickupAddress(String pickupAddress) {
         this.pickupAddress = pickupAddress;
     }
-    public String getpIC() {
-        return pIC;
+    public String getpic() {
+        return pic;
     }
-    public void setpIC(String pIC) {
-        this.pIC = pIC;
+    public void setpic(String pic) {
+        this.pic = pic;
     }
     public String getCompanyName() {
         return companyName;
