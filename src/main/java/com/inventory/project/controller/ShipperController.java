@@ -108,7 +108,7 @@ public class ShipperController {
 
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewShipper(@RequestParam(defaultValue = "0") int page, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> viewShipper(@RequestParam(defaultValue = "1") int page, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         try {

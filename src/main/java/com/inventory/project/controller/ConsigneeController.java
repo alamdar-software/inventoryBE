@@ -1,6 +1,7 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.Consignee;
+import com.inventory.project.model.Location;
 import com.inventory.project.repository.ConsigneeRepository;
 import com.inventory.project.repository.LocationRepository;
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,78 +31,95 @@ public class ConsigneeController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addConsignee(HttpSession session) {
+    public ResponseEntity<Map<String, Object>> addAndSaveConsignee(@RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         int page = 1;
 
         try {
-            Consignee consignee = new Consignee();
+            if (result.hasErrors()) {
+                response.put("error", "Please fill all fields correctly");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (consigneeRepo.existsByName(consignee.getName())) {
+                response.put("error", "Consignee already exists");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            consigneeRepo.save(consignee);
             response.put("consignee", consignee);
-            response.put("locationList", locationRepo.findAll());
+
+            // Fetch locations and handle the case when it returns null or empty
+            List<Location> locations = locationRepo.findAll();
+
+            if (locations == null) {
+                response.put("error", "Location list is null");
+                // You might handle this scenario as per your application logic
+            } else if (locations.isEmpty()) {
+                response.put("error", "Location list is empty");
+
+            } else {
+                response.put("locationList", locations);
+            }
+
             pagination(response, session, page);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
+            response.put("error", "Error saving consignee: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Map<String, Object>> editAndUpdateConsignee(@PathVariable("id") Long id,
+                                                                      @RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        int page = 1; // Default value for page if not found in session
 
-    @PostMapping("/save")
-    public ResponseEntity<String> saveConsignee(@RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
         try {
             if (result.hasErrors()) {
-                return ResponseEntity.badRequest().body("Please fill all fields correctly");
+                response.put("error", "Please enter all fields correctly");
+                return ResponseEntity.badRequest().body(response);
             }
-            if (consigneeRepo.existsByName(consignee.getName())) {
-                return ResponseEntity.badRequest().body("Consignee already exists");
+
+            Consignee existingConsignee = consigneeRepo.findById(id).orElse(null);
+            if (existingConsignee == null) {
+                response.put("error", "Consignee not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
+
+            // Check if the consignee's name is being changed to an existing name
+            if (!existingConsignee.getName().equals(consignee.getName()) &&
+                    consigneeRepo.existsByName(consignee.getName())) {
+                response.put("error", "Consignee with this name already exists");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            consignee.setId(id);
             consigneeRepo.save(consignee);
-            return ResponseEntity.ok("Consignee added successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving consignee: " + e.getMessage());
-        }
-    }
 
-
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<Map<String, Object>> editConsignee(@PathVariable("id") Long id, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        int page = (int) session.getAttribute("page");
-
-        try {
-            Consignee consignee = consigneeRepo.findById(id).orElse(null);
             response.put("consignee", consignee);
-            response.put("locationList", locationRepo.findAll());
+
+            // Fetch locations and handle the case when it returns null or empty
+            List<Location> locations = locationRepo.findAll();
+            if (locations == null) {
+                response.put("error", "Location list is null");
+            } else if (locations.isEmpty()) {
+                response.put("error", "Location list is empty");
+            } else {
+                response.put("locationList", locations);
+            }
+
             response.put("edit", true);
             pagination(response, session, page);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
+            response.put("error", "Error updating consignee: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-
-    @PutMapping("/update")
-    public ResponseEntity<String> updateConsignee(@RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
-        try {
-            if (result.hasErrors()) {
-                return ResponseEntity.badRequest().body("Please enter all fields correctly");
-            } else if (consigneeRepo.alreadyExists(consignee.getId(), consignee.getName()) != null) {
-                return ResponseEntity.badRequest().body("Consignee with this name already exists");
-            } else {
-                consigneeRepo.save(consignee);
-                int page = (int) session.getAttribute("page");
-                return ResponseEntity.ok("Consignee Updated Successfully!");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating consignee: " + e.getMessage());
-        }
-    }
-
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteConsignee(@PathVariable("id") Long id, HttpSession session) {
@@ -114,7 +133,7 @@ public class ConsigneeController {
 
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewConsignee(@RequestParam(defaultValue = "0") int page, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> viewConsignee(@RequestParam(defaultValue = "1") int page, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         try {
