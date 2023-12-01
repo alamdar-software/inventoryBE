@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PickupRepository extends JpaRepository<Pickup,Long> {
+    Pickup findByPickupAddress(String pickupAddress);
 }

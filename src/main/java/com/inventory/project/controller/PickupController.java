@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class PickupController {
         return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/list")
+    @GetMapping("/view")
     public ResponseEntity<List<Pickup>> getAllPickups(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize
@@ -45,12 +46,21 @@ public class PickupController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Pickup> createPickup(@RequestBody Pickup pickup) {
-        Pickup newPickup = pickupRepository.save(pickup);
+    public ResponseEntity<?> createPickup(@RequestBody Pickup pickup) {
+
+        Pickup existingPickup = pickupRepository.findByPickupAddress(pickup.getPickupAddress());
+        if (existingPickup != null) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Pickup with the given address already exists");
+        }
+
+               Pickup newPickup = pickupRepository.save(pickup);
         return ResponseEntity.ok(newPickup);
     }
 
-    @PutMapping("/{id}")
+
+    @PutMapping("/edit/{id}")
     public ResponseEntity<Pickup> updatePickup(@PathVariable("id") Long id, @RequestBody Pickup pickupDetails) {
         Optional<Pickup> optionalPickup = pickupRepository.findById(id);
 
@@ -67,7 +77,7 @@ public class PickupController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deletePickup(@PathVariable("id") Long id) {
         Optional<Pickup> optionalPickup = pickupRepository.findById(id);
 

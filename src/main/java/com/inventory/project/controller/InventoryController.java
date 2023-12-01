@@ -50,12 +50,16 @@ public class InventoryController {
                 return ResponseEntity.badRequest().body(response);
             }
 
+            if (inventory.getItem() == null || inventory.getLocation() == null) {
+                response.put("error", "Item or Location is null");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             Inventory existingInventory = inventoryRepo.findByItemAndLocation(inventory.getItem(), inventory.getLocation());
             if (existingInventory != null) {
                 response.put("error", "Inventory already exists");
                 return ResponseEntity.badRequest().body(response);
             }
-
 
             inventoryRepo.save(inventory);
 
@@ -66,6 +70,7 @@ public class InventoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Inventory inventory) {
         try {
