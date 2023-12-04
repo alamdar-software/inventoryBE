@@ -12,14 +12,14 @@ public class Unit {
     private Long id;
 
     @Column(name="unit_name")
-    private String name;
+    private String unitName;
 
     public Unit() {
     }
 
     public Unit(Long id, String name) {
         this.id = id;
-        this.name = name;
+        this.unitName = name;
     }
 
     public Long getId() {
@@ -30,11 +30,11 @@ public class Unit {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUnitName() {
+        return unitName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUnitName(String name) {
+        this.unitName = name;
     }
 }

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
 @Entity
-@Table
+@Table(name="inventory")
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

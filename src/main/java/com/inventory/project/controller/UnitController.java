@@ -20,6 +20,14 @@ public class UnitController {
     @PostMapping("/add")
     public ResponseEntity<String> addUnit(@RequestBody Unit unit) {
         try {
+            if (unit.getUnitName() == null || unit.getUnitName().isEmpty()) {
+                return ResponseEntity.status(400).body("Unit name cannot be null or empty");
+            }
+
+            if (unitRepo.existsByUnitName(unit.getUnitName())) {
+                return ResponseEntity.status(400).body("Unit with the same name already exists");
+            }
+
             unitRepo.save(unit);
             return ResponseEntity.ok("Unit saved successfully");
         } catch (Exception e) {
@@ -35,7 +43,7 @@ public class UnitController {
             if (existingUnit == null) {
                 return ResponseEntity.badRequest().body("Unit not found");
             }
-            existingUnit.setName(unit.getName());
+            existingUnit.setUnitName(unit.getUnitName());
             unitRepo.save(existingUnit);
             return ResponseEntity.ok("Unit updated successfully");
         } catch (Exception e) {
@@ -52,7 +60,7 @@ public class UnitController {
             Page<Unit> unitPage = unitRepo.findAll(pageable);
             return ResponseEntity.ok(unitPage);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // Handle error appropriately
+            return ResponseEntity.status(500).body(null);
         }
     }
 

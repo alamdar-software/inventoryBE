@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UnitRepository extends JpaRepository<Unit,Long> {
-    boolean existsByName(String name);
+    boolean existsByUnitName(String unitName);
 
-    @Query("SELECT u FROM Unit u WHERE u.id != :id AND u.name = :name")
-    Unit alreadyExists(Long id,String name);
+    @Query("SELECT u FROM Unit u WHERE u.id != :id AND u.unitName = :unitName")
+    Unit alreadyExists(Long id, String unitName);
 }
