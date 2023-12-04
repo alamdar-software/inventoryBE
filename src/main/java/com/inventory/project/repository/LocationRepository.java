@@ -6,12 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findByLocationName(String locationName);
 
     @Query("SELECT l FROM Location l WHERE l.locationName = :locationName AND l.id != :id")
-    Location findByLocationNameAndId(String locationName, Long id);
+    Optional<Location> findByLocationNameAndId(String locationName, Long id);
 
     Location findByAddress(String address);
 
@@ -22,4 +24,5 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<String> findUniqueLocationName();
 
     List<Location> findAllByOrderByLocationNameAsc();
+
 }

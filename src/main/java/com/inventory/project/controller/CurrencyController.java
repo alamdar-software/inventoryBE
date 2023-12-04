@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/currency")
@@ -34,6 +35,20 @@ public class CurrencyController {
         return ResponseEntity.ok(currency1);
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getCurrencyById(@PathVariable Long id) {
+        try {
+            Optional<Currency> currency = currencyRepo.findById(id);
+
+            if (currency.isPresent()) {
+                return ResponseEntity.ok(currency.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Currency not found for ID: " + id);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching currency: " + e.getMessage());
+        }
+    }
 
 
 

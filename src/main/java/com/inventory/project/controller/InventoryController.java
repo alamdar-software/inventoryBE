@@ -2,6 +2,7 @@ package com.inventory.project.controller;
 
 import com.inventory.project.model.Inventory;
 import com.inventory.project.model.Item;
+import com.inventory.project.model.Location;
 import com.inventory.project.model.Search;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
@@ -37,29 +38,33 @@ public class InventoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addAndSaveInventory(
-            @ModelAttribute("inventory") @Validated Inventory inventory,
-            BindingResult result,
-            HttpSession session
-    ) {
+    public ResponseEntity<Object> addInventory(@RequestBody Inventory request,Long id) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (result.hasErrors()) {
-                response.put("error", "Enter fields correctly");
+            String itemName = request.getItem().getItemName(); // Assuming this is how you get the item name from the request
+            Optional<Item> optionalItem = Optional.ofNullable(itemRepo.findByItemName(itemName));
+
+            if (optionalItem.isEmpty()) {
+                response.put("error", "Item with name '" + itemName + "' not found");
                 return ResponseEntity.badRequest().body(response);
             }
 
-            if (inventory.getItem() == null || inventory.getLocation() == null) {
-                response.put("error", "Item or Location is null");
+            String locationName = request.getLocation().getLocationName(); // Assuming this is how you get the location name from the request
+            Optional<Location> optionalLocation = locationRepo.findByLocationNameAndId(locationName,id);
+
+            if (optionalLocation.isEmpty()) {
+                response.put("error", "Location with name '" + locationName + "' not found");
                 return ResponseEntity.badRequest().body(response);
             }
 
-            Inventory existingInventory = inventoryRepo.findByItemAndLocation(inventory.getItem(), inventory.getLocation());
-            if (existingInventory != null) {
-                response.put("error", "Inventory already exists");
-                return ResponseEntity.badRequest().body(response);
-            }
+            Inventory inventory = new Inventory();
+            inventory.setItem(optionalItem.get());
+            inventory.setLocation(optionalLocation.get());
+            inventory.setQuantity(request.getQuantity());
+            inventory.setConsumedQuantity(request.getConsumedQuantity());
+            inventory.setSubLocation(request.getSubLocation());
+            inventory.setScrappedQuantity(request.getScrappedQuantity());
 
             inventoryRepo.save(inventory);
 
@@ -70,6 +75,9 @@ public class InventoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
+
 
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Inventory inventory) {
