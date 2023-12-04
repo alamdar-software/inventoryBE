@@ -26,7 +26,7 @@ public class Inventory {
     private int consumedQuantity;
 
     @Column(name="sub_location")
-    private int subLocation;
+    private String subLocation;
 
 
 
@@ -73,11 +73,11 @@ public class Inventory {
         this.consumedQuantity = consumedQuantity;
     }
 
-    public int getSubLocation() {
+    public String getSubLocation() {
         return subLocation;
     }
 
-    public void setSubLocation(int subLocation) {
+    public void setSubLocation(String subLocation) {
         this.subLocation = subLocation;
     }
 

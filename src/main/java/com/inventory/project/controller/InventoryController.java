@@ -50,8 +50,8 @@ public class InventoryController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            String locationName = request.getLocation().getLocationName(); // Assuming this is how you get the location name from the request
-            Optional<Location> optionalLocation = locationRepo.findByLocationNameAndId(locationName,id);
+            String locationName = request.getLocation().getLocationName();
+            Optional<Location> optionalLocation = Optional.ofNullable(locationRepo.findByAddress(locationName));
 
             if (optionalLocation.isEmpty()) {
                 response.put("error", "Location with name '" + locationName + "' not found");
