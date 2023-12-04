@@ -67,26 +67,15 @@ public class CurrencyController {
         }
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateCurrency(@PathVariable("id") Long id, @RequestBody Currency currency) {
+    public ResponseEntity<String> updateCurrency(@RequestBody Currency currency) {
         try {
-            Optional<Currency> existingCurrency = currencyRepo.findById(id);
 
-            if (existingCurrency.isPresent()) {
-                Currency updatedCurrency = existingCurrency.get();
-                updatedCurrency.setCurrencyName(currency.getCurrencyName());
-
-
-                currencyRepo.save(updatedCurrency);
-                return ResponseEntity.ok("Currency Updated Successfully!");
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            currencyRepo.save(currency);
+            return ResponseEntity.ok("Currency Updated Successfully!");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating currency: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating currency: " + e.getMessage());
         }
     }
-
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> viewCurrencies(@RequestParam(defaultValue = "0") int page) {
         try {
