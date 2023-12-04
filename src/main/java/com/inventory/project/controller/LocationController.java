@@ -37,6 +37,20 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding location");
         }
     }
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getLocationById(@PathVariable Long id) {
+        try {
+            Location location = locationRepo.findById(id).orElse(null);
+
+            if (location != null) {
+                return ResponseEntity.ok(location);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location not found for ID: " + id);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching location: " + e.getMessage());
+        }
+    }
 
     private void createInventories(Location location) {
 
