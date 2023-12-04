@@ -99,7 +99,7 @@ public class InventoryController {
         return ResponseEntity.ok(inventories);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
         Optional<Inventory> inventory = inventoryRepo.findById(id);
         return inventory.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

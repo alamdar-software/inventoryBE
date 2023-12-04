@@ -31,6 +31,22 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getCategoryById(@PathVariable Long id) {
+        try {
+            // Find the category by ID
+            Category category = categoryRepository.findById(id).orElse(null);
+
+            if (category != null) {
+                return ResponseEntity.ok(category);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error fetching category");
+        }
+    }
+
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editCategory(@PathVariable("id") Long id, @RequestBody Category category) {

@@ -125,6 +125,25 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
         }
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getBrandById(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Optional<Brand> brand = brandRepository.findById(id);
+
+            if (brand.isPresent()) {
+                return ResponseEntity.ok(brand.get());
+            } else {
+                response.put("error", "Brand not found for ID: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("error", "Error fetching brand: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteBrand(@PathVariable Long id) {
         try {

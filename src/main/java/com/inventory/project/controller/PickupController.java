@@ -24,7 +24,7 @@ public class PickupController {
 
 
 
-    @GetMapping("/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<Pickup> getPickupById(@PathVariable("id") Long id) {
         Optional<Pickup> pickup = pickupRepository.findById(id);
         return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

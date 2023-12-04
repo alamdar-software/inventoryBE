@@ -83,6 +83,21 @@ public class EntityController {
     }
 
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getEntityById(@PathVariable Long id) {
+        try {
+
+            Entity entity = entityRepository.findById(id).orElse(null);
+
+            if (entity != null) {
+                return ResponseEntity.ok(entity);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching entity");
+        }
+    }
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> viewEntityModels(@RequestParam(defaultValue = "1") int page, HttpSession session) {

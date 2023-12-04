@@ -121,6 +121,22 @@ public class ConsigneeController {
         }
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getConsigneeById(@PathVariable Long id) {
+        try {
+            // Find the consignee by ID
+            Consignee consignee = consigneeRepo.findById(id).orElse(null);
+
+            if (consignee != null) {
+                return ResponseEntity.ok(consignee);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching consignee");
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteConsignee(@PathVariable("id") Long id, HttpSession session) {
         try {

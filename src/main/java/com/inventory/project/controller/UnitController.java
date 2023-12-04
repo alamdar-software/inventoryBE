@@ -63,6 +63,16 @@ public class UnitController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    @GetMapping("get/{id}")
+    public ResponseEntity<Unit> getUnitById(@PathVariable("id") Long id) {
+        try {
+            return unitRepo.findById(id)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 
 
     @DeleteMapping("/delete/{id}")

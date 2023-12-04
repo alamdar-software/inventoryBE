@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/shipper")
@@ -121,6 +122,12 @@ public class ShipperController {
             response.put("error", "Error fetching data: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @GetMapping("get/{id}")
+    public ResponseEntity<Shipper> getShipperById(@PathVariable("id") Long id) {
+        Optional<Shipper> shipper = shipperRepository.findById(id);
+        return shipper.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 

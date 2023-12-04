@@ -55,6 +55,22 @@ public class ItemController {
         }
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getItemById(@PathVariable Long id) {
+        try {
+
+            Item item = itemRepository.findById(id).orElse(null);
+
+            if (item != null) {
+                return ResponseEntity.ok(item);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching item");
+        }
+    }
+
     private void createInventories(Item item) {
 
 
