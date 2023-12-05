@@ -31,51 +31,30 @@ public class ConsigneeController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addAndSaveConsignee(@RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
         Map<String, Object> response = new HashMap<>();
-        int page = 1;
 
         try {
-            if (result.hasErrors()) {
-                response.put("error", "Please fill all fields correctly");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            if (consigneeRepo.existsByName(consignee.getName())) {
-                response.put("error", "Consignee already exists");
-                return ResponseEntity.badRequest().body(response);
-            }
-
+            // Save the received Consignee object
             consigneeRepo.save(consignee);
+
+            response.put("message", "Consignee added successfully");
             response.put("consignee", consignee);
-
-
-            List<Location> locations = locationRepo.findAll();
-
-            if (locations == null) {
-                response.put("error", "Location list is null");
-
-            } else if (locations.isEmpty()) {
-                response.put("error", "Location list is empty");
-
-            } else {
-                response.put("locationList", locations);
-            }
-
-            pagination(response, session, page);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error saving consignee: " + e.getMessage());
+            response.put("error", "Error adding consignee: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> editAndUpdateConsignee(@PathVariable("id") Long id,
                                                                       @RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        int page = 1; // Default value for page if not found in session
+        int page = 1;
 
         try {
             if (result.hasErrors()) {

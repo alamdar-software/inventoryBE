@@ -109,20 +109,21 @@ public class ShipperController {
 
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewShipper(@RequestParam(defaultValue = "1") int page, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<List<Shipper>> getAllShippers(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Shipper> pagedResult = shipperRepository.findAll(paging);
 
-        try {
-            pagination(response, session, page);
-            response.put("shipper", new Shipper());
-            response.put("locationList", locationRepository.findAll());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        if (pagedResult.hasContent()) {
+            return ResponseEntity.ok(pagedResult.getContent());
+        } else {
+            return ResponseEntity.noContent().build();
         }
     }
+
+
 
     @GetMapping("get/{id}")
     public ResponseEntity<Shipper> getShipperById(@PathVariable("id") Long id) {

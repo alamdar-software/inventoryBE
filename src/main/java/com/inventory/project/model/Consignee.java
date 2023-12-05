@@ -30,6 +30,8 @@ public class Consignee {
 //
 //    private String picName2;
 
+
+
     private String NotifyParty;
 
     private String deliveryAddress;
@@ -38,9 +40,23 @@ public class Consignee {
 
 
     @ManyToOne
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "location_id",nullable = false)
     private Location location;
 
+    public Consignee() {
+    }
+
+    public Consignee(Long id, String name, String address, String pincode, String email, String phoneNumber, String notifyParty, String deliveryAddress, Location location) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.pincode = pincode;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+       this. NotifyParty = notifyParty;
+        this.deliveryAddress = deliveryAddress;
+        this.location = location;
+    }
 
     public Long getId() {
         return id;
@@ -146,15 +162,14 @@ public class Consignee {
 //        this.picName2 = picName2;
 //    }
 
+
     public String getNotifyParty() {
         return NotifyParty;
     }
 
-
     public void setNotifyParty(String notifyParty) {
-        NotifyParty = notifyParty;
+        this.NotifyParty = notifyParty;
     }
-
 
     public String getDeliveryAddress() {
         return deliveryAddress;
