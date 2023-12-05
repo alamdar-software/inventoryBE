@@ -38,7 +38,7 @@ public class ConsigneeController {
             // Save the received Consignee object
             consigneeRepo.save(consignee);
 
-            response.put("message", "Consignee added successfully");
+            response.put("message", "Consignee added successfully  done");
             response.put("consignee", consignee);
 
             return ResponseEntity.ok(response);
