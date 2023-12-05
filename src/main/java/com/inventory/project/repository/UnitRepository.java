@@ -11,4 +11,6 @@ public interface UnitRepository extends JpaRepository<Unit,Long> {
 
     @Query("SELECT u FROM Unit u WHERE u.id != :id AND u.unitName = :unitName")
     Unit alreadyExists(Long id, String unitName);
+
+    Unit findByUnitName(String unitName);
 }

@@ -29,6 +29,7 @@ public class ShipperController {
 
     @Autowired
     private LocationRepository locationRepository;
+
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addAndSaveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -65,7 +66,6 @@ public class ShipperController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
                                                                     @RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {

@@ -40,20 +40,47 @@ public class ItemController {
         response.put("unitList", unitRepository.findAll());
         return ResponseEntity.ok(response);
     }
-
     @PostMapping("/add")
     public ResponseEntity<String> save(@RequestBody Item item) {
         try {
             if (itemRepository.findByItemName(item.getItemName()) != null) {
                 return ResponseEntity.badRequest().body("Item Description already exists");
             }
+
+            Category category = categoryRepository.findByName(item.getCategory().getName());
+            Unit unit = unitRepository.findByUnitName(item.getUnit().getUnitName());
+
+            if (category == null || unit == null) {
+                return ResponseEntity.badRequest().body("Category or Unit not found");
+            }
+
+            item.setCategory(category);
+            item.setUnit(unit);
+
             itemRepository.save(item);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
+            String unitName = unit.getUnitName();
+            String categoryName = category.getName();
+            String responseMessage = "Item saved successfully. Unit: " + unitName + ", Category: " + categoryName;
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
         }
     }
+
+//    @PostMapping("/add")
+//    public ResponseEntity<String> save(@RequestBody Item item) {
+//        try {
+//            if (itemRepository.findByItemName(item.getItemName()) != null) {
+//                return ResponseEntity.badRequest().body("Item Description already exists");
+//            }
+//            itemRepository.save(item);
+//
+//            return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
+//        }
+//    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getItemById(@PathVariable Long id) {
