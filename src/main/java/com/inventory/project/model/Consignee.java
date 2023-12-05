@@ -1,5 +1,6 @@
 package com.inventory.project.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
@@ -40,7 +41,7 @@ public class Consignee {
 
 
     @ManyToOne
-    @JoinColumn(name = "location_id",nullable = false)
+    @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
     public Consignee() {

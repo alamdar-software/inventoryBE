@@ -30,24 +30,73 @@ public class ConsigneeController {
     private LocationRepository locationRepo;
 
 
-    @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
-        Map<String, Object> response = new HashMap<>();
 
-        try {
-            // Save the received Consignee object
-            consigneeRepo.save(consignee);
+//    @PostMapping("/add")
+//    public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        try {
+//            Long locationId = consignee.getLocation().getId();
+//            Location location = locationRepo.findById(locationId).orElse(null);
+//
+//            if (location == null) {
+//                response.put("error", "Location not found");
+//                return ResponseEntity.badRequest().body(response);
+//            }
+//
+//            consignee.setLocation(location);
+//            Consignee savedConsignee = consigneeRepo.save(consignee);
+//
+//            response.put("success", "Consignee added successfully");
+//            response.put("consignee", savedConsignee);
+//
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            response.put("error", "Error adding consignee: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
+@PostMapping("/add")
+public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
+    Map<String, Object> response = new HashMap<>();
 
-            response.put("message", "Consignee added successfully  done");
-            response.put("consignee", consignee);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error adding consignee: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    try {
+        if (consigneeRepo.existsByName(consignee.getName())) {
+            response.put("error", "Consignee with this name already exists");
+            return ResponseEntity.badRequest().body(response);
         }
-    }
 
+        String locationName = consignee.getLocation().getLocationName();
+        Location location = locationRepo.findByLocationName(locationName);
+
+        if (location == null) {
+            response.put("error", "Location not found");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (consigneeContainsNullFields(consignee)) {
+            response.put("error", "Consignee contains null fields");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        consignee.setLocation(location);
+        Consignee savedConsignee = consigneeRepo.save(consignee);
+
+        response.put("success", "Consignee added successfully");
+        response.put("consignee", savedConsignee);
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        response.put("error", "Error adding consignee: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+}
+
+    private boolean consigneeContainsNullFields(Consignee consignee) {
+        return consignee.getNotifyParty() == null || consignee.getAddress() == null ||
+                consignee.getPincode() == null || consignee.getEmail() == null ||
+                consignee.getPhoneNumber() == null || consignee.getDeliveryAddress() == null;
+    }
 
 
     @PutMapping("/edit/{id}")
@@ -68,7 +117,6 @@ public class ConsigneeController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Check if the consignee's name is being changed to an existing name
             if (!existingConsignee.getName().equals(consignee.getName()) &&
                     consigneeRepo.existsByName(consignee.getName())) {
                 response.put("error", "Consignee with this name already exists");
