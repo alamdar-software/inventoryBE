@@ -127,20 +127,12 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
 
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewConsignee(@RequestParam(defaultValue = "1") int page, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            pagination(response, session, page);
-            response.put("consignee", new Consignee());
-            response.put("locationList", locationRepo.findAll());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+    public ResponseEntity<List<Consignee>> getAllConsignees() {
+        List<Consignee> consigneeList = consigneeRepo.findAll();
+        return ResponseEntity.ok(consigneeList);
     }
+
+
 
     private void pagination(Map<String, Object> model, HttpSession session, int page) {
         Pageable pageable = PageRequest.of(page - 1, 10);
