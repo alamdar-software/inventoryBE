@@ -49,11 +49,9 @@ public class ShipperController {
             shipperRepository.save(shipper);
             response.put("shipper", shipper);
 
-            // Fetch locations and handle the case when it returns null or empty
             List<Location> locations = locationRepository.findAll();
             if (locations == null || locations.isEmpty()) {
                 response.put("error", "No locations found or error fetching locations");
-                // You might handle this scenario as per your application logic
             } else {
                 response.put("locationList", locations);
             }
@@ -70,7 +68,7 @@ public class ShipperController {
     public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
                                                                     @RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        int page = 1; // Default value for page if not found in session
+        int page = 1;
 
         try {
             if (result.hasErrors()) {
@@ -84,7 +82,6 @@ public class ShipperController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Check if the shipper's name is being changed to an existing name
             if (!existingShipper.getName().equals(shipper.getName()) &&
                     shipperRepository.existsByName(shipper.getName())) {
                 response.put("error", "Shipper with this name already exists");

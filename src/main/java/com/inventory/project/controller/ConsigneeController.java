@@ -30,56 +30,21 @@ public class ConsigneeController {
     private LocationRepository locationRepo;
 
 
-
-//    @PostMapping("/add")
-//    public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        try {
-//            Long locationId = consignee.getLocation().getId();
-//            Location location = locationRepo.findById(locationId).orElse(null);
-//
-//            if (location == null) {
-//                response.put("error", "Location not found");
-//                return ResponseEntity.badRequest().body(response);
-//            }
-//
-//            consignee.setLocation(location);
-//            Consignee savedConsignee = consigneeRepo.save(consignee);
-//
-//            response.put("success", "Consignee added successfully");
-//            response.put("consignee", savedConsignee);
-//
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            response.put("error", "Error adding consignee: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//        }
-//    }
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
     Map<String, Object> response = new HashMap<>();
 
     try {
-        if (consigneeRepo.existsByName(consignee.getName())) {
-            response.put("error", "Consignee with this name already exists");
-            return ResponseEntity.badRequest().body(response);
-        }
+        String locationName = consignee.getLocationName();
 
-        String locationName = consignee.getLocation().getLocationName();
         Location location = locationRepo.findByLocationName(locationName);
-
         if (location == null) {
             response.put("error", "Location not found");
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (consigneeContainsNullFields(consignee)) {
-            response.put("error", "Consignee contains null fields");
-            return ResponseEntity.badRequest().body(response);
-        }
+        consignee.setLocationName(location.getLocationName()); // Set locationName from Location entity
 
-        consignee.setLocation(location);
         Consignee savedConsignee = consigneeRepo.save(consignee);
 
         response.put("success", "Consignee added successfully");
@@ -92,6 +57,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
     }
 }
 
+
     private boolean consigneeContainsNullFields(Consignee consignee) {
         return consignee.getNotifyParty() == null || consignee.getAddress() == null ||
                 consignee.getPincode() == null || consignee.getEmail() == null ||
@@ -100,46 +66,31 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
 
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Map<String, Object>> editAndUpdateConsignee(@PathVariable("id") Long id,
-                                                                      @RequestBody @Validated Consignee consignee, BindingResult result, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> updateConsignee(@PathVariable Long id, @RequestBody Consignee consignee) {
         Map<String, Object> response = new HashMap<>();
-        int page = 1;
 
         try {
-            if (result.hasErrors()) {
-                response.put("error", "Please enter all fields correctly");
-                return ResponseEntity.badRequest().body(response);
-            }
-
             Consignee existingConsignee = consigneeRepo.findById(id).orElse(null);
             if (existingConsignee == null) {
                 response.put("error", "Consignee not found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            if (!existingConsignee.getName().equals(consignee.getName()) &&
-                    consigneeRepo.existsByName(consignee.getName())) {
-                response.put("error", "Consignee with this name already exists");
+            String locationName = consignee.getLocationName();
+
+            Location location = locationRepo.findByLocationName(locationName);
+            if (location == null) {
+                response.put("error", "Location not found");
                 return ResponseEntity.badRequest().body(response);
             }
 
-            consignee.setId(id);
-            consigneeRepo.save(consignee);
+            existingConsignee.setLocationName(location.getLocationName()); // Update locationName from Location entity
+            existingConsignee.setName(consignee.getName()); // Update other fields as needed
 
-            response.put("consignee", consignee);
+            Consignee updatedConsignee = consigneeRepo.save(existingConsignee);
 
-            // Fetch locations and handle the case when it returns null or empty
-            List<Location> locations = locationRepo.findAll();
-            if (locations == null) {
-                response.put("error", "Location list is null");
-            } else if (locations.isEmpty()) {
-                response.put("error", "Location list is empty");
-            } else {
-                response.put("locationList", locations);
-            }
-
-            response.put("edit", true);
-            pagination(response, session, page);
+            response.put("success", "Consignee updated successfully");
+            response.put("consignee", updatedConsignee);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -148,10 +99,10 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
         }
     }
 
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getConsigneeById(@PathVariable Long id) {
         try {
-            // Find the consignee by ID
             Consignee consignee = consigneeRepo.findById(id).orElse(null);
 
             if (consignee != null) {

@@ -3,7 +3,10 @@ package com.inventory.project.repository;
 import com.inventory.project.model.Consignee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ConsigneeRepository extends JpaRepository<Consignee,Long> {
@@ -18,5 +21,8 @@ public interface ConsigneeRepository extends JpaRepository<Consignee,Long> {
     @Query("SELECT c FROM Consignee c WHERE c.phoneNumber = :phoneNumber AND c.email = :email AND c.id != :id")
     Consignee findByPhoneNumberAndEmailAndId(String phoneNumber, String email, Long id);
 
+
+    @Query("SELECT c FROM Consignee c JOIN c.location l WHERE l.locationName = :locationName")
+    List<Consignee> findByLocationName(@Param("locationName") String locationName);
 
 }

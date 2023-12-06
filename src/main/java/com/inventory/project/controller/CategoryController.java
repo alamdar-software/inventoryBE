@@ -34,7 +34,6 @@ public class CategoryController {
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getCategoryById(@PathVariable Long id) {
         try {
-            // Find the category by ID
             Category category = categoryRepository.findById(id).orElse(null);
 
             if (category != null) {

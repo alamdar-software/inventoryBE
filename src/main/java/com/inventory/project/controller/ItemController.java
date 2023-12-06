@@ -115,20 +115,12 @@ public class ItemController {
 //        }
 //    }
 
+
+
     @GetMapping("/view")
-    public ResponseEntity<List<Item>> viewItems() {
-        List<Item> items = itemRepository.findAll();
-        return ResponseEntity.ok(items);
-    }
-
-    @GetMapping("/view/pageno={page}")
-    public ResponseEntity<List<Item>> viewItemsPaginated(@PathVariable("page") int page, HttpSession session) {
+    public ResponseEntity<List<Item>> viewAllItems(HttpSession session) {
         try {
-            int pageSize = 10; // Set your desired page size
-
-            Pageable pageable = PageRequest.of(page - 1, pageSize);
-            Page<Item> itemPage = itemRepository.findAll(pageable);
-            List<Item> items = itemPage.getContent();
+            List<Item> items = itemRepository.findAll();
 
             if (!items.isEmpty()) {
                 return ResponseEntity.ok(items);

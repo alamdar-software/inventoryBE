@@ -23,13 +23,7 @@ public class Consignee {
     @Column(name="consignee_contact_number")
     private String phoneNumber;
 
-//    private String ContactNumber1;
-//
-//    private String ContactNumber2;
 
-//    private String picName1;
-//
-//    private String picName2;
 
 
 
@@ -37,27 +31,56 @@ public class Consignee {
 
     private String deliveryAddress;
 
-//    private String countryCode;
-
-
     @ManyToOne
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id")
     private Location location;
+    @Transient
+    @JsonProperty("locationName")
+    private String locationName;
+
+//    @ManyToOne
+//    @JoinColumn(name = "location_name")
+//    private Location location;
+
 
     public Consignee() {
     }
 
-    public Consignee(Long id, String name, String address, String pincode, String email, String phoneNumber, String notifyParty, String deliveryAddress, Location location) {
+    public Consignee(Long id, String name, String address, String pincode, String email, String phoneNumber, String notifyParty, String deliveryAddress, String locationName, Location location) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.pincode = pincode;
         this.email = email;
         this.phoneNumber = phoneNumber;
-       this. NotifyParty = notifyParty;
+        NotifyParty = notifyParty;
         this.deliveryAddress = deliveryAddress;
+        this.locationName = locationName;
         this.location = location;
     }
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+    //
+//    public String getLocationName() {
+//        return (location != null) ? location.getLocationName() : null;
+//    }
+//
+//    public Location getLocation() {
+//        return location;
+//    }
+//
+//    public void setLocation(Location location) {
+//        this.location = location;
+//        if (location != null) {
+//            this.locationName = location.getLocationName();
+//        }
+//    }
+
 
     public Long getId() {
         return id;
@@ -124,45 +147,6 @@ public class Consignee {
     }
 
 
-//    public String getContactNumber1() {
-//        return ContactNumber1;
-//    }
-//
-//
-//    public void setContactNumber1(String contactNumber1) {
-//        ContactNumber1 = contactNumber1;
-//    }
-//
-//
-//    public String getContactNumber2() {
-//        return ContactNumber2;
-//    }
-//
-//
-//    public void setContactNumber2(String contactNumber2) {
-//        ContactNumber2 = contactNumber2;
-//    }
-//
-//
-//    public String getPicName1() {
-//        return picName1;
-//    }
-//
-//
-//    public void setPicName1(String picName1) {
-//        this.picName1 = picName1;
-//    }
-//
-//
-//    public String getPicName2() {
-//        return picName2;
-//    }
-//
-//
-//    public void setPicName2(String picName2) {
-//        this.picName2 = picName2;
-//    }
-
 
     public String getNotifyParty() {
         return NotifyParty;
@@ -182,22 +166,7 @@ public class Consignee {
     }
 
 
-    public Location getLocation() {
-        return location;
-    }
 
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 
-
-//    public String getCountryCode() {
-//        return countryCode;
-//    }
-//
-//
-//    public void setCountryCode(String countryCode) {
-//        this.countryCode = countryCode;
-//    }
 }

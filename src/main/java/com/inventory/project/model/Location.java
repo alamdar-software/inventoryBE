@@ -3,6 +3,8 @@ package com.inventory.project.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
+import java.util.List;
+
 @Entity
 @Table(name="location")
 public class Location {
@@ -15,7 +17,8 @@ public class Location {
 
     @Column(name="address")
     private String address;
-
+    @OneToMany(mappedBy = "location")
+    private List<Consignee> consignees;
     public Long getId() {
         return id;
     }
@@ -40,4 +43,11 @@ public class Location {
         this.address = address;
     }
 
+    public List<Consignee> getConsignees() {
+        return consignees;
+    }
+
+    public void setConsignees(List<Consignee> consignees) {
+        this.consignees = consignees;
+    }
 }
