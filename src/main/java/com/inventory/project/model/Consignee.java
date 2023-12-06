@@ -34,8 +34,7 @@ public class Consignee {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
-    @Transient
-    @JsonProperty("locationName")
+    @Column(name = "location_name")
     private String locationName;
 
 //    @ManyToOne
