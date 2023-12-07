@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface CategoryRepository extends JpaRepository<Category,Long> {
@@ -20,4 +21,7 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
     @Query("SELECT c.name FROM Category c") // Assuming 'name' is the property in your Category entity
 
     List<String> findAllNames();
+
+
+
 }

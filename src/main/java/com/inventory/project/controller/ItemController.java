@@ -174,12 +174,21 @@ public class ItemController {
                     item.setDescription(itemDetails.getDescription());
                 }
                 if (itemDetails.getUnit() != null) {
-                    Unit unit = unitRepository.findById(itemDetails.getUnit().getId()).orElse(null);
-                    item.setUnit(unit);
+                    // Retain the existing unit mapping without updating its name
+                    item.setUnit(item.getUnit());
                 }
                 if (itemDetails.getCategory() != null) {
-                    Category category = categoryRepository.findById(itemDetails.getCategory().getId()).orElse(null);
-                    item.setCategory(category);
+                    Category category = categoryRepository.findByName(itemDetails.getCategory().getName());
+                    if (category != null) {
+                        // If the category exists, update the item's category
+                        item.setCategory(category);
+                        // Update the name of the category if necessary
+                        if (!category.getName().equals(item.getName())) {
+                            item.setName(category.getName());
+                        }
+                    } else {
+                        // Handle category not found error
+                    }
                 }
 
                 Item updatedItem = itemRepository.save(item);
@@ -193,6 +202,8 @@ public class ItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating item");
         }
     }
+
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable(value = "id") Long id) {
