@@ -68,21 +68,41 @@ public class InventoryController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody Inventory inventory) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Map<String, Object>> updateInventory(@PathVariable Long id, @RequestBody Inventory updatedInventory) {
+        Map<String, Object> response = new HashMap<>();
+
         try {
-            Inventory updatedInventory = inventoryRepo.findById(inventory.getId()).orElse(null);
-            if (updatedInventory != null) {
-                return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
+            Optional<Inventory> existingInventoryOptional = inventoryRepo.findById(id);
+
+            if (existingInventoryOptional.isPresent()) {
+                Inventory existingInventory = existingInventoryOptional.get();
+
+                existingInventory.setItemName(updatedInventory.getItemName());
+                existingInventory.setLocationName(updatedInventory.getLocationName());
+                existingInventory.setAddress(updatedInventory.getAddress());
+                existingInventory.setQuantity(updatedInventory.getQuantity());
+                existingInventory.setConsumedItem(updatedInventory.getConsumedItem());
+                existingInventory.setScrappedItem(updatedInventory.getScrappedItem());
+
+                // Save the updated inventory
+                Inventory savedInventory = inventoryRepo.save(existingInventory);
+
+                response.put("success", "Inventory updated successfully");
+                response.put("inventory", savedInventory);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Inventory not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating item");
+            response.put("error", "Error updating inventory: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
 
-    @GetMapping("/all")
+    @GetMapping("/view")
     public ResponseEntity<List<Inventory>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
         return ResponseEntity.ok(inventories);
@@ -94,7 +114,7 @@ public class InventoryController {
         return inventory.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteInventory(@PathVariable Long id) {
         try {
             Optional<Inventory> inventory = inventoryRepo.findById(id);
