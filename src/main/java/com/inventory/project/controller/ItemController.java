@@ -40,48 +40,74 @@ public class ItemController {
         response.put("unitList", unitRepository.findAll());
         return ResponseEntity.ok(response);
     }
+//    @PostMapping("/add")
+//    public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item item) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        try {
+//            String name = item.getName();
+//            String unitName = item.getUnitName();
+//
+//            Unit unit = unitRepository.findByUnitName(unitName);
+//            if (unit == null) {
+//                response.put("error", "Unit Name not found");
+//                return ResponseEntity.badRequest().body(response);
+//            }
+//
+//            item.setUnitName(unit.getUnitName());
+//
+//            Item savedItem = itemRepository.save(item);
+//
+//            response.put("success", "Item added successfully");
+//            response.put("item", savedItem);
+//
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            response.put("error", "Error adding Item: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
+
     @PostMapping("/add")
-    public ResponseEntity<String> save(@RequestBody Item item) {
+    public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
+        Map<String, Object> response = new HashMap<>();
+
         try {
-            if (itemRepository.findByItemName(item.getItemName()) != null) {
-                return ResponseEntity.badRequest().body("Item Description already exists");
+            Item item = new Item();
+            item.setItemName(itemRequest.getItemName());
+            item.setMinimumStock(itemRequest.getMinimumStock());
+            item.setDescription(itemRequest.getDescription());
+
+            // Fetch the Category by name
+            Category category = categoryRepository.findByName(itemRequest.getName());
+            if (category != null) {
+                item.setCategory(category);
+                item.setName(category.getName()); // Set name from the fetched category
+            } else {
+                // Handle category not found error
             }
 
-            Category category = categoryRepository.findByName(item.getCategory().getName());
-            Unit unit = unitRepository.findByUnitName(item.getUnit().getUnitName());
-
-            if (category == null || unit == null) {
-                return ResponseEntity.badRequest().body("Category or Unit not found");
+            // Similarly, fetch and set the Unit
+            Unit unit = unitRepository.findByUnitName(itemRequest.getUnitName());
+            if (unit != null) {
+                item.setUnit(unit);
+                item.setUnitName(unit.getUnitName()); // Set unitName from the fetched unit
+            } else {
+                // Handle unit not found error
             }
 
-            item.setCategory(category);
-            item.setUnit(unit);
+            Item savedItem = itemRepository.save(item);
 
-            itemRepository.save(item);
+            response.put("success", "Item added successfully");
+            response.put("item", savedItem);
 
-            String unitName = unit.getUnitName();
-            String categoryName = category.getName();
-            String responseMessage = "Item saved successfully. Unit: " + unitName + ", Category: " + categoryName;
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
+            response.put("error", "Error adding Item: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-//    @PostMapping("/add")
-//    public ResponseEntity<String> save(@RequestBody Item item) {
-//        try {
-//            if (itemRepository.findByItemName(item.getItemName()) != null) {
-//                return ResponseEntity.badRequest().body("Item Description already exists");
-//            }
-//            itemRepository.save(item);
-//
-//            return ResponseEntity.status(HttpStatus.CREATED).body("Item saved successfully");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving item");
-//        }
-//    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getItemById(@PathVariable Long id) {

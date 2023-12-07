@@ -1,5 +1,6 @@
 package com.inventory.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
@@ -22,12 +23,17 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonProperty("category")
-    Category category;
+    @JsonIgnore
 
+    private Category category;
+    @Column(name = "category_name")
+    private String name;
     @ManyToOne
-    Unit unit;
-
+    @JoinColumn(name = "unit_id")
+    @JsonIgnore
+    private Unit unit;
+    @Column(name = "unit_name")
+    private String unitName;
 
 
 
@@ -35,13 +41,31 @@ public class Item {
 
     }
 
-    public Item(Long id, String itemName, String minimumStock, String description, Category category, Unit unit) {
+    public Item(Long id, String itemName, String minimumStock, String description, Category category, String name, Unit unit, String unitName) {
         this.id = id;
         this.itemName = itemName;
         this.minimumStock = minimumStock;
         this.description = description;
         this.category = category;
+        this.name = name;
         this.unit = unit;
+        this.unitName = unitName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     public Long getId() {
@@ -91,4 +115,5 @@ public class Item {
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
+
 }

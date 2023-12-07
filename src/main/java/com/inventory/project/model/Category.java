@@ -3,6 +3,8 @@ package com.inventory.project.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
+import java.util.List;
+
 @Entity
 @Table(name="category")
 public class Category {
@@ -12,15 +14,18 @@ public class Category {
 
     @Column(name="name")
     String name;
-    public Category(Long id, String name) {
-        super();
-        this.id = id;
-        this.name = name;
-    }
-
+    @OneToMany(mappedBy = "category")
+    private List<Item> items;
     public Category() {
 
     }
+    public Category(Long id, String name, List<Item> items) {
+        this.id = id;
+        this.name = name;
+        this.items = items;
+    }
+
+
     public Long getId() {
         return id;
     }
