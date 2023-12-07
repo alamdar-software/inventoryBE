@@ -76,15 +76,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            String locationName = consignee.getLocationName();
-
-            Location location = locationRepo.findByLocationName(locationName);
-            if (location == null) {
-                response.put("error", "Location not found");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            existingConsignee.setLocationName(location.getLocationName()); // Update locationName from Location entity
+            existingConsignee.setLocationName(consignee.getLocationName()); // Update locationName directly in Consignee entity
             existingConsignee.setName(consignee.getName()); // Update other fields as needed
 
             Consignee updatedConsignee = consigneeRepo.save(existingConsignee);
@@ -98,7 +90,6 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getConsigneeById(@PathVariable Long id) {
