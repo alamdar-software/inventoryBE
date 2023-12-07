@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory,Long> {
@@ -20,5 +21,8 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     Inventory findByItemAndLocation(Item item, Location location);
 
 
-    Inventory findById(Inventory inventory);
+    Optional<Inventory> findById(Long id);
+
+
+
 }

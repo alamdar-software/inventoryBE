@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
+import java.util.List;
+
 @Entity
 @Table(name="item")
 
@@ -35,13 +37,14 @@ public class Item {
     @Column(name = "unit_name")
     private String unitName;
 
-
+    @OneToMany(mappedBy = "item")
+    private List<Inventory> inventories;
 
     public Item() {
 
     }
 
-    public Item(Long id, String itemName, String minimumStock, String description, Category category, String name, Unit unit, String unitName) {
+    public Item(Long id, String itemName, String minimumStock, String description, Category category, String name, Unit unit, String unitName, List<Inventory> inventories) {
         this.id = id;
         this.itemName = itemName;
         this.minimumStock = minimumStock;
@@ -50,6 +53,7 @@ public class Item {
         this.name = name;
         this.unit = unit;
         this.unitName = unitName;
+        this.inventories = inventories;
     }
 
     public String getName() {
@@ -116,5 +120,11 @@ public class Item {
         this.unit = unit;
     }
 
+    public List<Inventory> getInventories() {
+        return inventories;
+    }
 
+    public void setInventories(List<Inventory> inventories) {
+        this.inventories = inventories;
+    }
 }

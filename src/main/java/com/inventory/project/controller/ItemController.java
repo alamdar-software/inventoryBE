@@ -78,13 +78,11 @@ public class ItemController {
             item.setMinimumStock(itemRequest.getMinimumStock());
             item.setDescription(itemRequest.getDescription());
 
-            // Fetch the Category by name
             Category category = categoryRepository.findByName(itemRequest.getName());
             if (category != null) {
                 item.setCategory(category);
                 item.setName(category.getName()); // Set name from the fetched category
             } else {
-                // Handle category not found error
             }
 
             // Similarly, fetch and set the Unit

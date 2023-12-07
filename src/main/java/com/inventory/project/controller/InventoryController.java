@@ -1,9 +1,6 @@
 package com.inventory.project.controller;
 
-import com.inventory.project.model.Inventory;
-import com.inventory.project.model.Item;
-import com.inventory.project.model.Location;
-import com.inventory.project.model.Search;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
@@ -38,51 +35,43 @@ public class InventoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addInventory(@RequestBody Inventory request,Long id) {
+    public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            String itemName = request.getItem().getItemName(); // Assuming this is how you get the item name from the request
-            Optional<Item> optionalItem = Optional.ofNullable(itemRepo.findByItemName(itemName));
+            Item item = itemRepo.findByItemName(inventoryRequest.getItemName());
+            Location location = locationRepo.findByLocationNameAndAddress(
+                    inventoryRequest.getLocationName(),
+                    inventoryRequest.getAddress()
+            );
+            if (item != null && location != null) {
+                Inventory inventory = new Inventory();
+                inventory.setItemName(item.getItemName());
+                inventory.setLocationName(location.getLocationName());
+                inventory.setQuantity(inventoryRequest.getQuantity());
+                inventory.setAddress(inventoryRequest.getAddress());
+                inventory.setConsumedItem(inventoryRequest.getConsumedItem());
+                inventory.setScrappedItem(inventoryRequest.getScrappedItem());
 
-            if (optionalItem.isEmpty()) {
-                response.put("error", "Item with name '" + itemName + "' not found");
-                return ResponseEntity.badRequest().body(response);
+                Inventory savedInventory = inventoryRepo.save(inventory);
+
+                response.put("success", "Inventory added successfully");
+                response.put("inventory", savedInventory);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Item or location not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
-
-            String locationName = request.getLocation().getLocationName();
-            Optional<Location> optionalLocation = Optional.ofNullable(locationRepo.findByAddress(locationName));
-
-            if (optionalLocation.isEmpty()) {
-                response.put("error", "Location with name '" + locationName + "' not found");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            Inventory inventory = new Inventory();
-            inventory.setItem(optionalItem.get());
-            inventory.setLocation(optionalLocation.get());
-            inventory.setQuantity(request.getQuantity());
-            inventory.setConsumedQuantity(request.getConsumedQuantity());
-            inventory.setSubLocation(request.getSubLocation());
-            inventory.setScrappedQuantity(request.getScrappedQuantity());
-
-            inventoryRepo.save(inventory);
-
-            response.put("success", "Inventory saved successfully");
-            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("error", "Error saving inventory: " + e.getMessage());
+            response.put("error", "Error adding Inventory: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-
-
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody Inventory inventory) {
         try {
-            Inventory updatedInventory = inventoryRepo.findById(inventory);
+            Inventory updatedInventory = inventoryRepo.findById(inventory.getId()).orElse(null);
             if (updatedInventory != null) {
                 return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
             }

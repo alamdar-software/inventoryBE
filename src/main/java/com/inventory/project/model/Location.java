@@ -19,6 +19,21 @@ public class Location {
     private String address;
     @OneToMany(mappedBy = "location")
     private List<Consignee> consignees;
+
+    @OneToMany(mappedBy = "location")
+    private List<Inventory> inventories;
+
+    public Location() {
+    }
+
+    public Location(Long id, String locationName, String address, List<Consignee> consignees, List<Inventory> inventories) {
+        this.id = id;
+        this.locationName = locationName;
+        this.address = address;
+        this.consignees = consignees;
+        this.inventories = inventories;
+    }
+
     public Long getId() {
         return id;
     }
@@ -49,5 +64,13 @@ public class Location {
 
     public void setConsignees(List<Consignee> consignees) {
         this.consignees = consignees;
+    }
+
+    public List<Inventory> getInventories() {
+        return inventories;
+    }
+
+    public void setInventories(List<Inventory> inventories) {
+        this.inventories = inventories;
     }
 }
