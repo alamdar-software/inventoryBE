@@ -54,16 +54,16 @@ public class Shipper {
 //    @JoinColumn(name = "location_id")
 //    private Location locationName;
 
-    @OneToMany(mappedBy = "shipper")
-    private List<Cipl> cipls;
+//    @OneToMany(mappedBy = "shipper")
+//    private List<Cipl> cipls;
 
-    public List<Cipl> getCipls() {
-        return cipls;
-    }
-
-    public void setCipls(List<Cipl> cipls) {
-        this.cipls = cipls;
-    }
+//    public List<Cipl> getCipls() {
+//        return cipls;
+//    }
+//
+//    public void setCipls(List<Cipl> cipls) {
+//        this.cipls = cipls;
+//    }
 
     public Long getId() {
         return id;
