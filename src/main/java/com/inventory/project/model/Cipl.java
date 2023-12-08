@@ -17,7 +17,7 @@ public class Cipl {
     private Double currencyRate;
 
     @Column(name = "repair_service")
-    String repairService;
+    private boolean repairService;
 
     @Column(name = "transfer_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -91,11 +91,11 @@ public class Cipl {
         this.currencyRate = currencyRate;
     }
 
-    public String getRepairService() {
+    public boolean getRepairService() {
         return repairService;
     }
 
-    public void setRepairService(String repairService) {
+    public void setRepairService(boolean repairService) {
         this.repairService = repairService;
     }
 
