@@ -1,5 +1,6 @@
 package com.inventory.project.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -8,6 +9,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "mto")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class Mto {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

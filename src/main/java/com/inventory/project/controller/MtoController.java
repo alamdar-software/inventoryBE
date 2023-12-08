@@ -1,8 +1,5 @@
 package com.inventory.project.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.ConsigneeRepository;
 import com.inventory.project.repository.LocationRepository;
@@ -10,7 +7,6 @@ import com.inventory.project.repository.MtoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -116,6 +112,11 @@ public class MtoController {
         }
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<List<Mto>> getAllMtos() {
+        List<Mto> mtos = mtoRepository.findAll();
+        return ResponseEntity.ok(mtos);
+    }
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteMto(@PathVariable Long id) {

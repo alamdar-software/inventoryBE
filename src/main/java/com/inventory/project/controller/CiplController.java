@@ -89,12 +89,9 @@ public ResponseEntity<Map<String, Object>> addCipl(@RequestBody Cipl ciplRequest
     @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipls() {
         List<Cipl> cipls = ciplRepository.findAll();
-        if (!cipls.isEmpty()) {
-            return ResponseEntity.ok(cipls);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
-        }
+        return ResponseEntity.ok(cipls);
     }
+
     @PutMapping("edit/{id}")
     public ResponseEntity<?> updateCipl(@PathVariable Long id, @RequestBody Cipl updatedCipl) {
         Optional<Cipl> existingCiplOptional = ciplRepository.findById(id);
