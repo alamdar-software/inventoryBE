@@ -5,13 +5,14 @@ import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
 @Entity
+@Table(name = "consignee")
 public class Consignee {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name="consignee_name")
-    private String name;
+    private String consigneeName;
 
     private String address;
 
@@ -37,17 +38,15 @@ public class Consignee {
     @Column(name = "location_name")
     private String locationName;
 
-//    @ManyToOne
-//    @JoinColumn(name = "location_name")
-//    private Location location;
+
 
 
     public Consignee() {
     }
 
-    public Consignee(Long id, String name, String address, String pincode, String email, String phoneNumber, String notifyParty, String deliveryAddress, String locationName, Location location) {
+    public Consignee(Long id, String consigneeName, String address, String pincode, String email, String phoneNumber, String notifyParty, String deliveryAddress, String locationName, Location location) {
         this.id = id;
-        this.name = name;
+        this.consigneeName = consigneeName;
         this.address = address;
         this.pincode = pincode;
         this.email = email;
@@ -91,13 +90,13 @@ public class Consignee {
     }
 
 
-    public String getName() {
-        return name;
+    public String getConsigneeName() {
+        return consigneeName;
     }
 
 
-    public void setName(String name) {
-        this.name = name;
+    public void setConsigneeName(String name) {
+        this.consigneeName = name;
     }
 
 

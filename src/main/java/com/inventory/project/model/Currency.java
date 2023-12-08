@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 @Entity
 @Table(name="currency")
 public class Currency {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

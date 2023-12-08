@@ -10,10 +10,14 @@ import java.util.List;
 
 @Repository
 public interface ConsigneeRepository extends JpaRepository<Consignee,Long> {
-    boolean existsByName(String name);
+    boolean existsByConsigneeName(String consigneeName);
+    @Query("SELECT c FROM Consignee c WHERE c.consigneeName = :consigneeName")
+    Consignee findFirstByConsigneeName(@Param("consigneeName") String consigneeName);
 
-    @Query("SELECT u FROM Consignee u WHERE u.id != :id AND u.name = :name")
-    Consignee alreadyExists(Long id,String name);
+
+    @Query("SELECT u FROM Consignee u WHERE u.id != :id AND u.consigneeName = :name")
+    Consignee alreadyExists(Long id, @Param("name") String name);
+
 
     @Query("SELECT c FROM Consignee c WHERE c.phoneNumber= :phoneNumber AND c.email = :email")
     Consignee findByPhoneNumberAndEmail(String phoneNumber,String email);

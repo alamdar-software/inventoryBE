@@ -3,6 +3,8 @@ package com.inventory.project.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
+import java.util.List;
+
 @Entity
 
 public class Shipper {
@@ -10,7 +12,7 @@ public class Shipper {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(name="shipper_name")
-    private String name;
+    private String shipperName;
 
 //    @Column(name="Pic_name1")
 //    private String PicName1;
@@ -52,6 +54,17 @@ public class Shipper {
 //    @JoinColumn(name = "location_id")
 //    private Location locationName;
 
+    @OneToMany(mappedBy = "shipper")
+    private List<Cipl> cipls;
+
+    public List<Cipl> getCipls() {
+        return cipls;
+    }
+
+    public void setCipls(List<Cipl> cipls) {
+        this.cipls = cipls;
+    }
+
     public Long getId() {
         return id;
     }
@@ -85,12 +98,12 @@ public class Shipper {
 //        this.locationName = location;
 //    }
 
-    public String getName() {
-        return name;
+    public String getShipperName() {
+        return shipperName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setShipperName(String shipperName) {
+        this.shipperName = shipperName;
     }
 
 //    public String getPicName1() {

@@ -41,7 +41,7 @@ public class ShipperController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            if (shipperRepository.existsByName(shipper.getName())) {
+            if (shipperRepository.existsByShipperName(shipper.getShipperName())) {
                 response.put("error", "Shipper already exists!");
                 return ResponseEntity.badRequest().body(response);
             }
@@ -49,14 +49,7 @@ public class ShipperController {
             shipperRepository.save(shipper);
             response.put("shipper", shipper);
 
-            List<Location> locations = locationRepository.findAll();
-            if (locations == null || locations.isEmpty()) {
-                response.put("error", "No locations found or error fetching locations");
-            } else {
-                response.put("locationList", locations);
-            }
-
-            pagination(response, session, page);
+            // Pagination logic here if needed
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -64,6 +57,7 @@ public class ShipperController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
                                                                     @RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
@@ -82,8 +76,8 @@ public class ShipperController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            if (!existingShipper.getName().equals(shipper.getName()) &&
-                    shipperRepository.existsByName(shipper.getName())) {
+            if (!existingShipper.getShipperName().equals(shipper.getShipperName()) &&
+                    shipperRepository.existsByShipperName(shipper.getShipperName())) {
                 response.put("error", "Shipper with this name already exists");
                 return ResponseEntity.badRequest().body(response);
             }
@@ -93,7 +87,7 @@ public class ShipperController {
 
             response.put("shipper", shipper);
             response.put("edit", true);
-            response.put("locationList", locationRepository.findAll());
+            // Remove locationList from the response
             pagination(response, session, page);
 
             return ResponseEntity.ok(response);
@@ -102,6 +96,7 @@ public class ShipperController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 
 
 
