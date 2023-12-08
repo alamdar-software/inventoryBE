@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface ConsigneeRepository extends JpaRepository<Consignee,Long> {
     boolean existsByConsigneeName(String consigneeName);
+    Consignee findTopByConsigneeName(String consigneeName);
+
     @Query("SELECT c FROM Consignee c WHERE c.consigneeName = :consigneeName")
     Consignee findFirstByConsigneeName(@Param("consigneeName") String consigneeName);
 

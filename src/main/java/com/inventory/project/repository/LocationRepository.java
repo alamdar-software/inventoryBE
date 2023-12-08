@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface LocationRepository extends JpaRepository<Location,Long> {
 //    List<Location> findByLocationName(String locationName);
     Location findByLocationName(String locationName);
+    Location findTopByLocationName(String locationName);
 
     @Query("SELECT l FROM Location l WHERE l.locationName = :locationName AND l.id != :id")
     Optional<Location> findByLocationNameAndId(String locationName, Long id);

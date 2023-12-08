@@ -12,5 +12,6 @@ public interface CurrencyRepository extends JpaRepository<Currency,Long> {
 
     @Query("SELECT c FROM Currency c WHERE c.currencyName = :currencyName")
     Currency findByCurrencyName(String currencyName);
+    Currency findTopByCurrencyName(String currencyName);
 
 }
