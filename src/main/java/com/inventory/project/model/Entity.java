@@ -10,8 +10,8 @@ public class Entity {
     @Column(name="id")
     private Long id;
 
-    @Column(name="name")
-    String name;
+    @Column(name="entity_name")
+    String entityName;
 
     public Long getId() {
         return id;
@@ -21,12 +21,11 @@ public class Entity {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getEntityName() {
+        return entityName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
     }
-
 }

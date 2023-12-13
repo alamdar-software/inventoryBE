@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EntityRepository extends JpaRepository<Entity,Long> {
-    Entity findByName(String name);
+    Entity findByEntityName(String name);
 
-    @Query("SELECT e FROM Entity e WHERE e.name = :name AND  e.id != :id")
-    Entity findByNameAndId(String name, Long id);
+//    @Query("SELECT e FROM Entity e WHERE e.entityName = :entityName AND e.id != :id")
+//    Entity findByNameAndId(@Param("entityName") String entityName, @Param("id") Long id);
+
 }

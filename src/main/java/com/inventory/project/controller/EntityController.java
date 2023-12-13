@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/entity")
@@ -23,116 +25,54 @@ public class EntityController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addAndSaveEntityModel(@RequestBody Entity entityModel, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        int page = 1;
-
-        try {
-            if (entityRepository.findByName(entityModel.getName()) != null) {
-                response.put("error", "Entity already exists");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            } else {
-                entityRepository.save(entityModel);
-                response.put("entityModel", entityModel);
-
-                pagination(response, session, page);
-
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            }
-        } catch (Exception e) {
-            response.put("error", "Error saving entity: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    public ResponseEntity<Entity> addEntity(@RequestBody Entity entity) {
+        if (entity == null || entity.getEntityName() == null || entity.getEntityName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
+
+        Entity existingEntity = entityRepository.findByEntityName(entity.getEntityName());
+        if (existingEntity != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(existingEntity);
+        }
+
+        Entity savedEntity = entityRepository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEntity);
     }
 
 
-
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<String> updateEntityById(@PathVariable("id") Long id, @RequestBody Entity entityModel, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        Integer page = (Integer) session.getAttribute("page");
-
-        try {
-            if (page == null) {
-
-                page = 1;
-            }
-
-            Entity existingEntity = entityRepository.findById(id).orElse(null);
-
-            if (existingEntity == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found");
-            }
-
-            if (!existingEntity.getName().equals(entityModel.getName()) &&
-                    entityRepository.findByName(entityModel.getName()) != null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entity with this name already exists");
-            }
-
-            entityModel.setId(id);
-            entityRepository.save(entityModel);
-
-            response.put("entityModel", entityModel);
-            response.put("edit", true);
-            pagination(response, session, page.intValue()); // Ensure to use intValue()
-
-            return ResponseEntity.ok("Entity Updated Successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating entity: " + e.getMessage());
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Entity> updateEntity(@PathVariable("id") Long id, @RequestBody Entity updatedEntity) {
+        Optional<Entity> optionalEntity = entityRepository.findById(id);
+        if (optionalEntity.isPresent()) {
+            Entity entity = optionalEntity.get();
+            entity.setEntityName(updatedEntity.getEntityName());
+            Entity savedEntity = entityRepository.save(entity);
+            return ResponseEntity.ok(savedEntity);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
-
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> getEntityById(@PathVariable Long id) {
-        try {
-
-            Entity entity = entityRepository.findById(id).orElse(null);
-
-            if (entity != null) {
-                return ResponseEntity.ok(entity);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching entity");
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<Entity> getEntityById(@PathVariable("id") Long id) {
+        Optional<Entity> optionalEntity = entityRepository.findById(id);
+        return optionalEntity.map(entity -> ResponseEntity.ok().body(entity))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewEntityModels(@RequestParam(defaultValue = "1") int page, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            pagination(response, session, page);
-            response.put("entityModel", new Entity());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "Error fetching data: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+    public ResponseEntity<List<Entity>> getAllEntities() {
+        List<Entity> entities = entityRepository.findAll();
+        return ResponseEntity.ok(entities);
     }
-
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteEntityModel(@PathVariable("id") Long id, HttpSession session) {
-        try {
-             entityRepository.deleteById(id);
+    public ResponseEntity<String> deleteEntity(@PathVariable("id") Long id) {
+        if (entityRepository.existsById(id)) {
+            entityRepository.deleteById(id);
             return ResponseEntity.ok("Entity deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion Unsuccessful: " + e.getMessage());
+        } else {
+            return ResponseEntity.notFound().build();
         }
-    }
-
-    private void pagination(Map<String, Object> model, HttpSession session, int page) {
-        Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Entity> list = entityRepository.findAll(pageable);
-
-        model.put("entityList", list.getContent());
-        session.setAttribute("page", page);
-        model.put("currentPage", page);
-        model.put("totalPages", list.getTotalPages());
-        model.put("totalItems", list.getTotalElements());
     }
 }
