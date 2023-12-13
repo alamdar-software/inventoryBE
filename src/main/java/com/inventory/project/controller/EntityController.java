@@ -53,7 +53,7 @@ public class EntityController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<Entity> getEntityById(@PathVariable("id") Long id) {
         Optional<Entity> optionalEntity = entityRepository.findById(id);
         return optionalEntity.map(entity -> ResponseEntity.ok().body(entity))
