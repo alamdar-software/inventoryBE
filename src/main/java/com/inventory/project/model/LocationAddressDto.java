@@ -1,5 +1,8 @@
 package com.inventory.project.model;
 
+import java.util.Collections;
+import java.util.List;
+
 public class LocationAddressDto {
     private String locationName;
     private String address;
@@ -19,4 +22,6 @@ public class LocationAddressDto {
     public void setAddress(String address) {
         this.address = address;
     }
+
+
 }

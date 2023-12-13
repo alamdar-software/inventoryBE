@@ -82,28 +82,19 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching location: " + e.getMessage());
         }
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateLocation(@PathVariable("id") Long id, @RequestBody Location updatedLocation) {
-        try {
-            Optional<Location> locationOptional = locationRepo.findById(id);
-            if (locationOptional.isPresent()) {
-                Location existingLocation = locationOptional.get();
 
-                existingLocation.setAddresses(updatedLocation.getAddresses());
-                existingLocation.setLocationName(updatedLocation.getLocationName());
-
-                locationRepo.save(existingLocation);
-
-                return ResponseEntity.status(HttpStatus.OK).body("Location/Vessel Updated Successfully!");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating location");
-        }
+@GetMapping("/edit/{id}")
+public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
+    Location location = locationRepo.findById(id).orElse(null);
+    if (location != null) {
+        return ResponseEntity.ok(location);
+    } else {
+        return ResponseEntity.notFound().build();
     }
+}
 
-        @DeleteMapping("/delete/{id}")
+
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteLocation(@PathVariable(value = "id") Long id) {
         try {
             locationRepo.deleteById(id);
@@ -112,58 +103,43 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion Unsuccessful");
         }
     }
+    @PutMapping("/update/{locationId}/addresses/{addressId}")
+    public ResponseEntity<Location> updateAddress(
+            @PathVariable("locationId") Long locationId,
+            @PathVariable("addressId") Long addressId,
+            @RequestBody Address updatedAddress
+    ) {
+        Optional<Location> locationOptional = locationRepo.findById(locationId);
+
+        if (locationOptional.isPresent()) {
+            Location existingLocation = locationOptional.get();
+
+            // Check if the address is associated with the given location
+            Optional<Address> existingAddressOptional = existingLocation.getAddresses()
+                    .stream()
+                    .filter(address -> address.getId().equals(addressId))
+                    .findFirst();
+
+            if (existingAddressOptional.isPresent()) {
+                Address existingAddress = existingAddressOptional.get();
+                existingAddress.setAddress(updatedAddress.getAddress());
+                // Update other address fields if needed
+                addressRepository.save(existingAddress);
+
+                // No need to update location name, as it's not changed
+
+                Location savedLocation = locationRepo.save(existingLocation);
+                return new ResponseEntity<>(savedLocation, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 
-//    @GetMapping("/get/{id}")
-//    public ResponseEntity<Object> getLocationById(@PathVariable Long id) {
-//        try {
-//            Location location = locationRepo.findById(id).orElse(null);
-//
-//            if (location != null) {
-//                return ResponseEntity.ok(location);
-//            } else {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location not found for ID: " + id);
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching location: " + e.getMessage());
-//        }
-//    }
-//
-//    private void createInventories(Location location) {
-//
-//    }
-//
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<String> updateLocation(@PathVariable("id") Long id, @RequestBody Location updatedLocation) {
-//        try {
-//            Location existingLocation = locationRepo.findById(id).orElse(null);
-//            if (existingLocation == null) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location not found");
-//            }
-//
-//
-//            existingLocation.setAddress(updatedLocation.getAddress());
-//            existingLocation.setLocationName(updatedLocation.getLocationName());
-//
-//
-//            locationRepo.save(existingLocation);
-//
-//            return ResponseEntity.status(HttpStatus.OK).body("Location/Vessel Updated Successfully!");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating location");
-//        }
-//    }
-//
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<String> deleteLocation(@PathVariable(value = "id") Long id) {
-//        try {
-//            locationRepo.deleteById(id);
-//            return ResponseEntity.status(HttpStatus.OK).body("Location/Vessel deleted successfully");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion Unsuccessful");
-//        }
-//    }
-//
+
 //    @GetMapping("/view/{page}")
 //    public ResponseEntity<List<Location>> viewLocations(@PathVariable int page) {
 //        try {
@@ -173,14 +149,6 @@ public class LocationController {
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
-//    }
-//    @GetMapping("/getAll")
-//    public ResponseEntity<List<Location>> getAllLocations() {
-//        List<Location> locations = locationRepo.findAll();
-//        if (locations.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//        return ResponseEntity.ok(locations);
 //    }
 
 }
