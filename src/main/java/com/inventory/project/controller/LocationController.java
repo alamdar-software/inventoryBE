@@ -11,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/location")
@@ -123,10 +121,9 @@ public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
             if (existingAddressOptional.isPresent()) {
                 Address existingAddress = existingAddressOptional.get();
                 existingAddress.setAddress(updatedAddress.getAddress());
-                // Update other address fields if needed
                 addressRepository.save(existingAddress);
 
-                // No need to update location name, as it's not changed
+
 
                 Location savedLocation = locationRepo.save(existingLocation);
                 return new ResponseEntity<>(savedLocation, HttpStatus.OK);
@@ -138,7 +135,40 @@ public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
         }
     }
 
+    @GetMapping("getLocation/{locationId}/{addressId}")
+    public ResponseEntity<Object> getAddressByLocationAndAddressId(
+            @PathVariable("locationId") Long locationId,
+            @PathVariable("addressId") Long addressId
+    ) {
+        Optional<Location> locationOptional = locationRepo.findById(locationId);
 
+        if (locationOptional.isPresent()) {
+            Location existingLocation = locationOptional.get();
+
+            Optional<Address> existingAddressOptional = existingLocation.getAddresses()
+                    .stream()
+                    .filter(address -> address.getId().equals(addressId))
+                    .findFirst();
+
+            if (existingAddressOptional.isPresent()) {
+                Address address = existingAddressOptional.get();
+                String locationName = existingLocation.getLocationName();
+
+                // Create a response object containing both locationName and address
+                // You might use a Map or create a custom DTO for this purpose
+                // For example, using a Map:
+                Map<String, Object> response = new HashMap<>();
+                response.put("locationName", locationName);
+                response.put("address", address);
+
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 //    @GetMapping("/view/{page}")
 //    public ResponseEntity<List<Location>> viewLocations(@PathVariable int page) {
