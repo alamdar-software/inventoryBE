@@ -1,7 +1,6 @@
 package com.inventory.project.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
@@ -127,4 +126,6 @@ public class Item {
     public void setInventories(List<Inventory> inventories) {
         this.inventories = inventories;
     }
+
+
 }

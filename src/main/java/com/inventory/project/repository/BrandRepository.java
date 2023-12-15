@@ -10,10 +10,12 @@ import java.util.Optional;
 @Repository
 public interface BrandRepository extends JpaRepository<Brand,Long> {
 
-    Brand findByName(String name);
+    Brand findByBrandName(String name);
 
 //    @Query("SELECT b FROM Brand b WHERE b.name = :name AND  b.id != :id")
 //    Brand findByNameAndId(String name, Long id);
-    @Query("SELECT b FROM Brand b WHERE b.name = :name AND  b.id != :id")
-    Optional<Object> findByNameAndIdNot(String name, Long id);
+    @Query("SELECT b FROM Brand b WHERE b.brandName = :brandName AND  b.id != :id")
+    Optional<Brand> findByBrandNameAndIdNot(String brandName, Long id);
+
+
 }

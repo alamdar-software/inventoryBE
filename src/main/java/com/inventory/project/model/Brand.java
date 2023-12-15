@@ -13,14 +13,14 @@ public class Brand {
     private Long id;
 
     @Column(name="brand_name")
-    String name;
+    String brandName;
 
     public Brand() {
     }
 
-    public Brand(Long id, String name) {
+    public Brand(Long id, String brandName) {
         this.id = id;
-        this.name = name;
+        this.brandName = brandName;
     }
 
     public Long getId() {
@@ -31,14 +31,11 @@ public class Brand {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getBrandName() {
+        return brandName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
-
-
-
 }

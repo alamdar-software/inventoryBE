@@ -54,7 +54,7 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            if (brandRepository.findByName(brand.getName()) != null) {
+            if (brandRepository.findByBrandName(brand.getBrandName()) != null) {
                 response.put("error", "Brand already exists");
                 return ResponseEntity.badRequest().body(response);
             }
@@ -102,13 +102,13 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
                 return ResponseEntity.notFound().build();
             }
 
-            if (brandRepository.findByNameAndIdNot(brand.getName(), id).isPresent()) {
+            if (brandRepository.findByBrandNameAndIdNot(brand.getBrandName(), id).isPresent()) {
                 response.put("error", "Brand with this name already exists");
                 return ResponseEntity.badRequest().body(response);
             }
 
             Brand updatedBrand = existingBrand.get();
-            updatedBrand.setName(brand.getName()); // Modify other properties as needed
+            updatedBrand.setBrandName(brand.getBrandName()); // Modify other properties as needed
 
             brandRepository.save(updatedBrand);
 
