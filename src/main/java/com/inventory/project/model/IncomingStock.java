@@ -76,7 +76,9 @@ public class IncomingStock {
     @ManyToOne
     @JoinColumn(name="unit_id")
     private Unit unit;
+    @Column(name = "address")
 
+    private String address;
 
     @JsonIgnore
     @ManyToOne
@@ -104,6 +106,14 @@ public class IncomingStock {
 
     public Long getId() {
         return id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public void setId(Long id) {
