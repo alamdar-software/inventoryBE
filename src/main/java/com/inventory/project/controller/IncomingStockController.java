@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/incomingstock")
+@CrossOrigin("*")
 public class IncomingStockController {
     @Autowired
     IncomingStockRepo incomingStockRepo;
