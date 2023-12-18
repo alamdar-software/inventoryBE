@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -20,6 +21,9 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     Item alreadyExistsByDescription(String description, Long id);
 
     Item findByItemName(String itemName);
+    @Query("SELECT i.itemName FROM Item i WHERE i.itemName = :itemName")
+    String findItemNameByItemName(@Param("itemName") String itemName);
+
 
 
 //    Optional<Object> findById(String itemName);

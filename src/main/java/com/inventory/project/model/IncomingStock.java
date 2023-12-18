@@ -28,11 +28,11 @@ public class IncomingStock {
     @Column(name="date")
     LocalDate date;
 
-    @Column(name="vessel")
-    String vessel;
-
-    @Column(name="vendor_brand")
-    String vendorBrand;
+//    @Column(name="vessel")
+//    String vessel;
+//
+//    @Column(name="vendor_brand")
+//    String vendorBrand;
 
     @Column(name="purchaseOrder")
     String purchaseOrder;
@@ -43,19 +43,21 @@ public class IncomingStock {
     @Column(name="s_n")
     String sn;
 
-    @Column(name="blind_count")
-    int blindCount;
+//    @Column(name="blind_count")
+//    int blindCount;
 
     @Column(name="price")
     Double price;
 
-    @Column(name="category")
-    String category;
+    @ManyToOne
+    @JoinColumn(name="category_id")
+    private Category category;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
-
+    @Column(name = "item_description")
+    private String itemDescription;
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
@@ -107,7 +109,13 @@ public class IncomingStock {
     public void setId(Long id) {
         this.id = id;
     }
+    public String getItemDescription() {
+        return itemDescription;
+    }
 
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
     public int getQuantity() {
         return quantity;
     }
@@ -140,21 +148,21 @@ public class IncomingStock {
         this.date = date;
     }
 
-    public String getVessel() {
-        return vessel;
-    }
-
-    public void setVessel(String vessel) {
-        this.vessel = vessel;
-    }
-
-    public String getVendorBrand() {
-        return vendorBrand;
-    }
-
-    public void setVendorBrand(String vendorBrand) {
-        this.vendorBrand = vendorBrand;
-    }
+//    public String getVessel() {
+//        return vessel;
+//    }
+//
+//    public void setVessel(String vessel) {
+//        this.vessel = vessel;
+//    }
+//
+//    public String getVendorBrand() {
+//        return vendorBrand;
+//    }
+//
+//    public void setVendorBrand(String vendorBrand) {
+//        this.vendorBrand = vendorBrand;
+//    }
 
     public String getPurchaseOrder() {
         return purchaseOrder;
@@ -180,13 +188,13 @@ public class IncomingStock {
         this.sn = sn;
     }
 
-    public int getBlindCount() {
-        return blindCount;
-    }
-
-    public void setBlindCount(int blindCount) {
-        this.blindCount = blindCount;
-    }
+//    public int getBlindCount() {
+//        return blindCount;
+//    }
+//
+//    public void setBlindCount(int blindCount) {
+//        this.blindCount = blindCount;
+//    }
 
     public Double getPrice() {
         return price;
@@ -196,21 +204,21 @@ public class IncomingStock {
         this.price = price;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
+//    public Item getItem() {
+//        return item;
+//    }
+//
+//    public void setItem(Item item) {
+//        this.item = item;
+//    }
 
     public Location getLocation() {
         return location;

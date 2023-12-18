@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category,Long> {
     Category findByName(String name);
 
+    List<Category> findAllByName(String name);
+
     @Query("SELECT c FROM Category c WHERE c.name = :name AND  c.id != :id")
     Category findByNameAndId(String name, Long id);
 

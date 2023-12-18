@@ -19,12 +19,12 @@ public class Category {
     public Category() {
 
     }
+
     public Category(Long id, String name, List<Item> items) {
         this.id = id;
         this.name = name;
         this.items = items;
     }
-
 
     public Long getId() {
         return id;

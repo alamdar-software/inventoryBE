@@ -3,6 +3,7 @@ package com.inventory.project.controller;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.IncomingStockService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -10,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/incomingstock")
@@ -45,85 +48,108 @@ public class IncomingStockController {
 
     @Autowired
     private IncomingStockService incomingStockService;
-
+    @Autowired
+     CategoryRepository categoryRepository;
     @PostMapping("/add")
-    public ResponseEntity<String> addIncomingStock(@RequestBody Map<String, Object> incomingStockDetails) {
+    public ResponseEntity<String> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
+
+        IncomingStock incomingStock = new IncomingStock();
+        incomingStock.setQuantity(incomingStockRequest.getQuantity());
+        incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+        incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+        incomingStock.setDate(incomingStockRequest.getDate());
+
+        incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        incomingStock.setPn(incomingStockRequest.getPn());
+        incomingStock.setSn(incomingStockRequest.getSn());
+//        incomingStock.setBlindCount(incomingStockRequest.getBlindCount());
+        incomingStock.setPrice(incomingStockRequest.getPrice());
+        incomingStock.setRemarks(incomingStockRequest.getRemarks());
+        incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+        incomingStock.setStatus(incomingStockRequest.getStatus());
+        incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+        incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+
+        Item item = new Item();
+        item.setDescription(incomingStockRequest.getDescription());
+        Location location = locationRepo.findByLocationName((incomingStockRequest.getLocationName()));
+
+        Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
+        Category category=categoryRepository.findByName((incomingStockRequest.getName()));
+        Brand  brand =brandRepository.findByBrandName(incomingStockRequest.getBrandName());
+        Unit unit=unitRepository.findByUnitName(incomingStockRequest.getUnitName());
+        Inventory inventory=inventoryRepo.findAllByQuantity(incomingStockRequest.getQuantity());
+        Entity entity=entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
+
+        StringBuilder errorMessages = new StringBuilder();
+
+        if (item == null) {
+            errorMessages.append("Item not found. ");
+        }
+        if (location == null) {
+            errorMessages.append("Location not found. ");
+        }
+//        if (currency == null) {
+//            errorMessages.append("Currency not found. ");
+//        }
+        if (category == null) {
+            errorMessages.append("Category not found. ");
+        }
+        if (brand == null) {
+            errorMessages.append("Brand not found. ");
+        }
+        if (unit == null) {
+            errorMessages.append("Unit not found. ");
+        }
+//        if (inventory == null) {
+//            errorMessages.append("Inventory not found. ");
+//        }
+        if (entity == null) {
+            errorMessages.append("Entity not found. ");
+        }
+
+        if (errorMessages.length() > 0) {
+            return ResponseEntity.badRequest().body(errorMessages.toString().trim());
+        }
+
+        incomingStock.setItemDescription(item.getDescription());
+        incomingStock.setLocation(location);
+        incomingStock.setCurrency(currency);
+        incomingStock.setCategory(category);
+        incomingStock.setBrand(brand);
+        incomingStock.setUnit(unit);
+        incomingStock.setInventory( inventory);
+        incomingStock.setEntity(entity);
+
+        incomingStockRepo.save(incomingStock);
+
+        return ResponseEntity.ok("Incoming Stock added successfully");
+    }
+    @GetMapping("/view")
+    public ResponseEntity<List<IncomingStock>> viewAllIncomingstock(HttpSession session) {
         try {
-            // Extracting incoming stock details from the request body
-            String itemName = (String) incomingStockDetails.get("itemName");
-            String locationName = (String) incomingStockDetails.get("locationName");
-            Integer unitName = (Integer) incomingStockDetails.get("unitName");
-            String currencyName = (String) incomingStockDetails.get("currencyName");
-            String brandName = (String) incomingStockDetails.get("brandName");
-            String entityName = (String) incomingStockDetails.get("entityName");
-            int quantity = (int) incomingStockDetails.get("quantity");
+            List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
 
-            // Fetching necessary entities
-            Item item = itemRepo.findByItemName(itemName);
-            Location location = locationRepo.findByLocationName(locationName);
-            Unit unit = unitRepository.findByUnitName(item.getUnitName());
-            Inventory inventory = inventoryRepo.findByQuantityEquals(quantity);
-            Currency currency = currencyRepository.findTopByCurrencyName(currencyName);
-            Brand brand = brandRepository.findByBrandName(brandName);
-            Entity entity = entityModelRepo.findByEntityName(entityName);
-
-            // Check if any required entities are not found
-            if (item == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Item not found", HttpStatus.NOT_FOUND);
+            if (!incomingStocks.isEmpty()) {
+                return ResponseEntity.ok(incomingStocks);
+            } else {
+                return ResponseEntity.notFound().build();
             }
-            if (location == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Location not found", HttpStatus.NOT_FOUND);
-            }
-            if (unit == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Unit not found", HttpStatus.NOT_FOUND);
-            }
-            if (inventory == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Inventory not found", HttpStatus.NOT_FOUND);
-            }
-            if (currency == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Currency not found", HttpStatus.NOT_FOUND);
-            }
-            if (brand == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Brand not found", HttpStatus.NOT_FOUND);
-            }
-            if (entity == null) {
-                return new ResponseEntity<>("Failed to add incoming stock: Entity not found", HttpStatus.NOT_FOUND);
-            }
-
-            // Creating the IncomingStock object and setting its properties
-            IncomingStock incomingStock = new IncomingStock();
-            incomingStock.setQuantity(quantity);
-            incomingStock.setUnitCost((Double) incomingStockDetails.get("unitCost"));
-            incomingStock.setExtendedValue((Double) incomingStockDetails.get("extendedValue"));
-            incomingStock.setDate(LocalDate.parse((String) incomingStockDetails.get("date")));
-            // Set other fields...
-
-            incomingStock.setItem(item);
-            incomingStock.setLocation(location);
-            incomingStock.setUnit(unit);
-            incomingStock.setInventory(inventory);
-            incomingStock.setCurrency(currency);
-            incomingStock.setBrand(brand);
-            incomingStock.setEntity(entity);
-            // Set other related entities...
-
-            // Saving the incoming stock object
-            IncomingStock savedStock = incomingStockService.processIncomingStockDetails(incomingStock);
-            return new ResponseEntity<>("Incoming stock added with ID: " + savedStock.getId(), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>("Failed to add incoming stock: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-
-    @GetMapping("/{id}/details")
-    public ResponseEntity<Object[]> getIncomingStockDetailsWithAssociatedFields(@PathVariable Long id) {
-        Object[] incomingStockDetailsWithFields = incomingStockRepo.findIncomingStockDetailsWithAssociatedFieldsById(id);
-        if (incomingStockDetailsWithFields != null) {
-            return ResponseEntity.ok(incomingStockDetailsWithFields);
-        } else {
-            return ResponseEntity.notFound().build();
+    @GetMapping("get/{id}")
+    public ResponseEntity<?> getIncomingStockById(@PathVariable Long id) {
+        Optional<IncomingStock> incomingStockOptional = incomingStockRepo.findById(id);
+        if (incomingStockOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Incoming stock with ID " + id + " not found");
         }
+        IncomingStock incomingStock = incomingStockOptional.get();
+        return ResponseEntity.ok(incomingStock);
     }
+
+
 
 }

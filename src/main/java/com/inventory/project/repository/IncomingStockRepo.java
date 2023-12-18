@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 @Repository
 public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     @Query("SELECT COUNT(p) FROM IncomingStock p")
@@ -22,7 +24,7 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
 
     List<IncomingStock> findByItemAndDateBetweenOrderByDate(Item item,LocalDate fromDate,LocalDate toDate);
 
-    List<IncomingStock> findByLocationAndDateBetweenOrderByItem(Location location,LocalDate fromDate,LocalDate toDate);
+    List<IncomingStock> findByLocationAndDateBetweenOrderByItemName(Location location, LocalDate fromDate, LocalDate toDate);
 
     List<IncomingStock> findByDateBetweenOrderByItem(LocalDate fromDate, LocalDate toDate);
 
@@ -34,9 +36,9 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     List<IncomingStock> findByInventoryOrderByDate(Inventory source);
 
     List<IncomingStock> findByStatus(String string);
-    @Query("SELECT s.quantity, s.unitCost, s.impaCode, s.remarks, s.storeNo, s.sn, s.pn, s.purchaseOrder, " +
-            "s.standardPrice, s.price, s.extendedValue, s.date, i.itemName, l.locationName, u.unitName, " +
-            "s.currency.currencyName, b.brandName, e.entityName " +
+    @Query("SELECT s.quantity AS quantity, s.unitCost AS unitCost, s.impaCode AS impaCode, s.remarks AS remarks, s.storeNo AS storeNo, s.sn AS sn, s.pn AS pn, s.purchaseOrder AS purchaseOrder, " +
+            "s.standardPrice AS standardPrice, s.price AS price, s.extendedValue AS extendedValue, s.date AS date, i.itemName AS itemName, l.locationName AS locationName, u.unitName AS unitName, " +
+            "s.currency.currencyName AS currencyName, b.brandName AS brandName, e.entityName AS entityName " +
             "FROM IncomingStock s " +
             "JOIN s.item i " +
             "JOIN s.location l " +
@@ -45,7 +47,8 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
             "JOIN s.brand b " +
             "JOIN s.entity e " +
             "WHERE s.id = :id")
-    Object[] findIncomingStockDetailsWithAssociatedFieldsById(@Param("id") Long id);
+    Map<String, Object> findIncomingStockDetailsWithAssociatedFieldsById(@Param("id") Long id);
+
 
 
     @Query("SELECT s FROM IncomingStock s JOIN FETCH s.location WHERE s.id = :id")
