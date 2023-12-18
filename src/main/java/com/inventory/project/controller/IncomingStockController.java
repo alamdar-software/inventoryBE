@@ -150,6 +150,74 @@ public class IncomingStockController {
         return ResponseEntity.ok(incomingStock);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteIncomingStock(@PathVariable Long id) {
+        Optional<IncomingStock> optionalIncomingStock = incomingStockRepo.findById(id);
 
+        if (optionalIncomingStock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Incoming stock with ID " + id + " not found");
+        }
+
+        IncomingStock incomingStock = optionalIncomingStock.get();
+
+        incomingStockRepo.delete(incomingStock);
+
+        return ResponseEntity.ok("Incoming Stock deleted successfully");
+    }
+    // Update an existing IncomingStock
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateIncomingStock(
+            @PathVariable Long id,
+            @RequestBody IncomingStockRequest incomingStockRequest) {
+
+        Optional<IncomingStock> optionalIncomingStock = incomingStockRepo.findById(id);
+
+        if (optionalIncomingStock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Incoming stock with ID " + id + " not found");
+        }
+
+        IncomingStock incomingStock = optionalIncomingStock.get();
+
+        incomingStock.setQuantity(incomingStockRequest.getQuantity());
+        incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+        incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+        incomingStock.setDate(incomingStockRequest.getDate());
+        incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        incomingStock.setPn(incomingStockRequest.getPn());
+        incomingStock.setSn(incomingStockRequest.getSn());
+        incomingStock.setPrice(incomingStockRequest.getPrice());
+        incomingStock.setRemarks(incomingStockRequest.getRemarks());
+        incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+        incomingStock.setStatus(incomingStockRequest.getStatus());
+        incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+        incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+
+        Item item = new Item();
+        item.setDescription(incomingStockRequest.getDescription());
+
+        Location location = locationRepo.findByLocationName(incomingStockRequest.getLocationName());
+        Currency currency = currencyRepository.findTopByCurrencyName(incomingStockRequest.getCurrencyName());
+        Category category = categoryRepository.findByName(incomingStockRequest.getName());
+        Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
+        Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
+        Inventory inventory = inventoryRepo.findAllByQuantity(incomingStockRequest.getQuantity());
+        Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
+
+
+        incomingStock.setItemDescription(item.getDescription());
+        incomingStock.setLocation(location);
+        incomingStock.setCurrency(currency);
+        incomingStock.setCategory(category);
+        incomingStock.setBrand(brand);
+        incomingStock.setUnit(unit);
+        incomingStock.setInventory(inventory);
+        incomingStock.setEntity(entity);
+
+        incomingStockRepo.save(incomingStock);
+
+        return ResponseEntity.ok("Incoming Stock updated successfully");
+    }
 
 }
