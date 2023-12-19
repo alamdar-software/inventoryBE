@@ -76,9 +76,9 @@ public class IncomingStock {
     @ManyToOne
     @JoinColumn(name="unit_id")
     private Unit unit;
-    @Column(name = "address")
-
-    private String address;
+    @ManyToOne
+    @JoinColumn(name = "address")
+    private Address address;
 
     @JsonIgnore
     @ManyToOne
@@ -108,11 +108,11 @@ public class IncomingStock {
         return id;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 
@@ -317,5 +317,6 @@ public class IncomingStock {
     public void setEntity(Entity entity) {
         this.entity = entity;
     }
+
 
 }

@@ -51,6 +51,8 @@ public class IncomingStockController {
     private IncomingStockService incomingStockService;
     @Autowired
      CategoryRepository categoryRepository;
+    @Autowired
+    AddressRepository  addressRepository;
     @PostMapping("/add")
     public ResponseEntity<String> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
 
@@ -74,7 +76,7 @@ public class IncomingStockController {
         Item item = new Item();
         item.setDescription(incomingStockRequest.getDescription());
         Location location = locationRepo.findByLocationName((incomingStockRequest.getLocationName()));
-
+        Address address=addressRepository.findByAddress((incomingStockRequest.getAddress()));
         Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
         Category category=categoryRepository.findByName((incomingStockRequest.getName()));
         Brand  brand =brandRepository.findByBrandName(incomingStockRequest.getBrandName());
@@ -115,6 +117,7 @@ public class IncomingStockController {
 
         incomingStock.setItemDescription(item.getDescription());
         incomingStock.setLocation(location);
+        incomingStock.setAddress(address);
         incomingStock.setCurrency(currency);
         incomingStock.setCategory(category);
         incomingStock.setBrand(brand);
@@ -181,6 +184,7 @@ public class IncomingStockController {
 
         IncomingStock incomingStock = optionalIncomingStock.get();
 
+        // Update the fields based on the incoming request
         incomingStock.setQuantity(incomingStockRequest.getQuantity());
         incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
         incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
@@ -195,20 +199,31 @@ public class IncomingStockController {
         incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
         incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
 
-        Item item = new Item();
-        item.setDescription(incomingStockRequest.getDescription());
-
+        // Fetching associated entities by their names
         Location location = locationRepo.findByLocationName(incomingStockRequest.getLocationName());
+        Address address = addressRepository.findByAddress(incomingStockRequest.getAddress());
         Currency currency = currencyRepository.findTopByCurrencyName(incomingStockRequest.getCurrencyName());
         Category category = categoryRepository.findByName(incomingStockRequest.getName());
         Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
         Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
         Inventory inventory = inventoryRepo.findAllByQuantity(incomingStockRequest.getQuantity());
+
         Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
 
+        // Check if any of the associated entities is null
+        StringBuilder errorMessages = new StringBuilder();
+        if (location == null) {
+            errorMessages.append("Location not found. ");
+        }
+        // Check for other entities as well...
 
-        incomingStock.setItemDescription(item.getDescription());
+        if (errorMessages.length() > 0) {
+            return ResponseEntity.badRequest().body(errorMessages.toString().trim());
+        }
+
+        incomingStock.setItemDescription(incomingStockRequest.getDescription());
         incomingStock.setLocation(location);
+        incomingStock.setAddress(address);
         incomingStock.setCurrency(currency);
         incomingStock.setCategory(category);
         incomingStock.setBrand(brand);
@@ -220,5 +235,9 @@ public class IncomingStockController {
 
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
+
+
+//    Bulk Controller
+
 
 }

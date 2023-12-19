@@ -16,6 +16,7 @@ public class IncomingStockRequest {
     private String name;
     private String description; // ID for Item entity
     private String locationName; // ID for Location entity
+        private String address;
     private String remarks;
 //    private String currenyName; // ID for Currency entity
     private String brandName; // ID for Brand entity
@@ -198,5 +199,14 @@ public class IncomingStockRequest {
 
     public void setEntityName(String entityName) {
         this.entityName = entityName;
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
