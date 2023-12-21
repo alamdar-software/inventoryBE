@@ -210,12 +210,10 @@ public class IncomingStockController {
 
         Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
 
-        // Check if any of the associated entities is null
         StringBuilder errorMessages = new StringBuilder();
         if (location == null) {
             errorMessages.append("Location not found. ");
         }
-        // Check for other entities as well...
 
         if (errorMessages.length() > 0) {
             return ResponseEntity.badRequest().body(errorMessages.toString().trim());

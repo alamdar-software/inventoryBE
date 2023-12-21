@@ -42,6 +42,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 //    Location findByLocationNameAndAddressesContaining(String locationName, String address);
 //    Optional<Location> findById(LocationKey locationKey);
 Location findByLocationNameAndAddresses(String locationName, Address address);
+
 //    @Transactional
 //    @Modifying
 //    @Query("INSERT INTO Location l (l.locationName, l.addresses) VALUES (:locationName, :addresses)")

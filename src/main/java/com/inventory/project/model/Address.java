@@ -1,6 +1,8 @@
 package com.inventory.project.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
@@ -25,6 +27,10 @@ public class Address {
     private Location location;
 
     public Address() {
+    }
+    public Address(String address) {
+        this.address = address;
+        // Other initialization logic if needed...
     }
 
     public Long getId() {
@@ -65,4 +71,5 @@ public class Address {
     public int hashCode() {
         return Objects.hash(id, address, location);
     }
+
 }

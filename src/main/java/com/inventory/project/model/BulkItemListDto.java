@@ -3,11 +3,13 @@ package com.inventory.project.model;
 import java.time.LocalDate;
 
 public class BulkItemListDto {
+    Location location;
+
     Item item;
 
     Brand brand;
 
-    int quantity;
+    Inventory inventory;
 
     Double unitCost;
 
@@ -20,11 +22,66 @@ public class BulkItemListDto {
     String sn;
     String pn;
 
-    Entity entityModel;
+    Entity entityName;
     String impaCode;
     String storeNo;
     Double extendedValue;
 
+    Unit unit;
+
+    Category category;
+
+    Currency currency;
+
+    Entity entity;
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Entity getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(Entity entityName) {
+        this.entityName = entityName;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
 
     public Item getItem() {
         return item;
@@ -34,12 +91,12 @@ public class BulkItemListDto {
         this.item = item;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Inventory getInventory() {
+        return inventory;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     public Double getUnitCost() {
@@ -112,13 +169,7 @@ public class BulkItemListDto {
 
     }
 
-    public Entity getEntity() {
-        return entityModel;
-    }
 
-    public void setEntity(Entity entityModel) {
-        this.entityModel = entityModel;
-    }
 
     public String getImpaCode() {
         return impaCode;
@@ -145,4 +196,5 @@ public class BulkItemListDto {
     }
 
 
+  
 }

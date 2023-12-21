@@ -36,19 +36,64 @@ public class InventoryController {
 @Autowired
     AddressRepository addressRepository;
 
-//    @PostMapping("/add")
-//    public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
-//        Map<String, Object> response = new HashMap<>();
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Item item = itemRepo.findByDescription(inventoryRequest.getDescription());
+            Location location = locationRepo.findByLocationName(inventoryRequest.getLocationName());
+
+            if (item != null && location != null) {
+
+                Inventory inventory = new Inventory();
+                inventory.setDescription(item.getDescription());
+                inventory.setLocationName(location.getLocationName());
+                inventory.setQuantity(inventoryRequest.getQuantity());
+                String addressString = inventoryRequest.getAddress().getAddress();
+
+                Address address = new Address();
+                address.setAddress(addressString); // Assuming addressString is fetched correctly
+
+                inventory.setAddress(address);
+                inventory.setConsumedItem(inventoryRequest.getConsumedItem());
+                inventory.setScrappedItem(inventoryRequest.getScrappedItem());
+
+                Inventory savedInventory = inventoryRepo.save(inventory);
+
+                response.put("success", "Inventory added successfully");
+                response.put("inventory", savedInventory);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Item or location not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("error", "Error adding Inventory: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+//@PostMapping("/add")
+//public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
+//    Map<String, Object> response = new HashMap<>();
 //
-//        try {
-//            Item item = itemRepo.findByItemName(inventoryRequest.getItemName());
+//    try {
+//        Item item = itemRepo.findByDescription(inventoryRequest.getDescription());
+//
+//
+//        // Fetch the Address object based on the address string
+//        Address address = addressRepository.findByAddress(inventoryRequest.getAddress().getAddress());
+//
+//        if (item != null && address != null) {
 //            Location location = locationRepo.findByLocationNameAndAddresses(
 //                    inventoryRequest.getLocationName(),
 //                    inventoryRequest.getAddress()
+//
 //            );
-//            if (item != null && location != null) {
+//
+//            if (location != null) {
 //                Inventory inventory = new Inventory();
-//                inventory.setItemName(item.getItemName());
+//                inventory.setDescription(item.getDescription());
 //                inventory.setLocationName(location.getLocationName());
 //                inventory.setQuantity(inventoryRequest.getQuantity());
 //                inventory.setAddress(inventoryRequest.getAddress());
@@ -61,57 +106,18 @@ public class InventoryController {
 //                response.put("inventory", savedInventory);
 //                return ResponseEntity.ok(response);
 //            } else {
-//                response.put("error", "Item or location not found");
+//                response.put("error", "Location not found");
 //                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 //            }
-//        } catch (Exception e) {
-//            response.put("error", "Error adding Inventory: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        } else {
+//            response.put("error", "Item or address not found");
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 //        }
+//    } catch (Exception e) {
+//        response.put("error", "Error adding Inventory: " + e.getMessage());
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //    }
-@PostMapping("/add")
-public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
-    Map<String, Object> response = new HashMap<>();
-
-    try {
-        Item item = itemRepo.findByItemName(inventoryRequest.getItemName());
-
-        // Fetch the Address object based on the address string
-        Address address = addressRepository.findByAddress(inventoryRequest.getAddress());
-
-        if (item != null && address != null) {
-            Location location = locationRepo.findByLocationNameAndAddresses(
-                    inventoryRequest.getLocationName(),
-                    address
-            );
-
-            if (location != null) {
-                Inventory inventory = new Inventory();
-                inventory.setItemName(item.getItemName());
-                inventory.setLocationName(location.getLocationName());
-                inventory.setQuantity(inventoryRequest.getQuantity());
-                inventory.setAddress(inventoryRequest.getAddress());
-                inventory.setConsumedItem(inventoryRequest.getConsumedItem());
-                inventory.setScrappedItem(inventoryRequest.getScrappedItem());
-
-                Inventory savedInventory = inventoryRepo.save(inventory);
-
-                response.put("success", "Inventory added successfully");
-                response.put("inventory", savedInventory);
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "Location not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } else {
-            response.put("error", "Item or address not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    } catch (Exception e) {
-        response.put("error", "Error adding Inventory: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
-}
+//}
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updateInventory(@PathVariable Long id, @RequestBody Inventory updatedInventory) {
@@ -123,7 +129,7 @@ public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory i
             if (existingInventoryOptional.isPresent()) {
                 Inventory existingInventory = existingInventoryOptional.get();
 
-                existingInventory.setItemName(updatedInventory.getItemName());
+                existingInventory.setDescription(updatedInventory.getDescription());
                 existingInventory.setLocationName(updatedInventory.getLocationName());
                 existingInventory.setAddress(updatedInventory.getAddress());
                 existingInventory.setQuantity(updatedInventory.getQuantity());

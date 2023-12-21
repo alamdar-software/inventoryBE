@@ -1,23 +1,31 @@
 package com.inventory.project.model;
 
+import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+
+
 
 public class BulkStockDto {
     Location location;
 
+
+    Address address;
     String remarks;
 
     Currency currency;
 
     String purchaseOrder;
 
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDate date;
 
-    List<BulkItemListDto> itemList;
+    private List<BulkItemListDto> itemList = new ArrayList<>();
 
     int quantity;
     int remaining;
@@ -83,18 +91,13 @@ public class BulkStockDto {
     }
 
 
-
     public List<BulkItemListDto> getItemList() {
         return itemList;
     }
 
-
-
     public void setItemList(List<BulkItemListDto> itemList) {
         this.itemList = itemList;
     }
-
-
 
     public BulkStockDto() {
 
@@ -133,7 +136,13 @@ public class BulkStockDto {
         this.quantity = quantity;
     }
 
+    public Address getAddress() {
+        return address;
+    }
 
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
     public BulkStockDto(String purchaseOrder, LocalDate date, int quantity) {
         super();
@@ -175,5 +184,6 @@ public class BulkStockDto {
         this.remaining = remaining;
         this.transferred = transferred;
     }
+
 
 }

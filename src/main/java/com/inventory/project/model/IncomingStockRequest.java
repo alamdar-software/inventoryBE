@@ -209,4 +209,7 @@ public class IncomingStockRequest {
     public void setAddress(String address) {
         this.address = address;
     }
+    public void setInventory(Inventory inventory) {
+        this.setInventory(inventory);
+    }
 }

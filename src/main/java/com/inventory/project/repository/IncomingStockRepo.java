@@ -54,4 +54,5 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     @Query("SELECT s FROM IncomingStock s JOIN FETCH s.location WHERE s.id = :id")
     IncomingStock findIncomingStockDetailsById(@Param("id") Long id);
 
+
 }

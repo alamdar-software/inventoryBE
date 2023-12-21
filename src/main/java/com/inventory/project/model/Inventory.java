@@ -22,11 +22,13 @@ public class Inventory {
 
     @Column(name = "location_name")
     private String locationName;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "address_id") // Assuming "address_id" is the foreign key column in the Inventory table
+    private Address address;
 
-    private String address;
 
-    @Column(name = "item_name")
-    private String itemName;
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
@@ -40,16 +42,13 @@ public class Inventory {
     public Inventory() {
     }
 
-    public Inventory(Long id, int quantity, String consumedItem, String scrappedItem, String locationName, String address, String itemName, Item item, Location location) {
-        this.id = id;
-        this.quantity = quantity;
-        this.consumedItem = consumedItem;
-        this.scrappedItem = scrappedItem;
-        this.locationName = locationName;
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
         this.address = address;
-        this.itemName = itemName;
-        this.item = item;
-        this.location = location;
     }
 
     public Long getId() {
@@ -92,20 +91,14 @@ public class Inventory {
         this.locationName = locationName;
     }
 
-    public String getAddress() {
-        return address;
+
+
+    public String getDescription() {
+        return description;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Item getItem() {
@@ -123,4 +116,6 @@ public class Inventory {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+
 }
