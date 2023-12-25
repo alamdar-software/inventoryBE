@@ -7,6 +7,14 @@ public class LocationAddressDto {
     private String locationName;
     private String address;
 
+    public LocationAddressDto() {
+    }
+
+    public LocationAddressDto(String locationName, String address) {
+        this.locationName = locationName;
+        this.address = address;
+    }
+
     public String getLocationName() {
         return locationName;
     }

@@ -158,6 +158,69 @@ public class BulkStockController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateIncomingStock(
+            @PathVariable Long id,
+            @RequestBody BulkStockDto incomingStockRequest) {
+
+        Optional<BulkStock> optionalIncomingStock = bulkStockRepo.findById(id);
+
+        if (optionalIncomingStock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Bulk stock with ID " + id + " not found");
+        }
+
+        BulkStock incomingStock = optionalIncomingStock.get();
+
+        // Update the fields based on the incoming request
+        incomingStock.setQuantity(incomingStockRequest.getQuantity());
+        incomingStock.setUnitPrice(incomingStockRequest.getUnitPrice());
+        incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+        incomingStock.setDate(incomingStockRequest.getDate());
+        incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        incomingStock.setPn(incomingStockRequest.getPn());
+        incomingStock.setSn(incomingStockRequest.getSn());
+        incomingStock.setPrice(incomingStockRequest.getPrice());
+        incomingStock.setRemarks(incomingStockRequest.getRemarks());
+        incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+//        incomingStock.setStatus(incomingStockRequest.getStatus());
+        incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+        incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+
+        // Fetching associated entities by their names
+        Location location = locationRepository.findByLocationName(incomingStockRequest.getLocationName());
+        Address address = addressRepository.findByAddress(incomingStockRequest.getAddress());
+        Currency currency = currencyRepository.findTopByCurrencyName(incomingStockRequest.getCurrencyName());
+        Category category = categoryRepository.findByName(incomingStockRequest.getName());
+        Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
+        Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
+        Inventory inventory = inventoryRepo.findAllByQuantity(incomingStockRequest.getQuantity());
+
+        Entity entity = entityRepository.findByEntityName(incomingStockRequest.getEntityName());
+
+        StringBuilder errorMessages = new StringBuilder();
+        if (location == null) {
+            errorMessages.append("Location not found. ");
+        }
+
+        if (errorMessages.length() > 0) {
+            return ResponseEntity.badRequest().body(errorMessages.toString().trim());
+        }
+
+        incomingStock.setItemDescription(incomingStockRequest.getDescription());
+        incomingStock.setLocation(location);
+        incomingStock.setAddress(address);
+        incomingStock.setCurrency(currency);
+        incomingStock.setCategory(category);
+        incomingStock.setBrand(brand);
+        incomingStock.setUnit(unit);
+        incomingStock.setInventory(inventory);
+        incomingStock.setEntity(entity);
+
+        bulkStockRepo.save(incomingStock);
+
+        return ResponseEntity.ok("Bulk Stock updated successfully");
+    }
 
 
 }

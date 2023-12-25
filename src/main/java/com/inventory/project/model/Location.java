@@ -24,6 +24,7 @@ public class Location {
 
 
 
+
 //    @OneToMany(mappedBy = "location")
 //    private List<Consignee> consignees;
 //

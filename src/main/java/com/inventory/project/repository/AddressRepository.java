@@ -8,5 +8,9 @@ import java.util.List;
 public interface AddressRepository extends JpaRepository<Address,Long> {
     Address findByAddress(String address);
     List<Address> findByLocationId(Long locationId);
+    Address findByAddressEquals(String address);
+//    List<Address> findByAddressId(Long addressId);
+
+
 
 }

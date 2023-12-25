@@ -19,7 +19,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 //    List<Location> findByLocationName(String locationName);
     Location findByLocationName(String locationName);
     Location findTopByLocationName(String locationName);
-//    Location findByAddressAndLocationName(String address, String locationName);
+    Location findByLocationNameAndAddresses_Address(String locationName, String address);
 //Location findByAddressesAndId(Address address, Long id);
 
     @Query("SELECT l FROM Location l WHERE l.locationName = :locationName AND l.id != :id")
@@ -41,7 +41,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findAllByLocationName(String locationName);
 //    Location findByLocationNameAndAddressesContaining(String locationName, String address);
 //    Optional<Location> findById(LocationKey locationKey);
-Location findByLocationNameAndAddresses(String locationName, Address address);
+//Location findByLocationNameAndAddresses(String locationName, String address);
 
 //    @Transactional
 //    @Modifying
