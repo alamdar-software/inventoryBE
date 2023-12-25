@@ -70,8 +70,20 @@ public class BulkStockController {
         Category category=categoryRepository.findByName((bulkStockDto.getName()));
         Brand  brand =brandRepository.findByBrandName(bulkStockDto.getBrandName());
         Unit unit=unitRepository.findByUnitName(bulkStockDto.getUnitName());
-        Inventory inventory=inventoryRepo.findAllByQuantity(bulkStockDto.getQuantity());
-        Entity entity=entityRepository.findByEntityName(bulkStockDto.getEntityName());
+        Optional<Inventory> optionalInventory = Optional.ofNullable(inventoryRepo.findAllByQuantity(bulkStockDto.getQuantity()));
+
+        if (optionalInventory.isPresent()) {
+            Inventory inventory = optionalInventory.get();
+
+            int newQuantity = inventory.getQuantity() + bulkStockDto.getQuantity();
+            inventory.setQuantity(newQuantity);
+
+            // Save the updated Inventory entity
+            inventoryRepo.save(inventory);
+        } else {
+            // Handle case when Inventory entity with given ID is not found
+            return ResponseEntity.badRequest().body("Inventory not found for the given ID");
+        }        Entity entity=entityRepository.findByEntityName(bulkStockDto.getEntityName());
 
         StringBuilder errorMessages = new StringBuilder();
 
@@ -97,9 +109,9 @@ public class BulkStockController {
         if (unit == null) {
             errorMessages.append("Unit not found. ");
         }
-        if (inventory == null) {
-            errorMessages.append("Inventory not found. ");
-        }
+//        if (inventory == null) {
+//            errorMessages.append("Inventory not found. ");
+//        }
         if (entity == null) {
             errorMessages.append("Entity not found. ");
         }
@@ -115,7 +127,7 @@ public class BulkStockController {
         bulkStock.setCategory(category);
         bulkStock.setBrand(brand);
         bulkStock.setUnit(unit);
-        bulkStock.setInventory( inventory);
+//        bulkStock.setInventory( inventory);
         bulkStock.setEntity(entity);
 
         bulkStockRepo.save(bulkStock);
