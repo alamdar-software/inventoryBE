@@ -11,179 +11,205 @@ import java.util.List;
 
 
 public class BulkStockDto {
-    Location location;
 
+    private int quantity;
+    private Double unitPrice;
+    private Double extendedValue;
+    private LocalDate date;
+    private String purchaseOrder;
+    private String pn;
+    private String sn;
+    private int blindCount;
+    private Double price;
+    private String name;
+    private String description;
+    private String locationName; // ID for Location entity
+    private String address;
+    private String remarks;
 
-    Address address;
-    String remarks;
-
-    Currency currency;
-
-    String purchaseOrder;
-
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    LocalDate date;
-
-    private List<BulkItemListDto> itemList = new ArrayList<>();
-
-    int quantity;
-    int remaining;
-    int transferred;
-
-
-    public Location getLocation() {
-        return location;
-    }
-
-
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-
-
-    public String getPurchaseOrder() {
-        return purchaseOrder;
-    }
-
-
-
-    public void setPurchaseOrder(String purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
-    }
-
-
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-
-    public List<BulkItemListDto> getItemList() {
-        return itemList;
-    }
-
-    public void setItemList(List<BulkItemListDto> itemList) {
-        this.itemList = itemList;
-    }
-
-    public BulkStockDto() {
-
-    }
-
-
-
-    public BulkStockDto(Location location, String remarks, Currency currency, String purchaseOrder, LocalDate date,
-                           List<BulkItemListDto> itemList) {
-        super();
-        this.location = location;
-        this.remarks = remarks;
-        this.currency = currency;
-        this.purchaseOrder = purchaseOrder;
-        this.date = date;
-        this.itemList = itemList;
-    }
-
-
-
-    public BulkStockDto(String purchaseOrder, LocalDate date) {
-
-        this.purchaseOrder = purchaseOrder;
-        this.date = date;
-    }
-
+    private String brandName; // ID for Brand entity
+    private String unitName; // ID for Unit entity
+    private Double standardPrice;
+    private String status;
+    private String impaCode;
+    private String storeNo;
+    private String entityName; // ID for Entity entity
+    private String currencyName;
 
 
     public int getQuantity() {
         return quantity;
     }
 
-
-
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public Address getAddress() {
+    public Double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getExtendedValue() {
+        return extendedValue;
+    }
+
+    public void setExtendedValue(Double extendedValue) {
+        this.extendedValue = extendedValue;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public String getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public void setPurchaseOrder(String purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
+    }
+
+    public String getPn() {
+        return pn;
+    }
+
+    public void setPn(String pn) {
+        this.pn = pn;
+    }
+
+    public String getSn() {
+        return sn;
+    }
+
+    public void setSn(String sn) {
+        this.sn = sn;
+    }
+
+    public int getBlindCount() {
+        return blindCount;
+    }
+
+    public void setBlindCount(int blindCount) {
+        this.blindCount = blindCount;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public String getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
-    public BulkStockDto(String purchaseOrder, LocalDate date, int quantity) {
-        super();
-        this.purchaseOrder = purchaseOrder;
-        this.date = date;
-        this.quantity = quantity;
+    public String getRemarks() {
+        return remarks;
     }
 
-
-
-    public int getRemaining() {
-        return remaining;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
-
-
-    public void setRemaining(int remaining) {
-        this.remaining = remaining;
+    public String getBrandName() {
+        return brandName;
     }
 
-
-
-    public int getTransferred() {
-        return transferred;
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 
-
-
-    public void setTransferred(int transferred) {
-        this.transferred = transferred;
+    public String getUnitName() {
+        return unitName;
     }
 
-
-
-    public BulkStockDto(String purchaseOrder, LocalDate date, int quantity, int remaining, int transferred) {
-        this.purchaseOrder = purchaseOrder;
-        this.date = date;
-        this.quantity = quantity;
-        this.remaining = remaining;
-        this.transferred = transferred;
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
+    public Double getStandardPrice() {
+        return standardPrice;
+    }
 
+    public void setStandardPrice(Double standardPrice) {
+        this.standardPrice = standardPrice;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getImpaCode() {
+        return impaCode;
+    }
+
+    public void setImpaCode(String impaCode) {
+        this.impaCode = impaCode;
+    }
+
+    public String getStoreNo() {
+        return storeNo;
+    }
+
+    public void setStoreNo(String storeNo) {
+        this.storeNo = storeNo;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
+    }
+
+    public String getCurrencyName() {
+        return currencyName;
+    }
+
+    public void setCurrencyName(String currencyName) {
+        this.currencyName = currencyName;
+    }
 }

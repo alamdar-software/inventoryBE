@@ -1,8 +1,13 @@
 package com.inventory.project.model;
 
+import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public class IncomingStockRequest {
+
 
     private int quantity;
     private Double unitCost;
@@ -28,7 +33,17 @@ public class IncomingStockRequest {
     private String entityName; // ID for Entity entity
     private String currencyName;
 
+    @OneToMany(mappedBy = "incomingStockRequest", cascade = CascadeType.ALL)
+    private List<BulkStock> bulkStocks;
     public IncomingStockRequest() {
+    }
+
+    public List<BulkStock> getBulkStocks() {
+        return bulkStocks;
+    }
+
+    public void setBulkStocks(List<BulkStock> bulkStocks) {
+        this.bulkStocks = bulkStocks;
     }
 
     public int getQuantity() {
