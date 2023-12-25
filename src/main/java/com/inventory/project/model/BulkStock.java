@@ -54,7 +54,7 @@ public class BulkStock {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "item_id")
+//    @JoinColumn(name = "item_id")
     private Item item;
     @Column(name = "item_description")
     private String itemDescription;
@@ -81,7 +81,7 @@ public class BulkStock {
     private Address address;
 
     @ManyToOne
-    @JoinColumn(name = "inventory_id")
+//    @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
 
