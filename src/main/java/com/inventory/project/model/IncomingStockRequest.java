@@ -10,7 +10,7 @@ public class IncomingStockRequest {
 
 
     private int quantity;
-    private Double unitCost;
+    private Double unitPrice;
     private Double extendedValue;
     private LocalDate date;
     private String purchaseOrder;
@@ -33,18 +33,18 @@ public class IncomingStockRequest {
     private String entityName; // ID for Entity entity
     private String currencyName;
 
-    @OneToMany(mappedBy = "incomingStockRequest", cascade = CascadeType.ALL)
-    private List<BulkStock> bulkStocks;
+//    @OneToMany(mappedBy = "incomingStockRequest", cascade = CascadeType.ALL)
+//    private List<BulkStock> bulkStocks;
     public IncomingStockRequest() {
     }
 
-    public List<BulkStock> getBulkStocks() {
-        return bulkStocks;
-    }
-
-    public void setBulkStocks(List<BulkStock> bulkStocks) {
-        this.bulkStocks = bulkStocks;
-    }
+//    public List<BulkStock> getBulkStocks() {
+//        return bulkStocks;
+//    }
+//
+//    public void setBulkStocks(List<BulkStock> bulkStocks) {
+//        this.bulkStocks = bulkStocks;
+//    }
 
     public int getQuantity() {
         return quantity;
@@ -54,12 +54,12 @@ public class IncomingStockRequest {
         this.quantity = quantity;
     }
 
-    public Double getUnitCost() {
-        return unitCost;
+    public Double getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setUnitCost(Double unitCost) {
-        this.unitCost = unitCost;
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public Double getExtendedValue() {

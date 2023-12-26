@@ -162,7 +162,7 @@ public class IncomingStockController {
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
     IncomingStock incomingStock = new IncomingStock();
     incomingStock.setQuantity(incomingStockRequest.getQuantity());
-    incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+    incomingStock.setUnitPrice(incomingStockRequest.getUnitPrice());
     incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
     incomingStock.setDate(incomingStockRequest.getDate());
     incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
@@ -218,7 +218,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             responseDTO.setLocationName(location.getLocationName());
             responseDTO.setAddress(requestedAddress);
             responseDTO.setQuantity(incomingStockRequest.getQuantity());
-            responseDTO.setUnitCost(incomingStockRequest.getUnitCost());
+            responseDTO.setUnitPrice(incomingStockRequest.getUnitPrice());
             responseDTO.setExtendedValue(incomingStockRequest.getExtendedValue());
             responseDTO.setDate(incomingStockRequest.getDate());
             responseDTO.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
@@ -272,7 +272,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         IncomingStockRequest responseDTO = new IncomingStockRequest();
 
         responseDTO.setQuantity(incomingStock.getQuantity());
-        responseDTO.setUnitCost(incomingStock.getUnitCost());
+        responseDTO.setUnitPrice(incomingStock.getUnitPrice());
         responseDTO.setExtendedValue(incomingStock.getExtendedValue());
         responseDTO.setDate(incomingStock.getDate());
         responseDTO.setPurchaseOrder(incomingStock.getPurchaseOrder());
@@ -357,7 +357,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
         // Update the fields based on the incoming request
         incomingStock.setQuantity(incomingStockRequest.getQuantity());
-        incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+        incomingStock.setUnitPrice(incomingStockRequest.getUnitPrice());
         incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
         incomingStock.setDate(incomingStockRequest.getDate());
         incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());

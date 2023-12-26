@@ -19,7 +19,7 @@ public class IncomingStock {
     int quantity;
 
     @Column(name="unit_cost")
-    Double unitCost;
+    Double unitPrice;
 
     @Column(name="extended_value")
     Double extendedValue;
@@ -134,12 +134,12 @@ public class IncomingStock {
         this.quantity = quantity;
     }
 
-    public Double getUnitCost() {
-        return unitCost;
+    public Double getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setUnitCost(Double unitCost) {
-        this.unitCost = unitCost;
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public Double getExtendedValue() {
