@@ -171,7 +171,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     incomingStock.setPrice(incomingStockRequest.getPrice());
     incomingStock.setRemarks(incomingStockRequest.getRemarks());
     incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
-    incomingStock.setStatus(incomingStockRequest.getStatus());
+//    incomingStock.setStatus(incomingStockRequest.getStatus());
     incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
     incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
 
@@ -232,7 +232,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             responseDTO.setBrandName(incomingStockRequest.getBrandName());
             responseDTO.setUnitName(incomingStockRequest.getUnitName());
             responseDTO.setStandardPrice(incomingStockRequest.getStandardPrice());
-            responseDTO.setStatus(incomingStockRequest.getStatus());
+//            responseDTO.setStatus(incomingStockRequest.getStatus());
             responseDTO.setImpaCode(incomingStockRequest.getImpaCode());
             responseDTO.setStoreNo(incomingStockRequest.getStoreNo());
             responseDTO.setEntityName(incomingStockRequest.getEntityName());
@@ -285,7 +285,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         responseDTO.setBrandName(incomingStock.getBrand() != null ? incomingStock.getBrand().getBrandName() : null);
         responseDTO.setUnitName(incomingStock.getUnit() != null ? incomingStock.getUnit().getUnitName() : null);
         responseDTO.setStandardPrice(incomingStock.getStandardPrice());
-        responseDTO.setStatus(incomingStock.getStatus());
+//        responseDTO.setStatus(incomingStock.getStatus());
         responseDTO.setImpaCode(incomingStock.getImpaCode());
         responseDTO.setStoreNo(incomingStock.getStoreNo());
         responseDTO.setEntityName(incomingStock.getEntity() != null ? incomingStock.getEntity().getEntityName() : null);

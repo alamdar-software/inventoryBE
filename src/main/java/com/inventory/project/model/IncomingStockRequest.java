@@ -27,7 +27,7 @@ public class IncomingStockRequest {
     private String brandName; // ID for Brand entity
     private String unitName; // ID for Unit entity
     private Double standardPrice;
-    private String status;
+//    private String status;
     private String impaCode;
     private String storeNo;
     private String entityName; // ID for Entity entity
@@ -184,13 +184,13 @@ public class IncomingStockRequest {
         this.standardPrice = standardPrice;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
 
     public String getImpaCode() {
         return impaCode;
