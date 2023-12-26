@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "bull_stock")
@@ -14,93 +16,63 @@ public class BulkStock {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(name="quantity")
-    int quantity;
-
-    @Column(name="unit_cost")
-    Double unitCost;
-
-    @Column(name="extended_value")
-    Double extendedValue;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name="date")
-    LocalDate date;
-
-//    @Column(name="vessel")
-//    String vessel;
-//
-//    @Column(name="vendor_brand")
-//    String vendorBrand;
-
-    @Column(name="purchaseOrder")
-    String purchaseOrder;
-
-    @Column(name="p_n")
-    String pn;
-
-    @Column(name="s_n")
-    String sn;
-
-//    @Column(name="blind_count")
-//    int blindCount;
-
-    @Column(name="price")
-    Double price;
-
-    @ManyToOne
-    @JoinColumn(name="category_id")
-    private Category category;
-
-    @ManyToOne
-//    @JoinColumn(name = "item_id")
-    private Item item;
-    @Column(name = "item_description")
-    private String itemDescription;
-    @ManyToOne
     @JoinColumn(name = "location_id")
-    private Location location;
-
-    @Column(name="remarks")
-    String remarks;
-
-    @ManyToOne
-    @JoinColumn(name="currency_id")
-    private Currency currency;
-
-    @ManyToOne
-    @JoinColumn(name="brand_id")
-    private Brand brand;
-
-    @ManyToOne
-    @JoinColumn(name="unit_id")
-    private Unit unit;
-    @ManyToOne
+    private String locationName;
     @JoinColumn(name = "address")
-    private Address address;
 
-    @ManyToOne
-//    @JoinColumn(name = "inventory_id")
-    private Inventory inventory;
+    private String address;
+    private String description;
+    private String purchaseOrder;
+    private String remarks;
+    private String date;
 
+    @ElementCollection
+    @CollectionTable(name = "unit_cost", joinColumns = @JoinColumn(name = "bulk_stock_id"))
+    @Column(name = "cost")
+    private List<Double> unitCost = new ArrayList<>();
 
-    @Column(name="standard_price")
-    Double standardPrice;
+    @ElementCollection
+    private List<String> name = new ArrayList<>();
 
+    @ElementCollection
+    private List<Integer> quantity = new ArrayList<>();
 
+    @ElementCollection
+    private List<String> item = new ArrayList<>();
 
-    @Column(name="impaCode")
-    String impaCode;
+    @ElementCollection
+    private List<String> brandName = new ArrayList<>();
 
-    @Column(name="storeNo")
-    String storeNo;
+    @ElementCollection
+    private List<Double> price = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "entity_id")
-    private com.inventory.project.model.Entity entity;
+    @ElementCollection
+    private List<String> unitName = new ArrayList<>();
+
+    @ElementCollection
+    private List<Double> standardPrice = new ArrayList<>();
+
+    @ElementCollection
+    private List<Double> extendedValue = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> sn = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> pn = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> entityName = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> storeNo = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> impaCode = new ArrayList<>();
+
 
     public BulkStock() {
+
     }
 
     public Long getId() {
@@ -111,38 +83,28 @@ public class BulkStock {
         this.id = id;
     }
 
-
-
-    public int getQuantity() {
-        return quantity;
+    public String getLocationName() {
+        return locationName;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
-    public Double getUnitCost() {
-        return unitCost;
+    public String getAddress() {
+        return address;
     }
 
-    public void setUnitCost(Double unitCost) {
-        this.unitCost = unitCost;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public Double getExtendedValue() {
-        return extendedValue;
+    public String getDescription() {
+        return description;
     }
 
-    public void setExtendedValue(Double extendedValue) {
-        this.extendedValue = extendedValue;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getPurchaseOrder() {
@@ -153,62 +115,6 @@ public class BulkStock {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public String getPn() {
-        return pn;
-    }
-
-    public void setPn(String pn) {
-        this.pn = pn;
-    }
-
-    public String getSn() {
-        return sn;
-    }
-
-    public void setSn(String sn) {
-        this.sn = sn;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    public String getItemDescription() {
-        return itemDescription;
-    }
-
-    public void setItemDescription(String itemDescription) {
-        this.itemDescription = itemDescription;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
     public String getRemarks() {
         return remarks;
     }
@@ -217,77 +123,123 @@ public class BulkStock {
         this.remarks = remarks;
     }
 
-    public Currency getCurrency() {
-        return currency;
+    public String getDate() {
+        return date;
     }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public Brand getBrand() {
-        return brand;
+    public List<Double> getUnitCost() {
+        return unitCost;
     }
 
-    public void setBrand(Brand brand) {
-        this.brand = brand;
+    public void setUnitCost(List<Double> unitCost) {
+        this.unitCost = unitCost;
     }
 
-    public Unit getUnit() {
-        return unit;
+    public List<String> getName() {
+        return name;
     }
 
-    public void setUnit(Unit unit) {
-        this.unit = unit;
+    public void setName(List<String> name) {
+        this.name = name;
     }
 
-    public Address getAddress() {
-        return address;
+    public List<Integer> getQuantity() {
+        return quantity;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setQuantity(List<Integer> quantity) {
+        this.quantity = quantity;
     }
 
-    public Inventory getInventory() {
-        return inventory;
+    public List<String> getItem() {
+        return item;
     }
 
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+    public void setItem(List<String> item) {
+        this.item = item;
     }
 
-    public Double getStandardPrice() {
+    public List<String> getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(List<String> brandName) {
+        this.brandName = brandName;
+    }
+
+    public List<Double> getPrice() {
+        return price;
+    }
+
+    public void setPrice(List<Double> price) {
+        this.price = price;
+    }
+
+    public List<String> getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(List<String> unitName) {
+        this.unitName = unitName;
+    }
+
+    public List<Double> getStandardPrice() {
         return standardPrice;
     }
 
-    public void setStandardPrice(Double standardPrice) {
+    public void setStandardPrice(List<Double> standardPrice) {
         this.standardPrice = standardPrice;
     }
 
-    public String getImpaCode() {
-        return impaCode;
+    public List<Double> getExtendedValue() {
+        return extendedValue;
     }
 
-    public void setImpaCode(String impaCode) {
-        this.impaCode = impaCode;
+    public void setExtendedValue(List<Double> extendedValue) {
+        this.extendedValue = extendedValue;
     }
 
-    public String getStoreNo() {
+    public List<String> getSn() {
+        return sn;
+    }
+
+    public void setSn(List<String> sn) {
+        this.sn = sn;
+    }
+
+    public List<String> getPn() {
+        return pn;
+    }
+
+    public void setPn(List<String> pn) {
+        this.pn = pn;
+    }
+
+    public List<String> getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(List<String> entityName) {
+        this.entityName = entityName;
+    }
+
+    public List<String> getStoreNo() {
         return storeNo;
     }
 
-    public void setStoreNo(String storeNo) {
+    public void setStoreNo(List<String> storeNo) {
         this.storeNo = storeNo;
     }
 
-    public com.inventory.project.model.Entity getEntity() {
-        return entity;
+    public List<String> getImpaCode() {
+        return impaCode;
     }
 
-    public void setEntity(com.inventory.project.model.Entity entity) {
-        this.entity = entity;
+    public void setImpaCode(List<String> impaCode) {
+        this.impaCode = impaCode;
     }
-
-
 }

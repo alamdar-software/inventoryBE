@@ -14,6 +14,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/cipl")
+@CrossOrigin("*")
 public class CiplController {
     @Autowired
     private CiplRepository ciplRepository;
@@ -37,13 +38,13 @@ private  PickupRepository pickupRepository;
         this.ciplService = ciplService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipl() {
         List<Cipl> ciplList = ciplService.getAllCipl();
         return new ResponseEntity<>(ciplList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Cipl> getCiplById(@PathVariable Long id) {
         return ciplService.getCiplById(id)
                 .map(ResponseEntity::ok)

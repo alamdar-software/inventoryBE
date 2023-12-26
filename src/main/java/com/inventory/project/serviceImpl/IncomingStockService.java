@@ -43,9 +43,9 @@ private BulkStockRepo bulkStockRepo;
     }
 
 
-    public Map<String, Object> getBulkStockDetailsById(Long id) {
-        return bulkStockRepo.findBulkStockDetailsWithAssociatedFieldsById(id);
-    }
+//    public Map<String, Object> getBulkStockDetailsById(Long id) {
+//        return bulkStockRepo.findBulkStockDetailsWithAssociatedFieldsById(id);
+//    }
 
 
 
