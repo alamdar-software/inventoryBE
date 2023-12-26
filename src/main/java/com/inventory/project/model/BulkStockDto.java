@@ -19,7 +19,7 @@ public class BulkStockDto {
     private String purchaseOrder;
     private String pn;
     private String sn;
-    private int blindCount;
+//    private int blindCount;
     private Double price;
     private String name;
     private String description;
@@ -30,7 +30,7 @@ public class BulkStockDto {
     private String brandName; // ID for Brand entity
     private String unitName; // ID for Unit entity
     private Double standardPrice;
-    private String status;
+//    private String status;
     private String impaCode;
     private String storeNo;
     private String entityName; // ID for Entity entity
@@ -93,13 +93,13 @@ public class BulkStockDto {
         this.sn = sn;
     }
 
-    public int getBlindCount() {
-        return blindCount;
-    }
-
-    public void setBlindCount(int blindCount) {
-        this.blindCount = blindCount;
-    }
+//    public int getBlindCount() {
+//        return blindCount;
+//    }
+//
+//    public void setBlindCount(int blindCount) {
+//        this.blindCount = blindCount;
+//    }
 
     public Double getPrice() {
         return price;
@@ -173,13 +173,13 @@ public class BulkStockDto {
         this.standardPrice = standardPrice;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
 
     public String getImpaCode() {
         return impaCode;

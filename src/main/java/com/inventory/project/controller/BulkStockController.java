@@ -200,7 +200,7 @@ public ResponseEntity<?> addBulkStock(@RequestBody BulkStockDto incomingStockReq
             responseDTO.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
             responseDTO.setPn(incomingStockRequest.getPn());
             responseDTO.setSn(incomingStockRequest.getSn());
-            responseDTO.setBlindCount(incomingStockRequest.getBlindCount());
+//            responseDTO.setBlindCount(incomingStockRequest.getBlindCount());
             responseDTO.setPrice(incomingStockRequest.getPrice());
             responseDTO.setName(incomingStockRequest.getName());
             responseDTO.setDescription(incomingStockRequest.getDescription());
@@ -209,7 +209,7 @@ public ResponseEntity<?> addBulkStock(@RequestBody BulkStockDto incomingStockReq
             responseDTO.setBrandName(incomingStockRequest.getBrandName());
             responseDTO.setUnitName(incomingStockRequest.getUnitName());
             responseDTO.setStandardPrice(incomingStockRequest.getStandardPrice());
-            responseDTO.setStatus(incomingStockRequest.getStatus());
+//            responseDTO.setStatus(incomingStockRequest.getStatus());
             responseDTO.setImpaCode(incomingStockRequest.getImpaCode());
             responseDTO.setStoreNo(incomingStockRequest.getStoreNo());
             responseDTO.setEntityName(incomingStockRequest.getEntityName());
