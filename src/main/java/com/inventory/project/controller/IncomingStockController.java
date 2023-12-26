@@ -253,7 +253,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     // ... (rest of your existing code)
 }
 
-    @GetMapping("/view/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<?> viewIncomingStock(@PathVariable Long id) {
         Optional<IncomingStock> incomingStockOptional = incomingStockRepo.findById(id);
 
@@ -315,15 +315,15 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     }
 
 
-    @GetMapping("get/{id}")
-    public ResponseEntity<?> getIncomingStockById(@PathVariable Long id) {
-        Optional<IncomingStock> incomingStockOptional = incomingStockRepo.findById(id);
-        if (incomingStockOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Incoming stock with ID " + id + " not found");
-        }
-        IncomingStock incomingStock = incomingStockOptional.get();
-        return ResponseEntity.ok(incomingStock);
-    }
+//    @GetMapping("/get/{id}")
+//    public ResponseEntity<?> getIncomingStockById(@PathVariable Long id) {
+//        Optional<IncomingStock> incomingStockOptional = incomingStockRepo.findById(id);
+//        if (incomingStockOptional.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Incoming stock with ID " + id + " not found");
+//        }
+//        IncomingStock incomingStock = incomingStockOptional.get();
+//        return ResponseEntity.ok(incomingStock);
+//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteIncomingStock(@PathVariable Long id) {
@@ -366,7 +366,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         incomingStock.setPrice(incomingStockRequest.getPrice());
         incomingStock.setRemarks(incomingStockRequest.getRemarks());
         incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
-        incomingStock.setStatus(incomingStockRequest.getStatus());
+//        incomingStock.setStatus(incomingStockRequest.getStatus());
         incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
         incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
 
