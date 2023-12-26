@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bulkstock")
@@ -228,30 +229,67 @@ public ResponseEntity<?> addBulkStock(@RequestBody BulkStockDto incomingStockReq
 
     // ... (rest of your existing code)
 }
-    @GetMapping("/view")
-    public ResponseEntity<List<BulkStock>> viewAllBulkstock(HttpSession session) {
-        try {
-            List<BulkStock> incomingStocks = bulkStockRepo.findAll();
-
-            if (!incomingStocks.isEmpty()) {
-                return ResponseEntity.ok(incomingStocks);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
     @GetMapping("/get/{id}")
-    public ResponseEntity<BulkStock> getBulkStockById(@PathVariable Long id) {
-        Optional<BulkStock> bulkStock = bulkStockRepo.findById(id);
+    public ResponseEntity<?> viewBulkStock(@PathVariable Long id) {
+        Optional<BulkStock> incomingStockOptional = bulkStockRepo.findById(id);
 
-        if (bulkStock.isPresent()) {
-            return ResponseEntity.ok(bulkStock.get());
-        } else {
-            return ResponseEntity.notFound().build();
+        if (incomingStockOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bulk stock with ID " + id + " not found");
         }
+
+        BulkStock incomingStock = incomingStockOptional.get();
+
+        IncomingStockRequest responseDTO = mapIncomingStockToResponseDTO(incomingStock);
+
+        return ResponseEntity.ok(responseDTO);
     }
+
+    private IncomingStockRequest mapIncomingStockToResponseDTO(BulkStock incomingStock) {
+        IncomingStockRequest responseDTO = new IncomingStockRequest();
+
+        responseDTO.setQuantity(incomingStock.getQuantity());
+        responseDTO.setUnitPrice(incomingStock.getUnitPrice());
+        responseDTO.setExtendedValue(incomingStock.getExtendedValue());
+        responseDTO.setDate(incomingStock.getDate());
+        responseDTO.setPurchaseOrder(incomingStock.getPurchaseOrder());
+        responseDTO.setPn(incomingStock.getPn());
+        responseDTO.setSn(incomingStock.getSn());
+        responseDTO.setPrice(incomingStock.getPrice());
+        responseDTO.setName(incomingStock.getCategory() != null ? incomingStock.getCategory().getName() : null);
+        responseDTO.setDescription(incomingStock.getItemDescription());
+        responseDTO.setRemarks(incomingStock.getRemarks());
+        responseDTO.setCurrencyName(incomingStock.getCurrency() != null ? incomingStock.getCurrency().getCurrencyName() : null);
+        responseDTO.setBrandName(incomingStock.getBrand() != null ? incomingStock.getBrand().getBrandName() : null);
+        responseDTO.setUnitName(incomingStock.getUnit() != null ? incomingStock.getUnit().getUnitName() : null);
+        responseDTO.setStandardPrice(incomingStock.getStandardPrice());
+//        responseDTO.setStatus(incomingStock.getStatus());
+        responseDTO.setImpaCode(incomingStock.getImpaCode());
+        responseDTO.setStoreNo(incomingStock.getStoreNo());
+        responseDTO.setEntityName(incomingStock.getEntity() != null ? incomingStock.getEntity().getEntityName() : null);
+
+        if (incomingStock.getAddress() != null) {
+            responseDTO.setLocationName(incomingStock.getLocation() != null ? incomingStock.getLocation().getLocationName() : null);
+            responseDTO.setAddress(incomingStock.getAddress().getAddress());
+        }
+
+        return responseDTO;
+    }
+
+    @GetMapping("/view")
+    public ResponseEntity<?> viewAllBulkStocks() {
+        List<BulkStock> allIncomingStocks = bulkStockRepo.findAll();
+
+        if (allIncomingStocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No block stocks found");
+        }
+
+        List<IncomingStockRequest> responseDTOList = allIncomingStocks.stream()
+                .map(this::mapIncomingStockToResponseDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseDTOList);
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateIncomingStock(
             @PathVariable Long id,

@@ -199,7 +199,6 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         boolean addressFound = addresses.stream()
                 .anyMatch(addr -> addr.getAddress().equals(requestedAddress));
 
-        // If the address was found for the location
         if (addressFound) {
             // Set all fields for incomingStock
             incomingStock.setItemDescription(item.getDescription());
