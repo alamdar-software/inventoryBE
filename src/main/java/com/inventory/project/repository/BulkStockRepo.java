@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Repository
 public interface BulkStockRepo extends JpaRepository<BulkStock,Long> {
-    @Query("SELECT s.quantity AS quantity, s.unitPrice AS unitPrice, s.impaCode AS impaCode, s.remarks AS remarks, s.storeNo AS storeNo, s.sn AS sn, s.pn AS pn, s.purchaseOrder AS purchaseOrder, " +
+    @Query("SELECT s.quantity AS quantity, s.unitCost AS unitCost, s.impaCode AS impaCode, s.remarks AS remarks, s.storeNo AS storeNo, s.sn AS sn, s.pn AS pn, s.purchaseOrder AS purchaseOrder, " +
             "s.standardPrice AS standardPrice, s.price AS price, s.extendedValue AS extendedValue, s.date AS date, i.itemName AS itemName, l.locationName AS locationName, u.unitName AS unitName, " +
             "s.currency.currencyName AS currencyName, b.brandName AS brandName, e.entityName AS entityName " +
             "FROM BulkStock s " +

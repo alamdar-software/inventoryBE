@@ -13,7 +13,7 @@ import java.util.List;
 public class BulkStockDto {
 
     private int quantity;
-    private Double unitPrice;
+    private Double unitCost;
     private Double extendedValue;
     private LocalDate date;
     private String purchaseOrder;
@@ -45,12 +45,12 @@ public class BulkStockDto {
         this.quantity = quantity;
     }
 
-    public Double getUnitPrice() {
-        return unitPrice;
+    public Double getUnitCost() {
+        return unitCost;
     }
 
-    public void setUnitPrice(Double unitPrice) {
-        this.unitPrice = unitPrice;
+    public void setUnitCost(Double unitCost) {
+        this.unitCost = unitCost;
     }
 
     public Double getExtendedValue() {
