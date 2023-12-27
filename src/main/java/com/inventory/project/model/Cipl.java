@@ -67,8 +67,7 @@ public class Cipl {
 //    @JoinColumn(name="incomingstock_id")
 //    private IncomingStock incomingStock;
 
-    @ElementCollection
-    private List<String> itemName = new ArrayList<>();
+   private String itemName;
 
     @ElementCollection
     private List<String> subLocations = new ArrayList<>();
@@ -214,11 +213,11 @@ public class Cipl {
         this.totalAmount = totalAmount;
     }
 
-    public List<String> getItemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setItemName(List<String> itemName) {
+    public void setItemName(String itemName) {
         this.itemName = itemName;
     }
 
