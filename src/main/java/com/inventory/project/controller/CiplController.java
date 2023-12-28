@@ -102,5 +102,17 @@ private  PickupRepository pickupRepository;
         ciplService.deleteCiplById(id);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Cipl> updateCiplStock(@PathVariable Long id, @RequestBody Cipl  cipl) {
+        Optional<Cipl> existingBulkStock = ciplService.getCiplById(id);
+
+        if (existingBulkStock.isPresent()) {
+            cipl.setId(id);
+            Cipl updatedCiplStock = ciplService.createCipl(cipl);
+            return new ResponseEntity<>(updatedCiplStock, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 }

@@ -6,19 +6,16 @@ import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "mto")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class Mto {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @ManyToOne
-//    @JoinColumn(name = "location_id")
-    private Location location;
 
     @Column(name = "location_name")
     private String locationName;
@@ -27,14 +24,33 @@ public class Mto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate transferDate;
 
-    @ManyToOne
-//    @JoinColumn(name = "consignee_id")
-    private Consignee consignee;
+
     @Column(name = "consignee_name")
     private String consigneeName;
 
     @Column(name = "repair_service")
     private boolean repairService;
+
+    @ElementCollection
+    private List<String> quantity = new ArrayList<>();
+    @ElementCollection
+    private List<String> purchase = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> pn = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> sn = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> item = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> SubLocation = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> remarks = new ArrayList<>();
+
 
     public Mto() {
     }
@@ -47,13 +63,7 @@ public class Mto {
         this.id = id;
     }
 
-    public Location getLocation() {
-        return location;
-    }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 
     public String getLocationName() {
         return locationName;
@@ -71,13 +81,7 @@ public class Mto {
         this.transferDate = transferDate;
     }
 
-    public Consignee getConsignee() {
-        return consignee;
-    }
 
-    public void setConsignee(Consignee consignee) {
-        this.consignee = consignee;
-    }
 
     public String getConsigneeName() {
         return consigneeName;
@@ -93,5 +97,65 @@ public class Mto {
 
     public void setRepairService(boolean repairService) {
         this.repairService = repairService;
+    }
+
+    public boolean isRepairService() {
+        return repairService;
+    }
+
+    public List<String> getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(List<String> quantity) {
+        this.quantity = quantity;
+    }
+
+    public List<String> getPurchase() {
+        return purchase;
+    }
+
+    public void setPurchase(List<String> purchase) {
+        this.purchase = purchase;
+    }
+
+    public List<String> getPn() {
+        return pn;
+    }
+
+    public void setPn(List<String> pn) {
+        this.pn = pn;
+    }
+
+    public List<String> getSn() {
+        return sn;
+    }
+
+    public void setSn(List<String> sn) {
+        this.sn = sn;
+    }
+
+    public List<String> getItem() {
+        return item;
+    }
+
+    public void setItem(List<String> item) {
+        this.item = item;
+    }
+
+    public List<String> getSubLocation() {
+        return SubLocation;
+    }
+
+    public void setSubLocation(List<String> subLocation) {
+        SubLocation = subLocation;
+    }
+
+    public List<String> getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(List<String> remarks) {
+        this.remarks = remarks;
     }
 }
