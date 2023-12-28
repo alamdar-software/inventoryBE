@@ -5,12 +5,14 @@ import com.inventory.project.model.Currency;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.CiplService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cipl")
@@ -38,10 +40,48 @@ private  PickupRepository pickupRepository;
         this.ciplService = ciplService;
     }
 
-    @GetMapping("/view")
-    public ResponseEntity<List<Cipl>> getAllCipl() {
-        List<Cipl> ciplList = ciplService.getAllCipl();
-        return new ResponseEntity<>(ciplList, HttpStatus.OK);
+//    @GetMapping("/view")
+//    public ResponseEntity<?> getAllCipl(
+//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate transferDate,
+//            @RequestParam(required = false) String locationName,
+//            @RequestParam(required = false) String item
+//    ) {
+//        List<Cipl> ciplList;
+//
+//        if (transferDate != null || locationName != null || item != null) {
+//            ciplList = ciplService.getSpecificCiplData(transferDate, locationName, item);
+//
+//            if (ciplList.isEmpty()) {
+//                return new ResponseEntity<>(ciplList, HttpStatus.OK);
+//            }
+//        } else {
+//            ciplList = ciplRepository.findAll();
+//        }
+//
+//        if (item != null && !item.isEmpty()) {
+//            ciplList = ciplList.stream()
+//                    .filter(cipl -> cipl.getItem().contains(item))
+//                    .map(cipl -> {
+//                        Cipl transformedCipl = new Cipl();
+//                        transformedCipl.setItem(cipl.getItem());
+//                        transformedCipl.setLocationName(cipl.getLocationName());
+//                        transformedCipl.setTransferDate(cipl.getTransferDate());
+//                        return transformedCipl;
+//                    })
+//                    .collect(Collectors.toList());
+//        }
+//
+//        return new ResponseEntity<>(ciplList, HttpStatus.OK);
+//    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody Cipl searchCriteria) {
+        List<Cipl> ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(
+                searchCriteria.getItem(),
+                searchCriteria.getLocationName(),
+                searchCriteria.getTransferDate()
+        );
+        return ResponseEntity.ok(ciplList);
     }
 
     @GetMapping("/get/{id}")
@@ -62,4 +102,5 @@ private  PickupRepository pickupRepository;
         ciplService.deleteCiplById(id);
         return ResponseEntity.ok().build();
     }
+
 }
