@@ -1,6 +1,7 @@
 package com.inventory.project.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -69,20 +70,28 @@ public class Cipl {
 
    private String itemName;
 
+    @JsonProperty("SubLocations")
     @ElementCollection
-    private List<String> subLocations = new ArrayList<>();
+    private List<String> SubLocations = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> date = new ArrayList<>();
 
     @ElementCollection
     private List<String> hs = new ArrayList<>();
 
     @ElementCollection
     private List<String> sn = new ArrayList<>();
+    @ElementCollection
+    private List<String> partNo = new ArrayList<>();
 
     @ElementCollection
     private List<String> dimension = new ArrayList<>();
 
     @ElementCollection
     private List<String> remarks = new ArrayList<>();
+    @ElementCollection
+    private List<String> quantity = new ArrayList<>();
 
     @ElementCollection
     private List<String> packageName = new ArrayList<>();
@@ -221,13 +230,7 @@ public class Cipl {
         this.itemName = itemName;
     }
 
-    public List<String> getSubLocations() {
-        return subLocations;
-    }
 
-    public void setSubLocations(List<String> subLocations) {
-        this.subLocations = subLocations;
-    }
 
     public List<String> getHs() {
         return hs;
@@ -331,5 +334,37 @@ public class Cipl {
 
     public void setPo(String po) {
         this.po = po;
+    }
+
+    public List<String> getSubLocations() {
+        return SubLocations;
+    }
+
+    public void setSubLocations(List<String> subLocations) {
+        SubLocations = subLocations;
+    }
+
+    public List<String> getDate() {
+        return date;
+    }
+
+    public void setDate(List<String> date) {
+        this.date = date;
+    }
+
+    public List<String> getPartNo() {
+        return partNo;
+    }
+
+    public void setPartNo(List<String> partNo) {
+        this.partNo = partNo;
+    }
+
+    public List<String> getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(List<String> quantity) {
+        this.quantity = quantity;
     }
 }
