@@ -24,7 +24,9 @@ public class BulkStock {
     private String description;
     private String purchaseOrder;
     private String remarks;
-    private String date;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+
+    private LocalDate date;
 
     @ElementCollection
     @CollectionTable(name = "unit_cost", joinColumns = @JoinColumn(name = "bulk_stock_id"))
@@ -123,11 +125,11 @@ public class BulkStock {
         this.remarks = remarks;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
