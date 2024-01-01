@@ -40,39 +40,12 @@ private  PickupRepository pickupRepository;
         this.ciplService = ciplService;
     }
 
-//    @GetMapping("/view")
-//    public ResponseEntity<?> getAllCipl(
-//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate transferDate,
-//            @RequestParam(required = false) String locationName,
-//            @RequestParam(required = false) String item
-//    ) {
-//        List<Cipl> ciplList;
-//
-//        if (transferDate != null || locationName != null || item != null) {
-//            ciplList = ciplService.getSpecificCiplData(transferDate, locationName, item);
-//
-//            if (ciplList.isEmpty()) {
-//                return new ResponseEntity<>(ciplList, HttpStatus.OK);
-//            }
-//        } else {
-//            ciplList = ciplRepository.findAll();
-//        }
-//
-//        if (item != null && !item.isEmpty()) {
-//            ciplList = ciplList.stream()
-//                    .filter(cipl -> cipl.getItem().contains(item))
-//                    .map(cipl -> {
-//                        Cipl transformedCipl = new Cipl();
-//                        transformedCipl.setItem(cipl.getItem());
-//                        transformedCipl.setLocationName(cipl.getLocationName());
-//                        transformedCipl.setTransferDate(cipl.getTransferDate());
-//                        return transformedCipl;
-//                    })
-//                    .collect(Collectors.toList());
-//        }
-//
-//        return new ResponseEntity<>(ciplList, HttpStatus.OK);
-//    }
+
+    @GetMapping("/view")
+    public ResponseEntity<List<Cipl>> getAllCipl() {
+        List<Cipl> ciplList = ciplRepository.findAll();
+        return new ResponseEntity<>(ciplList, HttpStatus.OK);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody Cipl searchCriteria) {

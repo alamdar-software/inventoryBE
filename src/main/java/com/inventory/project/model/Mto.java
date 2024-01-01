@@ -1,6 +1,7 @@
 package com.inventory.project.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -46,6 +47,8 @@ public class Mto {
     private List<String> item = new ArrayList<>();
 
     @ElementCollection
+    @JsonProperty("SubLocation")
+
     private List<String> SubLocation = new ArrayList<>();
 
     @ElementCollection
