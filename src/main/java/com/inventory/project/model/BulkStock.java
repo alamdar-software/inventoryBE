@@ -21,7 +21,7 @@ public class BulkStock {
     @JoinColumn(name = "address")
 
     private String address;
-    private String description;
+//    private String description;
     private String purchaseOrder;
     private String remarks;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -72,6 +72,9 @@ public class BulkStock {
     @ElementCollection
     private List<String> impaCode = new ArrayList<>();
 
+   @ElementCollection
+   private List<String> description = new ArrayList<>();
+
 
     public BulkStock() {
 
@@ -101,11 +104,11 @@ public class BulkStock {
         this.address = address;
     }
 
-    public String getDescription() {
+    public List<String> getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(List<String> description) {
         this.description = description;
     }
 
