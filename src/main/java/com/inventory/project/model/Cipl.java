@@ -28,6 +28,9 @@ public class Cipl {
     @Column(name = "transfer_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate transferDate;
+    @Column(name="reference_no")
+    private String referenceNo;
+    private String transferType;
 
 //    @ManyToOne
 ////    @JoinColumn(name = "shipper_id")
@@ -366,5 +369,21 @@ public class Cipl {
 
     public void setQuantity(List<String> quantity) {
         this.quantity = quantity;
+    }
+
+    public String getReferenceNo() {
+        return referenceNo;
+    }
+
+    public void setReferenceNo(String referenceNo) {
+        this.referenceNo = referenceNo;
+    }
+
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
     }
 }

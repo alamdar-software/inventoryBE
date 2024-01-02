@@ -63,12 +63,27 @@ private  PickupRepository pickupRepository;
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    @PostMapping("/add")
-    public ResponseEntity<Cipl> addCipl(@RequestBody Cipl cipl) {
-        Cipl newCipl = ciplService.createCipl(cipl);
-        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
+    @GetMapping("/createpdf/{id}")
+    public ResponseEntity<Cipl> creatPdfById(@PathVariable Long id) {
+        return ciplService.getCiplById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
+//    @PostMapping("/add")
+//    public ResponseEntity<Cipl> addCipl(@RequestBody Cipl cipl) {
+//        Cipl newCipl = ciplService.createCipl(cipl);
+//        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
+//    }
+@PostMapping("/add")
+public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
+    try {
+        Cipl savedCiplItem = ciplService.createCipl(ciplItem);
+        return new ResponseEntity<>(savedCiplItem, HttpStatus.CREATED);
+    } catch (Exception e) {
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCipl(@PathVariable Long id) {
