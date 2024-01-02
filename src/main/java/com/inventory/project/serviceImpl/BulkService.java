@@ -2,6 +2,7 @@ package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.BulkStock;
 import com.inventory.project.model.Cipl;
+import com.inventory.project.model.IncomingStockRequest;
 import com.inventory.project.repository.BulkStockRepo;
 import com.inventory.project.repository.CiplRepository;
 import jakarta.transaction.Transactional;

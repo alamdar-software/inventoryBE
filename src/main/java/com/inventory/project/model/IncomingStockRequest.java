@@ -227,4 +227,7 @@ public class IncomingStockRequest {
     public void setInventory(Inventory inventory) {
         this.setInventory(inventory);
     }
+
+
+
 }
