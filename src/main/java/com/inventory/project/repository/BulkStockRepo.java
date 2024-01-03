@@ -1,11 +1,15 @@
 package com.inventory.project.repository;
 
 import com.inventory.project.model.BulkStock;
+import com.inventory.project.model.Cipl;
+import com.inventory.project.model.StockViewDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -22,4 +26,12 @@ public interface BulkStockRepo extends JpaRepository<BulkStock,Long> {
 //            "JOIN s.entity e " +
 //            "WHERE s.id = :id")
 //    Map<String, Object> findBulkStockDetailsWithAssociatedFieldsById(@Param("id") Long id);
+
+    List<BulkStock> findByDescriptionInAndLocationNameAndDateAndEntityNameInAndPurchaseOrder(
+            List<String> description,
+            String locationName,
+            LocalDate date,
+            List<String> entityName,
+            String purchaseOrder
+    );
 }

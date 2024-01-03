@@ -90,25 +90,7 @@ IncomingStockRepo incomingStockRepo;
         bulkStockService.deleteBulkById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-//    @GetMapping("/view")
-//    public ResponseEntity<List<StockViewDto>> getStockView() {
-//        List<StockViewDto> stockViewList = new ArrayList<>();
-//
-//        List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
-//        List<BulkStock> bulkStocks = bulkStockRepo.findAll();
-//
-//        for (IncomingStock incomingStock : incomingStocks) {
-//            StockViewDto stockView = mapIncomingStockToDTO(incomingStock);
-//            stockViewList.add(stockView);
-//        }
-//
-//        for (BulkStock bulkStock : bulkStocks) {
-//            StockViewDto stockView = mapBulkStockToDTO(bulkStock);
-//            stockViewList.add(stockView);
-//        }
-//
-//        return ResponseEntity.ok(stockViewList);
-//    }
+
 @GetMapping("/view")
 public ResponseEntity<StockViewResponse> getStockView() {
     List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
@@ -211,4 +193,16 @@ public ResponseEntity<StockViewResponse> getStockView() {
 
         return stockView;
     }
+    @GetMapping("/search")
+    public ResponseEntity<List<BulkStock>> searchBulkStockByCriteria(@RequestBody BulkStock searchCriteria) {
+        List<BulkStock> bulkStockList = bulkStockService.getStockViewDtoByItemAndLocationAndTransferDate(
+                searchCriteria.getDescription(),
+                searchCriteria.getLocationName(),
+                searchCriteria.getDate(),
+                searchCriteria.getEntityName(),
+                searchCriteria.getPurchaseOrder()
+        );
+        return ResponseEntity.ok(bulkStockList);
+    }
+
 }
