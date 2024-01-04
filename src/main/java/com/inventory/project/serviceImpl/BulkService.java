@@ -56,4 +56,9 @@ public class BulkService {
         );
     }
 
+    public BulkStock save(BulkStock existingBulk) {
+        // Perform any additional operations before saving, if needed
+        return bulkStockRepo.save(existingBulk);
+    }
+
 }

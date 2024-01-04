@@ -1,5 +1,9 @@
 package com.inventory.project.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.BulkService;
@@ -65,93 +69,35 @@ IncomingStockRepo incomingStockRepo;
 
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<BulkStock> updateBulkStock(@PathVariable Long id, @RequestBody BulkStock bulkStock) {
+    public ResponseEntity<Object> updateStock(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates) {
         Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
+        Optional<IncomingStock> existingIncomingStock = incomingStockService.getById(id);
 
         if (existingBulkStock.isPresent()) {
-            bulkStock.setId(id);
-            BulkStock updatedBulkStock = bulkStockService.createBulk(bulkStock);
-            return new ResponseEntity<>(updatedBulkStock, HttpStatus.OK);
+            BulkStock existingBulk = existingBulkStock.get();
+            updateEntity(existingBulk, stockUpdates);
+            BulkStock updatedBulkStock = bulkStockService.save(existingBulk);
+            return ResponseEntity.ok(updatedBulkStock);
+        } else if (existingIncomingStock.isPresent()) {
+            IncomingStock existingIncoming = existingIncomingStock.get();
+            updateEntity(existingIncoming, stockUpdates);
+            IncomingStock updatedIncomingStock = incomingStockService.save(existingIncoming);
+            return ResponseEntity.ok(updatedIncomingStock);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<?> updateEntity(
-//
-//            @PathVariable Long id,
-//            @RequestBody IncomingStockRequest updatedEntity,
-//            @RequestBody BulkStock updatedBulkEntity
-//
-//
-//    ) {
-//        try {
-//            Optional<IncomingStock> existingIncomingStock = incomingStockRepo.findById(id);
-//            Optional<BulkStock> existingBulkStock = bulkStockRepo.findById(id);
-//
-//            if (existingIncomingStock.isPresent()) {
-//                IncomingStock updatedStock = new IncomingStock();
-//
-//                // Set fields for IncomingStock
-//                    updatedEntity.setLocationName(updatedEntity.getLocationName());
-//                    updatedEntity.setAddress(updatedEntity.getAddress());
-//                    updatedEntity.setPurchaseOrder(updatedEntity.getPurchaseOrder());
-//                    existingIncomingStock.get().setRemarks(updatedStock.getRemarks());
-//                    existingIncomingStock.get().setDate(updatedStock.getDate());
-//                    existingIncomingStock.get().setUnitCost(updatedStock.getUnitCost());
-//                    updatedEntity.setName(updatedEntity.getName());
-//                    existingIncomingStock.get().setQuantity(updatedStock.getQuantity());
-////                    existingIncomingStock.get().setItemDescription(updatedStock.getItemDescription());
-//                    updatedEntity.setBrandName(updatedEntity.getBrandName());
-//                    existingIncomingStock.get().setPrice(updatedStock.getPrice());
-//                    updatedEntity.setUnitName(updatedEntity.getUnitName());
-//                    existingIncomingStock.get().setStandardPrice(updatedStock.getStandardPrice());
-//                    existingIncomingStock.get().setExtendedValue(updatedStock.getExtendedValue());
-//                    existingIncomingStock.get().setSn(updatedStock.getSn());
-//                    existingIncomingStock.get().setPn(updatedStock.getPn());
-//                    updatedEntity.setEntityName(updatedEntity.getEntityName());
-//                    existingIncomingStock.get().setStoreNo(updatedStock.getStoreNo());
-//                    existingIncomingStock.get().setImpaCode(updatedStock.getImpaCode());
-//                    updatedEntity.setDescription(updatedEntity.getDescription());
-//
-//                    incomingStockRepo.save(existingIncomingStock.get());
-//                    return ResponseEntity.ok().body(existingIncomingStock.get());
-//                }  else if (existingBulkStock.isPresent()) {
-//                BulkStock updatedStock = new BulkStock();
-//
-//
-//                // Set fields for BulkStock
-//                updatedBulkEntity.setLocationName(updatedStock.getLocationName());
-//                updatedBulkEntity.setAddress(updatedStock.getAddress());
-//                updatedBulkEntity.setPurchaseOrder(updatedStock.getPurchaseOrder());
-//                updatedBulkEntity.setRemarks(updatedStock.getRemarks());
-//                updatedBulkEntity.setDate(updatedStock.getDate());
-//                updatedBulkEntity.setUnitCost(updatedStock.getUnitCost());
-//                updatedBulkEntity.setName(updatedStock.getName());
-//                updatedBulkEntity.setQuantity(updatedStock.getQuantity());
-//                updatedBulkEntity.setItem(updatedStock.getItem());
-//                updatedBulkEntity.setBrandName(updatedStock.getBrandName());
-//                updatedBulkEntity.setPrice(updatedStock.getPrice());
-//                updatedBulkEntity.setUnitName(updatedStock.getUnitName());
-//                updatedBulkEntity.setStandardPrice(updatedStock.getStandardPrice());
-//                updatedBulkEntity.setExtendedValue(updatedStock.getExtendedValue());
-//                updatedBulkEntity.setSn(updatedStock.getSn());
-//                updatedBulkEntity.setPn(updatedStock.getPn());
-//                updatedBulkEntity.setEntityName(updatedStock.getEntityName());
-//                updatedBulkEntity.setStoreNo(updatedStock.getStoreNo());
-//                updatedBulkEntity.setImpaCode(updatedStock.getImpaCode());
-//                updatedBulkEntity.setDescription(updatedStock.getDescription());
-//
-//                    bulkStockRepo.save(existingBulkStock.get());
-//                    return ResponseEntity.ok().body(existingBulkStock.get());
-//                } else {
-//                    return ResponseEntity.notFound().build();
-//                }
-//            } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating entity.");
-//        }
-//    }
+    private void updateEntity(Object entity, Map<String, Object> updates) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectReader updater = objectMapper.readerForUpdating(entity);
+        try {
+            updater.readValue(objectMapper.writeValueAsString(updates));
+        } catch (JsonProcessingException e) {
+            // Handle exception as per your application's requirements
+        }
+    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<BulkStock> getBulkStockById(@PathVariable Long id) {

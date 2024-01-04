@@ -42,6 +42,14 @@ private BulkStockRepo bulkStockRepo;
         return incomingStockRepo.findIncomingStockDetailsWithAssociatedFieldsById(id);
     }
 
+    public Optional<IncomingStock> getById(Long id) {
+        return incomingStockRepo.findById(id);
+    }
+
+    public IncomingStock save(IncomingStock existingIncoming) {
+        return incomingStockRepo.save(existingIncoming);
+
+    }
 
 //    public Map<String, Object> getBulkStockDetailsById(Long id) {
 //        return bulkStockRepo.findBulkStockDetailsWithAssociatedFieldsById(id);
