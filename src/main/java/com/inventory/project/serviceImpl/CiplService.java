@@ -43,8 +43,8 @@ public class CiplService {
 
 
     // Other methods for CRUD operations...
-    public List<Cipl> getCiplByItemAndLocationAndTransferDate(List<String> item, String locationName, LocalDate transferDate) {
-        return ciplRepository.findByItemInAndLocationNameAndTransferDate(item, locationName, transferDate);
+    public List<Cipl> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        return ciplRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
     }
 //    @Transactional
 //    public Cipl createCipl(Cipl cipl) {
@@ -165,12 +165,12 @@ public class CiplService {
 
 
 
-    public List<Cipl> getCiplByItemAndLocation(List<String> item, String locationName) {
-        return ciplRepository.findByItemInAndLocationName(item, locationName);
+    public List<Cipl> getCiplByItemAndLocation(String item, String locationName) {
+        return ciplRepository.findByItemAndLocationName(item, locationName);
     }
 
-    public List<Cipl> getCiplByItem(List<String> item) {
-        return ciplRepository.findByItemIn(item);
+    public List<Cipl> getCiplByItem(String item) {
+        return ciplRepository.findByItem(item);
     }
 
     public List<Cipl> getCiplByLocation(String locationName) {

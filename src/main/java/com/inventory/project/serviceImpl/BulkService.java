@@ -40,13 +40,13 @@ public class BulkService {
         bulkStockRepo.deleteById(id);
     }
     public List<BulkStock> getStockViewDtoByItemAndLocationAndTransferDate(
-            List<String> description,
+            String description,
             String locationName,
             LocalDate date,
-            List<String> entityName,
+            String entityName,
             String purchaseOrder) {
 
-        return bulkStockRepo.findByDescriptionInAndLocationNameAndDateAndEntityNameInAndPurchaseOrder(
+        return bulkStockRepo.findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrder(
                 description,
                 locationName,
                 date,
@@ -63,13 +63,13 @@ public class BulkService {
         List<BulkStock> result;
 
         if (searchRequest.getDescription() != null) {
-            result = bulkStockRepo.findByDescriptionIn(searchRequest.getDescription());
+            result = bulkStockRepo.findByDescription(searchRequest.getDescription());
         } else if (searchRequest.getLocationName() != null) {
             result = bulkStockRepo.findByLocationName(searchRequest.getLocationName());
         } else if (searchRequest.getDate() != null) {
             result = bulkStockRepo.findByDate(searchRequest.getDate());
         } else if (searchRequest.getEntityName() != null) {
-            result = bulkStockRepo.findByEntityNameIn(searchRequest.getEntityName());
+            result = bulkStockRepo.findByEntityName(searchRequest.getEntityName());
         } else if (searchRequest.getPurchaseOrder() != null) {
             result = bulkStockRepo.findByPurchaseOrder(searchRequest.getPurchaseOrder());
         } else {

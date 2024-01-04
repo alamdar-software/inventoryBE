@@ -27,21 +27,21 @@ public interface BulkStockRepo extends JpaRepository<BulkStock,Long> {
 //            "WHERE s.id = :id")
 //    Map<String, Object> findBulkStockDetailsWithAssociatedFieldsById(@Param("id") Long id);
 
-    List<BulkStock> findByDescriptionInAndLocationNameAndDateAndEntityNameInAndPurchaseOrder(
-            List<String> description,
+    List<BulkStock> findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrder(
+            String description,
             String locationName,
             LocalDate date,
-            List<String> entityName,
+            String entityName,
             String purchaseOrder
     );
 
-    List<BulkStock> findByDescriptionIn(List<String> description);
+    List<BulkStock> findByDescription(String description);
 
     List<BulkStock> findByLocationName(String locationName);
 
     List<BulkStock> findByDate(LocalDate date);
 
-    List<BulkStock> findByEntityNameIn(List<String> entityName);
+    List<BulkStock> findByEntityName(String entityName);
 
     List<BulkStock> findByPurchaseOrder(String purchaseOrder);
 }

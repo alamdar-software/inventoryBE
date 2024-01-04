@@ -57,10 +57,13 @@ public class CiplController {
 //    }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody SearchCriteria criteria) {
+    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null || (criteria.getItem() == null && criteria.getLocationName() == null && criteria.getTransferDate() == null)) {
-            return ResponseEntity.badRequest().body(Collections.emptyList());
+            // If no search criteria provided, return all Cipl data
+            List<Cipl> allCipl = ciplService.getAllCipl();
+            return ResponseEntity.ok(allCipl);
         }
+
 
         List<Cipl> ciplList;
 
@@ -86,7 +89,11 @@ public class CiplController {
 
         return ResponseEntity.ok(ciplList);
     }
-
+    @GetMapping("/all")
+    public ResponseEntity<List<Cipl>> AllCipl() {
+        List<Cipl> allCipl = ciplService.getAllCipl();
+        return ResponseEntity.ok(allCipl);
+    }
 
 
     @GetMapping("/get/{id}")

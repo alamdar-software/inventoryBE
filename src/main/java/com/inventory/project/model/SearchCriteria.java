@@ -4,23 +4,23 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class SearchCriteria {
-    private List<String> item;
+    private String item;
     private String locationName;
     private LocalDate transferDate;
 
-    private List<String> description;
+    private String description;
 
     private LocalDate date;
     private String purchaseOrder;
-    private List<String> entityName;
+    private String entityName;
     public SearchCriteria() {
     }
 
-    public List<String> getItem() {
+    public String getItem() {
         return item;
     }
 
-    public void setItem(List<String> item) {
+    public void setItem(String item) {
         this.item = item;
     }
 
@@ -40,12 +40,20 @@ public class SearchCriteria {
         this.transferDate = transferDate;
     }
 
-    public List<String> getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(List<String> description) {
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
     }
 
     public LocalDate getDate() {
@@ -64,13 +72,7 @@ public class SearchCriteria {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public List<String> getEntityName() {
-        return entityName;
-    }
 
-    public void setEntityName(List<String> entityName) {
-        this.entityName = entityName;
-    }
     public boolean isEmpty() {
         return description == null && locationName == null && date == null &&
                 purchaseOrder == null && entityName == null;
