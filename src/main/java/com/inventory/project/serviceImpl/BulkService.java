@@ -60,7 +60,11 @@ public class BulkService {
         return bulkStockRepo.save(existingBulk);
     }
     public List<BulkStock> searchBulk(SearchCriteria searchRequest) {
-        List<BulkStock> result;
+        if (searchRequest.isEmpty()) {
+            return bulkStockRepo.findAll(); // If no search parameters provided, return all records
+        }
+
+        List<BulkStock> result = new ArrayList<>();
 
         if (searchRequest.getDescription() != null) {
             result = bulkStockRepo.findByDescription(searchRequest.getDescription());
@@ -72,9 +76,6 @@ public class BulkService {
             result = bulkStockRepo.findByEntityName(searchRequest.getEntityName());
         } else if (searchRequest.getPurchaseOrder() != null) {
             result = bulkStockRepo.findByPurchaseOrder(searchRequest.getPurchaseOrder());
-        } else {
-            // Handle an unexpected situation here or return an empty list
-            result = Collections.emptyList();
         }
 
         return result;
