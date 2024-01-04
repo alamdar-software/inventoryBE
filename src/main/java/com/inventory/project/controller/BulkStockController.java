@@ -9,10 +9,12 @@ import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.BulkService;
 import com.inventory.project.serviceImpl.IncomingStockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -216,15 +218,18 @@ public ResponseEntity<StockViewResponse> getStockView() {
         return stockView;
     }
     @GetMapping("/search")
-    public ResponseEntity<List<BulkStock>> searchBulkStockByCriteria(@RequestBody BulkStock searchCriteria) {
-        List<BulkStock> bulkStockList = bulkStockService.getStockViewDtoByItemAndLocationAndTransferDate(
-                searchCriteria.getDescription(),
-                searchCriteria.getLocationName(),
-                searchCriteria.getDate(),
-                searchCriteria.getEntityName(),
-                searchCriteria.getPurchaseOrder()
-        );
-        return ResponseEntity.ok(bulkStockList);
+    public ResponseEntity<List<BulkStock>> searchBulk(@RequestBody SearchCriteria searchRequest) {
+        if (searchRequest.isEmpty()) {
+            return ResponseEntity.badRequest().build(); // No search parameters provided
+        }
+
+        List<BulkStock> result = bulkStockService.searchBulk(searchRequest);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build(); // No records found
+        }
+
+        return ResponseEntity.ok(result);
     }
 
 }

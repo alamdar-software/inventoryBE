@@ -162,4 +162,27 @@ public class CiplService {
         }
         return 0;
     }
+
+
+
+    public List<Cipl> getCiplByItemAndLocation(List<String> item, String locationName) {
+        return ciplRepository.findByItemInAndLocationName(item, locationName);
+    }
+
+    public List<Cipl> getCiplByItem(List<String> item) {
+        return ciplRepository.findByItemIn(item);
+    }
+
+    public List<Cipl> getCiplByLocation(String locationName) {
+        return ciplRepository.findByLocationName(locationName);
+    }
+
+    public List<Cipl> getCiplByTransferDate(LocalDate transferDate) {
+        return ciplRepository.findByTransferDate(transferDate);
+    }
+
+    public List<Cipl> getCiplByLocationAndTransferDate(String locationName, LocalDate transferDate) {
+        return ciplRepository.findByLocationNameAndTransferDate(locationName,transferDate);
+
+    }
 }

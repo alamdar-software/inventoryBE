@@ -34,4 +34,14 @@ public interface BulkStockRepo extends JpaRepository<BulkStock,Long> {
             List<String> entityName,
             String purchaseOrder
     );
+
+    List<BulkStock> findByDescriptionIn(List<String> description);
+
+    List<BulkStock> findByLocationName(String locationName);
+
+    List<BulkStock> findByDate(LocalDate date);
+
+    List<BulkStock> findByEntityNameIn(List<String> entityName);
+
+    List<BulkStock> findByPurchaseOrder(String purchaseOrder);
 }

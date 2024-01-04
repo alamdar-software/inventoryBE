@@ -12,8 +12,13 @@ import java.util.List;
 public interface CiplRepository extends JpaRepository<Cipl,Long> {
     List<Cipl> findByItemInAndLocationNameAndTransferDate(List<String> item, String locationName, LocalDate transferDate);
 
+    List<Cipl> findByItemInAndLocationName(List<String> item, String locationName);
 
-    List<Cipl> findByLocationNameAndTransferType(String locationName, String transferType);
+    List<Cipl> findByItemIn(List<String> item);
 
-    List<Cipl> findByLocationNameOrderByReferenceNoDesc(String locationName);
+    List<Cipl> findByLocationName(String locationName);
+
+    List<Cipl> findByTransferDate(LocalDate transferDate);
+
+    List<Cipl> findByLocationNameAndTransferDate(String locationName, LocalDate transferDate);
 }
