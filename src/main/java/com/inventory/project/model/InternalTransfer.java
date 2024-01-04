@@ -44,7 +44,8 @@ public class InternalTransfer {
 
     @ElementCollection
     private List<String> remarks = new ArrayList<>();
-
+    @Column(name="reference_no")
+    private String referenceNo;
     public InternalTransfer() {
     }
 
@@ -134,5 +135,13 @@ public class InternalTransfer {
 
     public void setRemarks(List<String> remarks) {
         this.remarks = remarks;
+    }
+
+    public String getReferenceNo() {
+        return referenceNo;
+    }
+
+    public void setReferenceNo(String referenceNo) {
+        this.referenceNo = referenceNo;
     }
 }

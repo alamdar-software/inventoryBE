@@ -77,6 +77,82 @@ IncomingStockRepo incomingStockRepo;
         }
     }
 
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<?> updateEntity(
+//
+//            @PathVariable Long id,
+//            @RequestBody IncomingStockRequest updatedEntity,
+//            @RequestBody BulkStock updatedBulkEntity
+//
+//
+//    ) {
+//        try {
+//            Optional<IncomingStock> existingIncomingStock = incomingStockRepo.findById(id);
+//            Optional<BulkStock> existingBulkStock = bulkStockRepo.findById(id);
+//
+//            if (existingIncomingStock.isPresent()) {
+//                IncomingStock updatedStock = new IncomingStock();
+//
+//                // Set fields for IncomingStock
+//                    updatedEntity.setLocationName(updatedEntity.getLocationName());
+//                    updatedEntity.setAddress(updatedEntity.getAddress());
+//                    updatedEntity.setPurchaseOrder(updatedEntity.getPurchaseOrder());
+//                    existingIncomingStock.get().setRemarks(updatedStock.getRemarks());
+//                    existingIncomingStock.get().setDate(updatedStock.getDate());
+//                    existingIncomingStock.get().setUnitCost(updatedStock.getUnitCost());
+//                    updatedEntity.setName(updatedEntity.getName());
+//                    existingIncomingStock.get().setQuantity(updatedStock.getQuantity());
+////                    existingIncomingStock.get().setItemDescription(updatedStock.getItemDescription());
+//                    updatedEntity.setBrandName(updatedEntity.getBrandName());
+//                    existingIncomingStock.get().setPrice(updatedStock.getPrice());
+//                    updatedEntity.setUnitName(updatedEntity.getUnitName());
+//                    existingIncomingStock.get().setStandardPrice(updatedStock.getStandardPrice());
+//                    existingIncomingStock.get().setExtendedValue(updatedStock.getExtendedValue());
+//                    existingIncomingStock.get().setSn(updatedStock.getSn());
+//                    existingIncomingStock.get().setPn(updatedStock.getPn());
+//                    updatedEntity.setEntityName(updatedEntity.getEntityName());
+//                    existingIncomingStock.get().setStoreNo(updatedStock.getStoreNo());
+//                    existingIncomingStock.get().setImpaCode(updatedStock.getImpaCode());
+//                    updatedEntity.setDescription(updatedEntity.getDescription());
+//
+//                    incomingStockRepo.save(existingIncomingStock.get());
+//                    return ResponseEntity.ok().body(existingIncomingStock.get());
+//                }  else if (existingBulkStock.isPresent()) {
+//                BulkStock updatedStock = new BulkStock();
+//
+//
+//                // Set fields for BulkStock
+//                updatedBulkEntity.setLocationName(updatedStock.getLocationName());
+//                updatedBulkEntity.setAddress(updatedStock.getAddress());
+//                updatedBulkEntity.setPurchaseOrder(updatedStock.getPurchaseOrder());
+//                updatedBulkEntity.setRemarks(updatedStock.getRemarks());
+//                updatedBulkEntity.setDate(updatedStock.getDate());
+//                updatedBulkEntity.setUnitCost(updatedStock.getUnitCost());
+//                updatedBulkEntity.setName(updatedStock.getName());
+//                updatedBulkEntity.setQuantity(updatedStock.getQuantity());
+//                updatedBulkEntity.setItem(updatedStock.getItem());
+//                updatedBulkEntity.setBrandName(updatedStock.getBrandName());
+//                updatedBulkEntity.setPrice(updatedStock.getPrice());
+//                updatedBulkEntity.setUnitName(updatedStock.getUnitName());
+//                updatedBulkEntity.setStandardPrice(updatedStock.getStandardPrice());
+//                updatedBulkEntity.setExtendedValue(updatedStock.getExtendedValue());
+//                updatedBulkEntity.setSn(updatedStock.getSn());
+//                updatedBulkEntity.setPn(updatedStock.getPn());
+//                updatedBulkEntity.setEntityName(updatedStock.getEntityName());
+//                updatedBulkEntity.setStoreNo(updatedStock.getStoreNo());
+//                updatedBulkEntity.setImpaCode(updatedStock.getImpaCode());
+//                updatedBulkEntity.setDescription(updatedStock.getDescription());
+//
+//                    bulkStockRepo.save(existingBulkStock.get());
+//                    return ResponseEntity.ok().body(existingBulkStock.get());
+//                } else {
+//                    return ResponseEntity.notFound().build();
+//                }
+//            } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating entity.");
+//        }
+//    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<BulkStock> getBulkStockById(@PathVariable Long id) {
         Optional<BulkStock> bulkStock = bulkStockService.getBulkById(id);

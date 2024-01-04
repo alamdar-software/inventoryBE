@@ -53,7 +53,8 @@ public class Mto {
 
     @ElementCollection
     private List<String> remarks = new ArrayList<>();
-
+    @Column(name="reference_no")
+    private String referenceNo;
 
     public Mto() {
     }
@@ -161,4 +162,14 @@ public class Mto {
     public void setRemarks(List<String> remarks) {
         this.remarks = remarks;
     }
+
+    public String getReferenceNo() {
+        return referenceNo;
+    }
+
+    public void setReferenceNo(String referenceNo) {
+        this.referenceNo = referenceNo;
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.InternalTransfer;
+import com.inventory.project.model.Mto;
 import com.inventory.project.serviceImpl.InternalTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class InternalTransferController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<InternalTransfer> addInternalTransfer(@RequestBody InternalTransfer internalTransfer) {
+    public ResponseEntity<InternalTransfer> createInternalTransfer(@RequestBody InternalTransfer internalTransfer) {
         InternalTransfer newInternalTransfer = internalTransferService.createInternalTransfer(internalTransfer);
         return new ResponseEntity<>(newInternalTransfer, HttpStatus.CREATED);
     }
@@ -53,4 +54,14 @@ public class InternalTransferController {
         return updatedTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+    @GetMapping("/search")
+    public ResponseEntity<List<InternalTransfer>> searchITByCriteria(@RequestBody InternalTransfer internalTransfer) {
+        List<InternalTransfer> internalTransferListList = internalTransferService.getInternalTransferByItemAndLocationAndTransferDate(
+                internalTransfer.getItem(),
+                internalTransfer.getLocationName(),
+                internalTransfer.getTransferDate()
+        );
+        return ResponseEntity.ok(internalTransferListList);
+    }
+
 }

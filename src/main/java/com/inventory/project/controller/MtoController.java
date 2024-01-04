@@ -36,9 +36,15 @@ public class MtoController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<List<Mto>> getAllMto() {
+    public ResponseEntity<Map<String, Object>> getAllMtoWithCount() {
         List<Mto> mtoList = mtoService.getAllMto();
-        return new ResponseEntity<>(mtoList, HttpStatus.OK);
+        int totalCount = mtoList.size();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", totalCount);
+        response.put("mtoList", mtoList);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/get/{id}")

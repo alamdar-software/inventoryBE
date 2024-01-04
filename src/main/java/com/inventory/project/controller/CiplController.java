@@ -29,9 +29,8 @@ public class CiplController {
     private LocationRepository locationRepository;
     @Autowired
     private CurrencyRepository  currencyRepository;
-
-@Autowired
-private  PickupRepository pickupRepository;
+    @Autowired
+    private  PickupRepository pickupRepository;
 
     private final CiplService ciplService;
 
