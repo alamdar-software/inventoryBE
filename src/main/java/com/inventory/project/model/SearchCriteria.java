@@ -77,4 +77,5 @@ public class SearchCriteria {
         return description == null && locationName == null && date == null &&
                 purchaseOrder == null && entityName == null;
     }
+
 }

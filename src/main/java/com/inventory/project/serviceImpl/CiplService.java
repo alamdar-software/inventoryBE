@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CiplService {
@@ -43,9 +45,9 @@ public class CiplService {
 
 
     // Other methods for CRUD operations...
-    public List<Cipl> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
-        return ciplRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
-    }
+//    public List<Cipl> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+//        return ciplRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+//    }
 //    @Transactional
 //    public Cipl createCipl(Cipl cipl) {
 //        String locationName = cipl.getLocationName();
@@ -185,4 +187,21 @@ public class CiplService {
         return ciplRepository.findByLocationNameAndTransferDate(locationName,transferDate);
 
     }
+    public List<Cipl> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        if (transferDate == null || item == null || item.isEmpty() || locationName == null || locationName.isEmpty()) {
+            return Collections.emptyList(); // If any required parameter is null or empty, return an empty list
+        }
+
+        List<Cipl> ciplList = ciplRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+
+        if (ciplList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided item, location, and date
+        }
+
+        return ciplList; // Return the matching records
+    }
+
+
+
+
 }

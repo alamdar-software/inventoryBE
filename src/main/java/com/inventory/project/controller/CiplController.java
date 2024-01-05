@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,7 +96,40 @@ public class CiplController {
 //        return ResponseEntity.ok(allCipl);
 //    }
 
-    @GetMapping("/search")
+//    @GetMapping("/search")
+//    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+//
+//        if (criteria == null) {
+//            List<Cipl> allCipl = ciplService.getAllCipl();
+//            return ResponseEntity.ok(allCipl);
+//        }
+//
+//        List<Cipl> ciplList = new ArrayList<>();
+//
+//        if (criteria.getItem() != null && !criteria.getItem().isEmpty() && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty() && criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+//        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty() && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            ciplList = ciplService.getCiplByItemAndLocation(criteria.getItem(), criteria.getLocationName());
+//        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+//            ciplList = ciplService.getCiplByItem(criteria.getItem());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty() && criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByLocationAndTransferDate(criteria.getLocationName(), criteria.getTransferDate());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            ciplList = ciplService.getCiplByLocation(criteria.getLocationName());
+//        } else if (criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByTransferDate(criteria.getTransferDate());
+//        } else {
+//            return ResponseEntity.badRequest().body(Collections.emptyList());
+//        }
+//
+//        if (ciplList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok(ciplList);
+//    }
+
+    @PostMapping("/search")
     public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
             List<Cipl> allCipl = ciplService.getAllCipl();
@@ -104,20 +138,35 @@ public class CiplController {
 
         List<Cipl> ciplList = new ArrayList<>();
 
-        if (criteria.getItem() != null && !criteria.getItem().isEmpty() && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty() && criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
-        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty() && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            ciplList = ciplService.getCiplByItemAndLocation(criteria.getItem(), criteria.getLocationName());
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+
+            if (ciplList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            ciplList = ciplService.getCiplByItemAndLocation(
+                    criteria.getItem(), criteria.getLocationName());
         } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
             ciplList = ciplService.getCiplByItem(criteria.getItem());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty() && criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByLocationAndTransferDate(criteria.getLocationName(), criteria.getTransferDate());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByLocationAndTransferDate(
+                    criteria.getLocationName(), criteria.getTransferDate());
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
             ciplList = ciplService.getCiplByLocation(criteria.getLocationName());
         } else if (criteria.getTransferDate() != null) {
             ciplList = ciplService.getCiplByTransferDate(criteria.getTransferDate());
+
+            if (ciplList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
         } else {
-            return ResponseEntity.badRequest().body(Collections.emptyList());
+            return ResponseEntity.badRequest().build();
         }
 
         if (ciplList.isEmpty()) {
@@ -126,6 +175,8 @@ public class CiplController {
 
         return ResponseEntity.ok(ciplList);
     }
+
+
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Cipl> getCiplById(@PathVariable Long id) {
