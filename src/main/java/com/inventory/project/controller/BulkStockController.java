@@ -217,15 +217,10 @@ public ResponseEntity<StockViewResponse> getStockView() {
 
         return stockView;
     }
-    @GetMapping("/search")
-    public ResponseEntity<List<BulkStock>> searchBulk(@RequestBody SearchCriteria searchRequest) {
-        List<BulkStock> result;
 
-        if (searchRequest.isEmpty()) {
-            result = bulkStockRepo.findAll(); // If no search parameters provided, return all records
-        } else {
-            result = bulkStockService.searchBulk(searchRequest);
-        }
+    @PostMapping("/search")
+    public ResponseEntity<List<BulkStock>> searchBulk(@RequestBody SearchCriteria searchRequest) {
+        List<BulkStock> result = bulkStockService.searchBySingleField(searchRequest);
 
         if (result.isEmpty()) {
             return ResponseEntity.notFound().build(); // No records found
