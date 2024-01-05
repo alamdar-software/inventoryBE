@@ -117,12 +117,12 @@ public class MtoService {
         return 0;
     }
 
-    public List<Mto> getMtoByItemAndLocation(String item, String locationName) {
-        return mtoRepository.findByItemAndLocationName(item, locationName);
+    public List<Mto> getMtoByDescriptionAndLocation(String description, String locationName) {
+        return mtoRepository.findByDescriptionAndLocationName(description, locationName);
     }
 
-    public List<Mto> getMtoByItem(String item) {
-        return mtoRepository.findByItem(item);
+    public List<Mto> getMtoByDescription(String description) {
+        return mtoRepository.findByDescription(description);
     }
 
     public List<Mto> getMtoByLocation(String locationName) {
@@ -137,18 +137,18 @@ public class MtoService {
         return mtoRepository.findByLocationNameAndTransferDate(locationName,transferDate);
 
     }
-    public List<Mto> getMtoByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
-        if (transferDate == null || item == null || item.isEmpty() || locationName == null || locationName.isEmpty()) {
-            return Collections.emptyList(); // If any required parameter is null or empty, return an empty list
+    public List<Mto> getMtoByDescriptionAndLocationAndTransferDate(String description, String locationName, LocalDate transferDate) {
+        if (transferDate == null || description == null || description.isEmpty() || locationName == null || locationName.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        List<Mto> ciplList = mtoRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+        List<Mto> ciplList = mtoRepository.findByDescriptionAndLocationNameAndTransferDate(description, locationName, transferDate);
 
         if (ciplList.isEmpty()) {
-            return Collections.emptyList(); // No matching records found for the provided item, location, and date
+            return Collections.emptyList();
         }
 
-        return ciplList; // Return the matching records
+        return ciplList;
     }
 
 }

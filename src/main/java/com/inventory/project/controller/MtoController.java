@@ -69,50 +69,49 @@ public class MtoController {
     @PostMapping("/search")
     public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
-            List<Mto> allCipl = mtoService.getAllMto();
-            return ResponseEntity.ok(allCipl);
+            List<Mto> allMto = mtoService.getAllMto();
+            return ResponseEntity.ok(allMto);
         }
 
-        List<Mto> ciplList = new ArrayList<>();
+        List<Mto> mtoList = new ArrayList<>();
 
-        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
                 && criteria.getTransferDate() != null) {
-            ciplList = mtoService.getMtoByItemAndLocationAndTransferDate(
-                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+            mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDate(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
 
-            if (ciplList.isEmpty()) {
+            if (mtoList.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            ciplList = mtoService.getMtoByItemAndLocation(
-                    criteria.getItem(), criteria.getLocationName());
-        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
-            ciplList = mtoService.getMtoByItem(criteria.getItem());
+            mtoList = mtoService.getMtoByDescriptionAndLocation(
+                    criteria.getDescription(), criteria.getLocationName());
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
                 && criteria.getTransferDate() != null) {
-            ciplList = mtoService.getMtoByLocationAndTransferDate(
+            mtoList = mtoService.getMtoByLocationAndTransferDate(
                     criteria.getLocationName(), criteria.getTransferDate());
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            ciplList = mtoService.getMtoByLocation(criteria.getLocationName());
+            mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
         } else if (criteria.getTransferDate() != null) {
-            ciplList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
+            mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
 
-            if (ciplList.isEmpty()) {
+            if (mtoList.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
         } else {
             return ResponseEntity.badRequest().build();
         }
 
-        if (ciplList.isEmpty()) {
+        if (mtoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(ciplList);
+        return ResponseEntity.ok(mtoList);
     }
-
 
 
 

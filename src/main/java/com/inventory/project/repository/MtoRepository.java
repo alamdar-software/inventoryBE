@@ -11,17 +11,29 @@ import java.util.List;
 
 @Repository
 public interface MtoRepository extends JpaRepository<Mto,Long> {
-//    List<Mto> findByItemInAndLocationNameAndTransferDate(String item, String locationName, LocalDate transferDate);
 
-    List<Mto> findByItemAndLocationName(String item, String locationName);
+//    List<Mto> findByItemAndLocationName(String item, String locationName);
+//
+//    List<Mto> findByItemAndLocationNameAndTransferDate(String item, String locationName, LocalDate transferDate);
+//
+//    List<Mto> findByLocationNameAndTransferDate(String locationName, LocalDate transferDate);
+//
+//    List<Mto> findByTransferDate(LocalDate transferDate);
+//
+//    List<Mto> findByLocationName(String locationName);
+//
+//    List<Mto> findByItem(String item);
 
-    List<Mto> findByItemAndLocationNameAndTransferDate(String item, String locationName, LocalDate transferDate);
+    List<Mto> findByDescriptionAndLocationNameAndTransferDate(
+            String description, String locationName, LocalDate transferDate);
+
+    List<Mto> findByDescriptionAndLocationName(String description, String locationName);
+
+    List<Mto> findByDescription(String description);
 
     List<Mto> findByLocationNameAndTransferDate(String locationName, LocalDate transferDate);
 
-    List<Mto> findByTransferDate(LocalDate transferDate);
-
     List<Mto> findByLocationName(String locationName);
 
-    List<Mto> findByItem(String item);
+    List<Mto> findByTransferDate(LocalDate transferDate);
 }
