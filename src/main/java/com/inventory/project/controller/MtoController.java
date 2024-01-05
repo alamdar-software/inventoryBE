@@ -65,7 +65,12 @@ public class MtoController {
         mtoService.deleteMtoById(id);
         return ResponseEntity.ok().build();
     }
-
+    @GetMapping("/createpdf/{id}")
+    public ResponseEntity<Mto> creatPdfById(@PathVariable Long id) {
+        return mtoService.getMtoById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
     @PostMapping("/search")
     public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {

@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -23,10 +25,17 @@ public class InternalTransferController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<List<InternalTransfer>> getAllInternalTransfers() {
-        List<InternalTransfer> internalTransfers = internalTransferService.getAllInternalTransfers();
-        return new ResponseEntity<>(internalTransfers, HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> getAllItWithCount() {
+        List<InternalTransfer> mtoList = internalTransferService.getAllInternalTransfers();
+        int totalCount = mtoList.size();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", totalCount);
+        response.put("mtoList", mtoList);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
     @GetMapping("/get/{id}")
     public ResponseEntity<InternalTransfer> getInternalTransferById(@PathVariable Long id) {
