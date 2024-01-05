@@ -39,9 +39,9 @@ public class MtoService {
     }
 
 
-    public List<Mto> getMtoByItemAndLocationAndTransferDate(List<String> item, String locationName, LocalDate transferDate) {
-        return mtoRepository.findByItemInAndLocationNameAndTransferDate(item, locationName, transferDate);
-    }
+//    public List<Mto> getMtoByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+//        return mtoRepository.findByItemInAndLocationNameAndTransferDate(item, locationName, transferDate);
+//    }
 
     @Transactional
     public Mto createMto(Mto mto) {
@@ -116,4 +116,39 @@ public class MtoService {
         }
         return 0;
     }
+
+    public List<Mto> getMtoByItemAndLocation(String item, String locationName) {
+        return mtoRepository.findByItemAndLocationName(item, locationName);
+    }
+
+    public List<Mto> getMtoByItem(String item) {
+        return mtoRepository.findByItem(item);
+    }
+
+    public List<Mto> getMtoByLocation(String locationName) {
+        return mtoRepository.findByLocationName(locationName);
+    }
+
+    public List<Mto> getMtoByTransferDate(LocalDate transferDate) {
+        return mtoRepository.findByTransferDate(transferDate);
+    }
+
+    public List<Mto> getMtoByLocationAndTransferDate(String locationName, LocalDate transferDate) {
+        return mtoRepository.findByLocationNameAndTransferDate(locationName,transferDate);
+
+    }
+    public List<Mto> getMtoByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        if (transferDate == null || item == null || item.isEmpty() || locationName == null || locationName.isEmpty()) {
+            return Collections.emptyList(); // If any required parameter is null or empty, return an empty list
+        }
+
+        List<Mto> ciplList = mtoRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+
+        if (ciplList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided item, location, and date
+        }
+
+        return ciplList; // Return the matching records
+    }
+
 }
