@@ -59,8 +59,8 @@ public class InternalTransferService {
         }
     }
 
-    public List<InternalTransfer> getInternalTransferByItemAndLocationAndTransferDate(List<String> item, String locationName, LocalDate transferDate) {
-        return internalTransferRepository.findByItemInAndLocationNameAndTransferDate(item, locationName, transferDate);
+    public List<InternalTransfer> getInternalTransferByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
     }
     @Transactional
     public InternalTransfer createInternalTransfer(InternalTransfer internalTransfer) {
@@ -135,4 +135,5 @@ public class InternalTransferService {
         }
         return 0;
     }
+
 }

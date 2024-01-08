@@ -63,14 +63,5 @@ public class InternalTransferController {
         return updatedTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    @GetMapping("/search")
-    public ResponseEntity<List<InternalTransfer>> searchITByCriteria(@RequestBody InternalTransfer internalTransfer) {
-        List<InternalTransfer> internalTransferListList = internalTransferService.getInternalTransferByItemAndLocationAndTransferDate(
-                internalTransfer.getItem(),
-                internalTransfer.getLocationName(),
-                internalTransfer.getTransferDate()
-        );
-        return ResponseEntity.ok(internalTransferListList);
-    }
 
 }

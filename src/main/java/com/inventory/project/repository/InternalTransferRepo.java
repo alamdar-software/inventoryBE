@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface InternalTransferRepo extends JpaRepository<InternalTransfer,Long> {
-    List<InternalTransfer> findByItemInAndLocationNameAndTransferDate(List<String> item, String locationName, LocalDate transferDate);
+    List<InternalTransfer> findByItemAndLocationNameAndTransferDate(String item, String locationName, LocalDate transferDate);
 }
