@@ -30,47 +30,7 @@ public class ConsumedItemController {
     @Autowired
     private ItemRepository itemRepository;
 
-//    @PostMapping("/add")
-//    public ResponseEntity<String> saveConsumedItem(@RequestBody ConsumedItem consumedItem) {
-//        List<String> items = consumedItem.getItem();
-//        List<String> quantities = consumedItem.getQuantity();
-//
-//        // Check if the number of items matches the number of quantities
-//        if (items.size() != quantities.size()) {
-//            return ResponseEntity.badRequest().body("Number of items does not match number of quantities.");
-//        }
-//
-//        List<String> successItems = new ArrayList<>();
-//        List<String> failedItems = new ArrayList<>();
-//
-//        // Create a ConsumedItem for each item with its respective quantity appended
-//        for (int i = 0; i < items.size(); i++) {
-//            String item = items.get(i);
-//            String quantity = quantities.get(i);
-//
-//            ConsumedItem consumed = new ConsumedItem();
-//            consumed.setLocationName(consumedItem.getLocationName());
-//            consumed.setTransferDate(consumedItem.getTransferDate());
-//            consumed.getItem().add(item + " - Quantity: " + quantity);
-//
-//            try {
-//                // Save the item
-//                consumedItemRepo.save(consumed);
-//                successItems.add(item);
-//            } catch (Exception e) {
-//                failedItems.add(item);
-//            }
-//        }
-//
-//        // Prepare the response
-//        StringBuilder response = new StringBuilder();
-//        response.append("Items added successfully: ").append(successItems);
-//        if (!failedItems.isEmpty()) {
-//            response.append("\nItems failed to add: ").append(failedItems);
-//        }
-//
-//        return ResponseEntity.ok(response.toString());
-//    }
+
 
     @PostMapping("/add")
     public ResponseEntity<String> saveConsumedItem(@RequestBody ConsumedItem consumedItem) {

@@ -16,10 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/inventory")
@@ -154,10 +151,25 @@ public class InventoryController {
 
 
     @GetMapping("/view")
-    public ResponseEntity<List<Inventory>> getAllInventories() {
+    public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
-        return ResponseEntity.ok(inventories);
+        List<Map<String, Object>> inventoryList = new ArrayList<>();
+
+        for (Inventory inventory : inventories) {
+            Map<String, Object> inventoryDetails = new HashMap<>();
+            inventoryDetails.put("description", inventory.getDescription() + " (" + inventory.getQuantity() + ")");
+            // Include other fields if needed
+            inventoryDetails.put("locationName", inventory.getLocationName());
+            inventoryDetails.put("address", inventory.getAddress());
+            inventoryDetails.put("quantity", inventory.getQuantity());
+            inventoryDetails.put("consumedItem", inventory.getConsumedItem());
+            inventoryDetails.put("scrappedItem", inventory.getScrappedItem());
+            inventoryList.add(inventoryDetails);
+        }
+
+        return ResponseEntity.ok(inventoryList);
     }
+
 
     @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
