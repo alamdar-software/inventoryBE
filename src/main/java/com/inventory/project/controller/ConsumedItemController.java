@@ -106,7 +106,7 @@ public class ConsumedItemController {
             consumed.setTransferDate(consumedItem.getTransferDate());
 
             // Append quantity to item
-            String itemWithQuantity = item + " - Quantity: " + quantity;
+            String itemWithQuantity = item + " - (" + quantity + ")";
 
             // Set all fields
             List<String> itemList = Collections.singletonList(itemWithQuantity);
