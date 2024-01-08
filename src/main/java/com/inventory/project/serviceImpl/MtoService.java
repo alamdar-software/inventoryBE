@@ -129,6 +129,7 @@ public class MtoService {
         return mtoRepository.findByLocationName(locationName);
     }
 
+
     public List<Mto> getMtoByTransferDate(LocalDate transferDate) {
         return mtoRepository.findByTransferDate(transferDate);
     }

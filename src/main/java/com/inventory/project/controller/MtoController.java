@@ -80,7 +80,13 @@ public class MtoController {
 
         List<Mto> mtoList = new ArrayList<>();
 
-        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+        if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
+
+            if (mtoList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
                 && criteria.getTransferDate() != null) {
             mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDate(
@@ -95,12 +101,6 @@ public class MtoController {
                     criteria.getDescription(), criteria.getLocationName());
         } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
             mtoList = mtoService.getMtoByDescription(criteria.getDescription());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null) {
-            mtoList = mtoService.getMtoByLocationAndTransferDate(
-                    criteria.getLocationName(), criteria.getTransferDate());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
         } else if (criteria.getTransferDate() != null) {
             mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
 
@@ -118,6 +118,54 @@ public class MtoController {
         return ResponseEntity.ok(mtoList);
     }
 
+//    @PostMapping("/search")
+//    public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+//        if (criteria == null) {
+//            List<Mto> allMto = mtoService.getAllMto();
+//            return ResponseEntity.ok(allMto);
+//        }
+//
+//        List<Mto> mtoList = new ArrayList<>();
+//
+//
+//        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+//                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+//                && criteria.getTransferDate() != null) {
+//            mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDate(
+//                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
+//
+//            if (mtoList.isEmpty()) {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+//                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            mtoList = mtoService.getMtoByDescriptionAndLocation(
+//                    criteria.getDescription(), criteria.getLocationName());
+//        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+//            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+//                && criteria.getTransferDate() != null) {
+//            mtoList = mtoService.getMtoByLocationAndTransferDate(
+//                    criteria.getLocationName(), criteria.getTransferDate());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
+//        } else if (criteria.getTransferDate() != null) {
+//            mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
+//
+//            if (mtoList.isEmpty()) {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } else {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        if (mtoList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok(mtoList);
+//    }
+//
 
 
 
