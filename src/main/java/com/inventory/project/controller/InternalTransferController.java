@@ -43,6 +43,12 @@ public class InternalTransferController {
         return internalTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+    @GetMapping("/createpdf/{id}")
+    public ResponseEntity<InternalTransfer> createpdfById(@PathVariable Long id) {
+        Optional<InternalTransfer> internalTransfer = internalTransferService.getInternalTransferById(id);
+        return internalTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 
     @PostMapping("/add")
     public ResponseEntity<InternalTransfer> createInternalTransfer(@RequestBody InternalTransfer internalTransfer) {
