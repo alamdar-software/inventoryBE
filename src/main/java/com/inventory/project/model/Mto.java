@@ -31,8 +31,8 @@ public class Mto {
 
     @Column(name = "repair_service")
     private boolean repairService;
-    @Column(name = "description")
-    private String description;
+//    @Column(name = "description")
+//    private String description;
     @ElementCollection
     private List<String> quantity = new ArrayList<>();
     @ElementCollection
@@ -45,7 +45,9 @@ public class Mto {
     private List<String> sn = new ArrayList<>();
 
     @ElementCollection
-    private List<String> item = new ArrayList<>();
+    @JsonProperty("description")
+
+    private List<String> description = new ArrayList<>();
 
     @ElementCollection
     @JsonProperty("SubLocation")
@@ -140,12 +142,8 @@ public class Mto {
         this.sn = sn;
     }
 
-    public List<String> getItem() {
-        return item;
-    }
-
-    public void setItem(List<String> item) {
-        this.item = item;
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 
     public List<String> getSubLocation() {
@@ -172,11 +170,5 @@ public class Mto {
         this.referenceNo = referenceNo;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

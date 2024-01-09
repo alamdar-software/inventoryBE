@@ -129,6 +129,7 @@ public class ConsumedItemController {
 //    }
 
 
+
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
         List<String> items = consumedItem.getItem();
@@ -195,7 +196,6 @@ public class ConsumedItemController {
 
         return ResponseEntity.ok("Consumed items recorded successfully.");
     }
-
 
 
 }
