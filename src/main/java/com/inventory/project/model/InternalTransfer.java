@@ -28,7 +28,7 @@ public class InternalTransfer {
     private List<String> SubLocation = new ArrayList<>();
 
     @ElementCollection
-    private List<String> item = new ArrayList<>();
+    private List<String> description = new ArrayList<>();
 
     @ElementCollection
     private List<String> sn = new ArrayList<>();
@@ -89,13 +89,7 @@ public class InternalTransfer {
         this.SubLocation = SubLocation;
     }
 
-    public List<String> getItem() {
-        return item;
-    }
 
-    public void setItem(List<String> item) {
-        this.item = item;
-    }
 
     public List<String> getSn() {
         return sn;
@@ -143,5 +137,13 @@ public class InternalTransfer {
 
     public void setReferenceNo(String referenceNo) {
         this.referenceNo = referenceNo;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
     }
 }

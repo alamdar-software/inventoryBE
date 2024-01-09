@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InternalTransferService {
@@ -45,7 +42,7 @@ public class InternalTransferService {
             internalTransfer.setLocationName(updatedInternalTransfer.getLocationName());
             internalTransfer.setTransferDate(updatedInternalTransfer.getTransferDate());
             internalTransfer.setDestination(updatedInternalTransfer.getDestination());
-            internalTransfer.setItem(updatedInternalTransfer.getItem());
+            internalTransfer.setDescription(updatedInternalTransfer.getDescription());
             internalTransfer.setSubLocation(updatedInternalTransfer.getSubLocation());
             internalTransfer.setSn(updatedInternalTransfer.getSn());
             internalTransfer.setPartNumber(updatedInternalTransfer.getPartNumber());
@@ -59,8 +56,8 @@ public class InternalTransferService {
         }
     }
 
-    public List<InternalTransfer> getInternalTransferByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
-        return internalTransferRepository.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+    public List<InternalTransfer> getInternalTransferByItemAndLocationAndTransferDate(String description, String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByDescriptionAndLocationNameAndTransferDate(description, locationName, transferDate);
     }
     @Transactional
     public InternalTransfer createInternalTransfer(InternalTransfer internalTransfer) {
@@ -134,6 +131,41 @@ public class InternalTransferService {
             }
         }
         return 0;
+    }
+
+    public List<InternalTransfer> getMtoByDescriptionAndLocation(String description, String locationName) {
+        return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
+    }
+
+    public List<InternalTransfer> getMtoByDescription(String description) {
+        return internalTransferRepository.findByDescription(description);
+    }
+
+    public List<InternalTransfer> getMtoByLocation(String locationName) {
+        return internalTransferRepository.findByLocationName(locationName);
+    }
+
+
+    public List<InternalTransfer> getMtoByTransferDate(LocalDate transferDate) {
+        return internalTransferRepository.findByTransferDate(transferDate);
+    }
+
+    public List<InternalTransfer> getMtoByLocationAndTransferDate(String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByLocationNameAndTransferDate(locationName,transferDate);
+
+    }
+    public List<InternalTransfer> getMtoByDescriptionAndLocationAndTransferDate(String description, String locationName, LocalDate transferDate) {
+        if (transferDate == null || description == null || description.isEmpty() || locationName == null || locationName.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<InternalTransfer> ciplList = internalTransferRepository.findByDescriptionAndLocationNameAndTransferDate(description, locationName, transferDate);
+
+        if (ciplList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return ciplList;
     }
 
 }
