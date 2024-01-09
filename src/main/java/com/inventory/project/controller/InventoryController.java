@@ -157,6 +157,8 @@ public class InventoryController {
 
         for (Inventory inventory : inventories) {
             Map<String, Object> inventoryDetails = new HashMap<>();
+            inventoryDetails.put("id", inventory.getId()); // Include the ID
+
             inventoryDetails.put("description", inventory.getDescription() + " (" + inventory.getQuantity() + ")");
             // Include other fields if needed
             inventoryDetails.put("locationName", inventory.getLocationName());
