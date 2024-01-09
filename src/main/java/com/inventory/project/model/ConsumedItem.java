@@ -38,6 +38,8 @@ public class ConsumedItem {
     @ElementCollection
     private List<String> date;
 
+@ManyToOne
+private Inventory inventory;
 
     public ConsumedItem() {
         this.item = new ArrayList<>();
@@ -132,6 +134,13 @@ public class ConsumedItem {
         this.date = date;
     }
 
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
 
 
 }
