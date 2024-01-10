@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +26,7 @@ public class ConsumedItem {
     private List<String> SubLocations;
     @ElementCollection
     private List<String> item;
+
     @ElementCollection
     private List<String> sn;
     @ElementCollection
@@ -41,9 +41,9 @@ public class ConsumedItem {
 @ManyToOne
 private Inventory inventory;
 
-    public ConsumedItem() {
-        this.item = new ArrayList<>();
-    }
+//    public ConsumedItem() {
+//        this.item = new ArrayList<>();
+//    }
 
     public Long getId() {
         return id;
@@ -60,6 +60,7 @@ private Inventory inventory;
 //    public void setItemDescription(String itemDescription) {
 //        this.itemDescription = itemDescription;
 //    }
+
 
     public LocalDate getTransferDate() {
         return transferDate;
@@ -85,6 +86,7 @@ private Inventory inventory;
     public void setSubLocations(List<String> subLocations) {
         SubLocations = subLocations;
     }
+
 
     public List<String> getItem() {
         return item;
