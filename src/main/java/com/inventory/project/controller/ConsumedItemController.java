@@ -72,9 +72,9 @@ public class ConsumedItemController {
                     String updatedDescription = inventory.getDescription() + " (Consumed: " + consumedQuantity + ")";
                     inventory.setDescription(updatedDescription);
 
-                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
-                    String updatedDescriptionAfterDeduction = updatedDescription.substring(consumedIndex);
-                    inventory.setDescription(updatedDescriptionAfterDeduction);
+//                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
+//                    String updatedDescriptionAfterDeduction = updatedDescription.substring(consumedIndex);
+//                    inventory.setDescription(updatedDescriptionAfterDeduction);
 
                     String currentConsumedQuantity = inventory.getConsumedItem();
                     int newConsumedQuantity = Integer.parseInt(quantity);
