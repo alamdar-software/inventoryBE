@@ -1,11 +1,10 @@
 package com.inventory.project.controller;
 
-import com.inventory.project.model.ConsumedItem;
-import com.inventory.project.model.Inventory;
-import com.inventory.project.model.Item;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.ConsumedItemRepo;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
+import com.inventory.project.serviceImpl.ConsumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +28,8 @@ public class ConsumedItemController {
     @Autowired
     private ItemRepository itemRepository;
 
-
-
-
-
+@Autowired
+private ConsumeService consumeService;
 
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
@@ -83,9 +80,10 @@ public class ConsumedItemController {
                     inventory.setConsumedItem(String.valueOf(totalConsumed));
                     inventoryRepo.save(inventory);
 
-
+                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
+                    String finalDescription = updatedDescription.substring(0, consumedIndex).trim();
+                    inventory.setDescription(finalDescription);
                     inventoryRepo.save(inventory);
-
                     // Create a ConsumedItem instance for each item and save it to the list
                     ConsumedItem consumed = new ConsumedItem();
                     consumed.setLocationName(consumedItem.getLocationName());
@@ -112,6 +110,105 @@ public class ConsumedItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<List<ConsumedItem>> getAllConsumedItems() {
+        List<ConsumedItem> consumedItems = consumedItemRepo.findAll();
+        if (consumedItems.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(consumedItems);
+    }
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ConsumedItem> getConsumedItemById(@PathVariable("id") Long id) {
+        Optional<ConsumedItem> consumedItem = consumedItemRepo.findById(id);
+        return consumedItem.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateConsumedItemById(@PathVariable Long id, @RequestBody ConsumedItem updatedConsumedItem) {
+        Optional<ConsumedItem> existingConsumedItemOptional = consumedItemRepo.findById(id);
+
+        if (existingConsumedItemOptional.isPresent()) {
+            ConsumedItem existingConsumedItem = existingConsumedItemOptional.get();
+
+            existingConsumedItem.setLocationName(updatedConsumedItem.getLocationName());
+            existingConsumedItem.setTransferDate(updatedConsumedItem.getTransferDate());
+            existingConsumedItem.setSn(updatedConsumedItem.getSn());
+            existingConsumedItem.setPartNo(updatedConsumedItem.getPartNo());
+            existingConsumedItem.setRemarks(updatedConsumedItem.getRemarks());
+            existingConsumedItem.setDate(updatedConsumedItem.getDate());
+            existingConsumedItem.setItem(updatedConsumedItem.getItem());
+            existingConsumedItem.setSubLocations(updatedConsumedItem.getSubLocations());
+            existingConsumedItem.setQuantity(updatedConsumedItem.getQuantity());
+
+            // Save the updated ConsumedItem
+            ConsumedItem savedConsumedItem = consumedItemRepo.save(existingConsumedItem);
+            return ResponseEntity.ok(savedConsumedItem);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteConsumedItemById(@PathVariable Long id) {
+        Optional<ConsumedItem> consumedItemOptional = consumedItemRepo.findById(id);
+
+        if (consumedItemOptional.isPresent()) {
+            consumedItemRepo.deleteById(id);
+            return ResponseEntity.ok("ConsumedItem with ID " + id + " has been deleted.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<ConsumedItem>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null) {
+            List<ConsumedItem> allCipl = consumeService.getAll();
+            return ResponseEntity.ok(allCipl);
+        }
+
+        List<ConsumedItem> ciplList = new ArrayList<>();
+
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByItemAndLocationAndTransferDate(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+
+            if (ciplList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            ciplList = consumeService.getCiplByItemAndLocation(
+                    criteria.getItem(), criteria.getLocationName());
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+            ciplList = consumeService.getCiplByItem(criteria.getItem());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByLocationAndTransferDate(
+                    criteria.getLocationName(), criteria.getTransferDate());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            ciplList = consumeService.getCiplByLocation(criteria.getLocationName());
+        } else if (criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByTransferDate(criteria.getTransferDate());
+
+            if (ciplList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (ciplList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ciplList);
+    }
 
 
 }

@@ -1,59 +1,65 @@
-//package com.inventory.project.serviceImpl;
-//
-//import com.inventory.project.model.ConsumedItem;
-//import com.inventory.project.repository.ConsumedItemRepo;
-//import com.inventory.project.repository.InventoryRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Service;
-//
-//import java.time.LocalDate;
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Map;
-//
-//@Service
-//public class ConsumeService {
-//    @Autowired
-//    private InventoryRepository inventoryRepo;
-//
-//    @Autowired
-//    private ConsumedItemRepo consumedItemRepo;
-//
-//    public ResponseEntity<String> saveBulkConsumedItems(ConsumedItem consumedItems) {
-//        List<String> noQtyItems = new ArrayList<>();
-//        List<String> successItems = new ArrayList<>();
-//
-//        for (int i = 0; i < consumedItems.getItem().size(); i++) {
-//            Long itemId = Long.valueOf(consumedItems.getItem().get(i));
-//            String locationName = consumedItems.getLocationName();
-//            Integer availableQuantity = inventoryRepo.findQuantityByItemId(itemId);
-//
-//            if (availableQuantity != null && availableQuantity >= 0) {
-//                int consumedQuantity = Integer.parseInt(consumedItems.getQuantity().get(i));
-//
-//                if (availableQuantity >= consumedQuantity) {
-//                    ConsumedItem consumed = new ConsumedItem();
-//                    consumed.setTransferDate(LocalDate.now());
-//                    consumed.setLocationName(locationName);
-//                    consumed.setItemDescription(consumedItems.getItem().get(i) + " - Quantity: " + consumedQuantity);
-//                    consumedItemRepo.save(consumed);
-//                    successItems.add(String.valueOf(itemId));
-//                } else {
-//                    noQtyItems.add(String.valueOf(itemId));
-//                }
-//            } else {
-//                // Handle scenario where inventory or quantity information is not found
-//            }
-//        }
-//
-//        if (!noQtyItems.isEmpty()) {
-//            return ResponseEntity.badRequest().body("Quantity of some Items at Inventory is less than Consumed Quantity mentioned for Items: " + noQtyItems);
-//        } else {
-//            return ResponseEntity.ok(
-//                    String.valueOf(Map.of("message", "Consumed Items created successfully",
-//                            "result", Map.of("successItems", successItems)))
-//            );
-//        }
-//    }
-//}
+package com.inventory.project.serviceImpl;
+
+import com.inventory.project.model.Cipl;
+import com.inventory.project.model.ConsumedItem;
+import com.inventory.project.repository.ConsumedItemRepo;
+import com.inventory.project.repository.InventoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class ConsumeService {
+    @Autowired
+    private InventoryRepository inventoryRepo;
+
+    @Autowired
+    private ConsumedItemRepo consumedItemRepo;
+
+
+    public List<ConsumedItem> getCiplByItemAndLocation(String item, String locationName) {
+        return consumedItemRepo.findByItemAndLocationName(item, locationName);
+    }
+
+    public List<ConsumedItem> getCiplByItem(String item) {
+        return consumedItemRepo.findByItem(item);
+    }
+
+    public List<ConsumedItem> getCiplByLocation(String locationName) {
+        return consumedItemRepo.findByLocationName(locationName);
+    }
+
+    public List<ConsumedItem> getCiplByTransferDate(LocalDate transferDate) {
+        return consumedItemRepo.findByTransferDate(transferDate);
+    }
+
+    public List<ConsumedItem> getCiplByLocationAndTransferDate(String locationName, LocalDate transferDate) {
+        return consumedItemRepo.findByLocationNameAndTransferDate(locationName,transferDate);
+
+    }
+    public List<ConsumedItem> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        if (transferDate == null || item == null || item.isEmpty() || locationName == null || locationName.isEmpty()) {
+            return Collections.emptyList(); // If any required parameter is null or empty, return an empty list
+        }
+
+        List<ConsumedItem> ciplList = consumedItemRepo.findByItemAndLocationNameAndTransferDate(item, locationName, transferDate);
+
+        if (ciplList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided item, location, and date
+        }
+
+        return ciplList; // Return the matching records
+    }
+
+
+    public List<ConsumedItem> getAll() {
+        return consumedItemRepo.findAll();
+    }
+
+}
