@@ -7,12 +7,17 @@ import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.serviceImpl.ConsumeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
+//import org.springframework.core.io.ByteArrayResource;
+//import org.springframework.core.io.Resource;
+//import org.springframework.http.HttpHeaders;
 
 @RestController
 @RequestMapping("/consumeditem")
@@ -210,5 +215,32 @@ private ConsumeService consumeService;
         return ResponseEntity.ok(ciplList);
     }
 
+//    @GetMapping("/download/excel")
+//    public ResponseEntity<Resource> downloadExcel() throws IOException {
+//        List<ConsumedItem> consumedItems = consumeService.getAll();
+//        byte[] excelContent = consumeService.generateExcelFile(consumedItems);
+//
+//        ByteArrayResource resource = new ByteArrayResource(excelContent);
+//
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=consumedItems.xlsx")
+//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .contentLength(excelContent.length)
+//                .body(resource);
+//    }
+//
+//    @GetMapping("/download/pdf")
+//    public ResponseEntity<Resource> downloadPdf() throws IOException {
+//        List<ConsumedItem> consumedItems = consumeService.getAll();
+//        byte[] pdfContent = consumeService.generatePdfFile(consumedItems);
+//
+//        ByteArrayResource resource = new ByteArrayResource(pdfContent);
+//
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=consumedItems.pdf")
+//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .contentLength(pdfContent.length)
+//                .body(resource);
+//    }
 
 }
