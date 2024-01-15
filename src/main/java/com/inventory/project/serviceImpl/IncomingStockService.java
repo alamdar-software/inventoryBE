@@ -2,8 +2,8 @@ package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+//import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,6 @@
 package com.inventory.project.model;
 
 import jakarta.persistence.*;
-
 @jakarta.persistence.Entity
 @Table(name="entity")
 public class Entity {

@@ -1,15 +1,18 @@
 package com.inventory.project.repository;
 
 import com.inventory.project.model.Address;
+import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Location;
 //import com.inventory.project.model.LocationKey;
-import jakarta.transaction.Transactional;
+import com.inventory.project.model.Mto;
+//import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +52,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 //    void saveLocationWithAddresses(@Param("locationName") String locationName, @Param("addresses") List<Address> addresses);
 
 
+    List<Location> findByAddressesAddressIgnoreCase(String address);
 
 
 }

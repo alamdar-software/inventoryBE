@@ -13,6 +13,11 @@ public class SearchCriteria {
     private LocalDate date;
     private String purchaseOrder;
     private String entityName;
+
+    private String address;
+
+    private boolean generateExcel;
+
     public SearchCriteria() {
     }
 
@@ -72,10 +77,24 @@ public class SearchCriteria {
         this.purchaseOrder = purchaseOrder;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public boolean isEmpty() {
         return description == null && locationName == null && date == null &&
                 purchaseOrder == null && entityName == null;
     }
 
+    public boolean isGenerateExcel() {
+        return generateExcel;
+    }
+
+    public void setGenerateExcel(boolean generateExcel) {
+        this.generateExcel = generateExcel;
+    }
 }

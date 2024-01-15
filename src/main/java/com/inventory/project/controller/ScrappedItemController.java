@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/scrappeditem")
+@CrossOrigin("*")
 public class ScrappedItemController {
     @Autowired
     private InventoryRepository inventoryRepository;

@@ -1,16 +1,17 @@
 package com.inventory.project.controller;
 
-import com.inventory.project.model.Address;
-import com.inventory.project.model.Location;
-import com.inventory.project.model.LocationAddressDto;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.AddressRepository;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.serviceImpl.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -35,7 +36,6 @@ public class LocationController {
 
     @Autowired
     private LocationService locationService;
-
 
 
 //    @PostMapping("/add")
@@ -66,6 +66,7 @@ public class LocationController {
         }
         return ResponseEntity.ok(locations);
     }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getLocationById(@PathVariable Long id) {
         try {
@@ -81,15 +82,15 @@ public class LocationController {
         }
     }
 
-@GetMapping("/edit/{id}")
-public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
-    Location location = locationRepo.findById(id).orElse(null);
-    if (location != null) {
-        return ResponseEntity.ok(location);
-    } else {
-        return ResponseEntity.notFound().build();
+    @GetMapping("/edit/{id}")
+    public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
+        Location location = locationRepo.findById(id).orElse(null);
+        if (location != null) {
+            return ResponseEntity.ok(location);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-}
 
 
     @DeleteMapping("/delete/{id}")
@@ -101,6 +102,7 @@ public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion Unsuccessful");
         }
     }
+
     @PutMapping("/update/{locationId}/addresses/{addressId}")
     public ResponseEntity<Location> updateAddress(
             @PathVariable("locationId") Long locationId,
@@ -122,7 +124,6 @@ public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
                 Address existingAddress = existingAddressOptional.get();
                 existingAddress.setAddress(updatedAddress.getAddress());
                 addressRepository.save(existingAddress);
-
 
 
                 Location savedLocation = locationRepo.save(existingLocation);
@@ -179,6 +180,77 @@ public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
+//    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Location>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null) {
+            List<Location> allLocations = locationService.getAllLocations();
+            return ResponseEntity.ok(allLocations);
+        }
+
+        List<Location> locationList;
+
+        if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+            locationList = locationService.searchByAddress(criteria.getAddress());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            locationList = locationService.getLocationByLocationName(criteria.getLocationName());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (locationList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(locationList);
+    }
+
+//    @PostMapping("/downloadExcel")
+//    public ResponseEntity<?> downloadExcel(@RequestBody(required = false) SearchCriteria criteria) {
+//        // Your existing search logic
+//
+//        // Generate Excel if needed
+//        if (criteria != null && criteria.isGenerateExcel()) {
+//            try {
+//                List<Location> locationList;
+//
+//                if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//                    locationList = locationService.getLocationByLocationName(criteria.getLocationName());
+//
+//                    // Check if the locationList is not empty before generating Excel
+//                    if (!locationList.isEmpty()) {
+//                        byte[] excelBytes = ExcelGenerator.generateExcel(locationList);
+//
+//                        HttpHeaders headers = new HttpHeaders();
+//                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//                        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=locations.xlsx");
+//
+//                        return ResponseEntity.ok()
+//                                .headers(headers)
+//                                .body(excelBytes);
+//                    } else {
+//                        return ResponseEntity.notFound().build();
+//                    }
+//                } else {
+//                    return ResponseEntity.badRequest().build(); // You may customize this response according to your needs
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace(); // Handle exception appropriately
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating Excel");
+//            }
+//        }
+//
+//        // Continue with your existing logic
+//        // ...
+//
+//        // Replace the comment with the actual result you want to return
+//        List<Location> locationList = locationService.getLocationByLocationName(String.valueOf(criteria));
+//        if (locationList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok(locationList);
 //    }
 
 }

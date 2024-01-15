@@ -1,12 +1,15 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Address;
+import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Location;
+import com.inventory.project.model.Mto;
 import com.inventory.project.repository.AddressRepository;
 import com.inventory.project.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,5 +83,16 @@ public class LocationService {
         }
     }
 
+    public List<Location> searchByAddress(String address) {
+        return locationRepository.findByAddressesAddressIgnoreCase(address);
+    }
+
+    public List<Location> getLocationByLocationName(String locationName) {
+        return locationRepository.findAllByLocationName(locationName);
+    }
+
+    public List<Location> getAllLocations() {
+        return locationRepository.findAllByOrderByLocationNameAsc();
+    }
 
 }

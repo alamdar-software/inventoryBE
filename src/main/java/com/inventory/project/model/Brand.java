@@ -3,6 +3,7 @@ package com.inventory.project.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 
+
 @Entity
 @Table(name="brand")
 
