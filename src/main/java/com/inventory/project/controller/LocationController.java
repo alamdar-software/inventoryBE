@@ -206,6 +206,7 @@ public class LocationController {
         return ResponseEntity.ok(locationList);
     }
 
+
 //    @PostMapping("/downloadExcel")
 //    public ResponseEntity<?> downloadExcel(@RequestBody(required = false) SearchCriteria criteria) {
 //        // Your existing search logic

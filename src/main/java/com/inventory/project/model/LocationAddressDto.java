@@ -6,10 +6,14 @@ import java.util.List;
 public class LocationAddressDto {
     private String locationName;
     private String address;
+    private List<Address> addresses;
 
     public LocationAddressDto() {
     }
-
+    public LocationAddressDto(String locationName, List<Address> addresses) {
+        this.locationName = locationName;
+        this.addresses = addresses;
+    }
     public LocationAddressDto(String locationName, String address) {
         this.locationName = locationName;
         this.address = address;

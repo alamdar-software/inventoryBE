@@ -52,7 +52,9 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 //    void saveLocationWithAddresses(@Param("locationName") String locationName, @Param("addresses") List<Address> addresses);
 
 
-    List<Location> findByAddressesAddressIgnoreCase(String address);
+    @Query("SELECT DISTINCT l FROM Location l LEFT JOIN FETCH l.addresses a WHERE LOWER(a.address) = LOWER(:address)")
+    List<Location> findByAddressesAddressIgnoreCase(@Param("address") String address);
+
 
 
 }
