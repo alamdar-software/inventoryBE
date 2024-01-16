@@ -1,5 +1,7 @@
 package com.inventory.project.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,6 +20,11 @@ public class SearchCriteria {
 
     private boolean generateExcel;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
     public SearchCriteria() {
     }
 
@@ -96,5 +103,21 @@ public class SearchCriteria {
 
     public void setGenerateExcel(boolean generateExcel) {
         this.generateExcel = generateExcel;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

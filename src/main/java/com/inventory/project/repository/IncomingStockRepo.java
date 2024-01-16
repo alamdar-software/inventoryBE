@@ -49,10 +49,13 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
             "WHERE s.id = :id")
     Map<String, Object> findIncomingStockDetailsWithAssociatedFieldsById(@Param("id") Long id);
 
-
-
     @Query("SELECT s FROM IncomingStock s JOIN FETCH s.location WHERE s.id = :id")
     IncomingStock findIncomingStockDetailsById(@Param("id") Long id);
 
 
+    List<IncomingStock> findByEntity_EntityName(String entityName);
+
+    List<IncomingStock> findByEntity_EntityNameAndDateBetween(String entityName, LocalDate startDate, LocalDate endDate);
+
+    List<IncomingStock> findByDateBetween(LocalDate transferDate, LocalDate plusDays);
 }

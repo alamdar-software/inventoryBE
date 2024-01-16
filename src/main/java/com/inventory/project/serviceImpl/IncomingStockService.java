@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class IncomingStockService {
@@ -99,5 +96,42 @@ private BulkStockRepo bulkStockRepo;
 //        // Save the incoming stock record
 //        return incomingStockRepo.save(incomingStock);
 //    }
+
+//    public List<IncomingStock> searchIncomingStock(SearchCriteria searchCriteria) {
+//        if (searchCriteria.getTransferDate() != null) {
+//            // Date-based query
+//            return incomingStockRepo.findByEntity_EntityNameAndDateBetween(
+//                    searchCriteria.getEntityName(),
+//                    searchCriteria.getTransferDate(),
+//                    searchCriteria.getTransferDate().plusDays(1)
+//            );
+//        } else {
+//            // EntityName-based query
+//            return incomingStockRepo.findByEntity_EntityName(searchCriteria.getEntityName());
+//        }
+//    }
+public List<IncomingStock> searchIncomingStock(SearchCriteria searchCriteria) {
+    if (searchCriteria.getEntityName() != null && !searchCriteria.getEntityName().isEmpty()) {
+        // Search by entityName
+        return searchByEntityName(searchCriteria.getEntityName());
+    } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+        // Search by date range
+        return searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+    } else {
+        // No criteria provided, return all
+        return incomingStockRepo.findAll();
+    }
+}
+
+    private List<IncomingStock> searchByEntityName(String entityName) {
+        return incomingStockRepo.findByEntity_EntityName(entityName);
+    }
+
+    private List<IncomingStock> searchByDateRange(LocalDate startDate, LocalDate endDate) {
+        return incomingStockRepo.findByDateBetween(startDate, endDate.plusDays(1));
+    }
+
+
+
 }
 

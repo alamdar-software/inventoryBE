@@ -404,8 +404,10 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
 
-
-//    Bulk Controller
+    @PostMapping("/searchReport")
+    public List<IncomingStock> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
+        return incomingStockService.searchIncomingStock(searchCriteria);
+    }
 
 
 }
