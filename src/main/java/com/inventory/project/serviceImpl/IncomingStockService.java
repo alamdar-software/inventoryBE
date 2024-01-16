@@ -97,19 +97,7 @@ private BulkStockRepo bulkStockRepo;
 //        return incomingStockRepo.save(incomingStock);
 //    }
 
-//    public List<IncomingStock> searchIncomingStock(SearchCriteria searchCriteria) {
-//        if (searchCriteria.getTransferDate() != null) {
-//            // Date-based query
-//            return incomingStockRepo.findByEntity_EntityNameAndDateBetween(
-//                    searchCriteria.getEntityName(),
-//                    searchCriteria.getTransferDate(),
-//                    searchCriteria.getTransferDate().plusDays(1)
-//            );
-//        } else {
-//            // EntityName-based query
-//            return incomingStockRepo.findByEntity_EntityName(searchCriteria.getEntityName());
-//        }
-//    }
+
 public List<IncomingStock> searchIncomingStock(SearchCriteria searchCriteria) {
     if (searchCriteria.getEntityName() != null && !searchCriteria.getEntityName().isEmpty()) {
         // Search by entityName

@@ -1,6 +1,7 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.*;
+import com.inventory.project.model.Currency;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.IncomingStockService;
 import jakarta.servlet.http.HttpSession;
@@ -11,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -197,7 +195,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
         // Check if the provided address belongs to the found location
         boolean addressFound = addresses.stream()
-                .anyMatch(addr -> addr.getAddress().equals(requestedAddress));
+                .anyMatch(addr -> Objects.equals(addr.getAddress(), requestedAddress));
+
 
         if (addressFound) {
             // Set all fields for incomingStock

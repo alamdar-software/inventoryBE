@@ -26,6 +26,7 @@ public class StockViewDto {
     private List<String> storeNo = new ArrayList<>();
     private List<String> impaCode = new ArrayList<>();
     private List<String> description = new ArrayList<>();
+    private String dataType;
 
     public StockViewDto() {
     }
@@ -199,6 +200,12 @@ public class StockViewDto {
         this.description = description;
     }
 
+    public String getDataType() {
+        return dataType;
+    }
 
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
 }
 

@@ -149,6 +149,7 @@ public ResponseEntity<StockViewResponse> getStockView() {
     private StockViewDto mapIncomingStockToDTO(IncomingStock incomingStockRequest) {
         StockViewDto stockView = new StockViewDto();
         stockView.setId(incomingStockRequest.getId());
+        stockView.setDataType("Incoming Stock"); // Set data type
 
         if (incomingStockRequest.getLocation() != null) {
             stockView.setLocationName(incomingStockRequest.getLocation().getLocationName());
@@ -192,6 +193,7 @@ public ResponseEntity<StockViewResponse> getStockView() {
 
     private StockViewDto mapBulkStockToDTO(BulkStock bulkStock) {
         StockViewDto stockView = new StockViewDto();
+        stockView.setDataType("Bulk Stock"); // Set data type
 
         stockView.setId(bulkStock.getId());
         stockView.setLocationName(bulkStock.getLocationName());

@@ -2,6 +2,7 @@ package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InternalTransferRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,6 +167,22 @@ public class InternalTransferService {
         }
 
         return ciplList;
+    }
+
+
+
+    public List<InternalTransfer> searchBoth(SearchCriteria searchCriteria) {
+        if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            // Search by date range
+            return searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+        } else {
+            // No criteria provided, return all
+            return internalTransferRepository.findAll();
+        }
+    }
+
+    public List<InternalTransfer> searchByDateRange(LocalDate startDate, LocalDate endDate) {
+        return internalTransferRepository.findByTransferDateBetween(startDate, endDate.plusDays(1));
     }
 
 }

@@ -1,7 +1,9 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Cipl;
+import com.inventory.project.model.IncomingStock;
 import com.inventory.project.model.Mto;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.MtoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +152,20 @@ public class MtoService {
         }
 
         return ciplList;
+    }
+
+    public List<Mto> searchBoth(SearchCriteria searchCriteria) {
+       if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            // Search by date range
+            return searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+        } else {
+            // No criteria provided, return all
+            return mtoRepository.findAll();
+        }
+    }
+
+    public List<Mto> searchByDateRange(LocalDate startDate, LocalDate endDate) {
+        return mtoRepository.findByTransferDateBetween(startDate, endDate.plusDays(1));
     }
 
 }

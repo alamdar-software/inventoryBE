@@ -18,6 +18,7 @@ public class SearchCriteria {
 
     private String address;
 
+    private boolean repairService;
     private boolean generateExcel;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -119,5 +120,13 @@ public class SearchCriteria {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isRepairService() {
+        return repairService;
+    }
+
+    public void setRepairService(boolean repairService) {
+        this.repairService = repairService;
     }
 }
