@@ -26,6 +26,7 @@ public class SearchCriteria {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+    private String entityType;
     public SearchCriteria() {
     }
 
@@ -128,5 +129,13 @@ public class SearchCriteria {
 
     public void setRepairService(boolean repairService) {
         this.repairService = repairService;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 }
