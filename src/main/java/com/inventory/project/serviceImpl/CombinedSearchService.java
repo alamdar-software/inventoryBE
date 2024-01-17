@@ -7,10 +7,7 @@ import com.inventory.project.model.StockViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CombinedSearchService {
@@ -75,12 +72,20 @@ public class CombinedSearchService {
             // Search only Mto with repairService as true
             List<Mto> mtoResults = searchMtoWithRepairService(true);
             return combineMtoResultsWithDataType(mtoResults, "Mto");
+        } else if (!searchCriteria.isRepairService() && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            // Search all InternalTransfer and Mto within the specified date range
+            List<InternalTransfer> internalTransferResults = searchInternalTransfer(searchCriteria);
+            List<Mto> mtoResults = searchMto(searchCriteria);
+
+            // Combine and return the results
+            List<Object> combinedResults = combineResults(internalTransferResults, mtoResults);
+            return combinedResults;
         } else {
-            // Search only Mto with repairService as false
-            List<Mto> mtoResults = searchMtoWithRepairService(false);
-            return combineMtoResultsWithDataType(mtoResults, "Mto");
+            // Handle other cases or return an empty list as needed
+            return Collections.emptyList();
         }
     }
+
 
 
     private List<Object> combineMtoResultsWithDataType(List<Mto> mtoResults, String dataType) {
