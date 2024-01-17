@@ -168,4 +168,8 @@ public class MtoService {
         return mtoRepository.findByTransferDateBetween(startDate, endDate.plusDays(1));
     }
 
+    public List<Mto> getMtoEntitiesByRepairService(boolean repairService) {
+        return mtoRepository.findMtoEntitiesByRepairService(repairService);
+    }
+
 }

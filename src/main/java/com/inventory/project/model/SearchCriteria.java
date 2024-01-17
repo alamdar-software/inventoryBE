@@ -138,4 +138,5 @@ public class SearchCriteria {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
+
 }

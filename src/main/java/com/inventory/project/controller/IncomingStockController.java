@@ -403,29 +403,12 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
 
-//    @PostMapping("/searchReport")
-//    public List<IncomingStock> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
-//        return incomingStockService.searchIncomingStock(searchCriteria);
-//    }
+
 @PostMapping("/searchReport")
 public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
     List<StockViewDto> result = incomingStockService.searchIncomingStock(searchCriteria);
     return ResponseEntity.ok(result);
 }
-//    @PostMapping("/searchReport")
-//    public ResponseEntity<StockViewResponse> searchReport(@RequestBody SearchCriteria searchCriteria) {
-//        List<StockViewDto> stockViewList = incomingStockService.searchIncomingStock(searchCriteria);
-//        int totalCount = stockViewList.size();
-//        int incomingStockCount = (int) stockViewList.stream().filter(stock -> "Incoming Stock".equalsIgnoreCase(stock.getDataType())).count();
-//        int bulkStockCount = (int) stockViewList.stream().filter(stock -> "Bulk Stock".equalsIgnoreCase(stock.getDataType())).count();
-//
-//        StockViewResponse response = new StockViewResponse();
-//        response.setTotalCount(totalCount);
-//        response.setIncomingStockCount(incomingStockCount);
-//        response.setBulkStockCount(bulkStockCount);
-//        response.setStockViewList(stockViewList);
-//
-//        return ResponseEntity.ok(response);
-//    }
+
 
 }

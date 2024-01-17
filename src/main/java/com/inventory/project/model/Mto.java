@@ -170,5 +170,7 @@ public class Mto {
         this.referenceNo = referenceNo;
     }
 
-
+    public List<String> getDescription() {
+        return description;
+    }
 }
