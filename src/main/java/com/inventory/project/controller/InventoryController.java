@@ -6,15 +6,9 @@ import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.serviceImpl.InventoryService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -31,11 +25,12 @@ public class InventoryController {
 
     @Autowired
     private LocationRepository locationRepo;
-@Autowired
+    @Autowired
     AddressRepository addressRepository;
 
-@Autowired
-    InventoryService  inventoryService;
+    @Autowired
+    InventoryService inventoryService;
+
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
         Map<String, Object> response = new HashMap<>();
@@ -230,6 +225,7 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
+
     @PostMapping("/search")
     public ResponseEntity<List<Inventory>> searchInventorysByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
@@ -264,6 +260,47 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
+
+//    @PostMapping("/searchItem")
+//    public ResponseEntity<List<Inventory>> searchInventoryByItemDescription(@RequestBody SearchCriteria criteria) {
+//        if (criteria == null || criteria.getDescription() == null || criteria.getDescription().isEmpty()) {
+//            // If criteria or description is empty, return bad request
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        String description = criteria.getDescription();
+//        String categoryName = criteria.getItem(); // Fetch the category name from criteria
+//
+//        System.out.println("Received Search Criteria - Description: " + description + ", CategoryName: " + categoryName);
+//
+//        List<Inventory> inventoryList;
+//
+//        if (categoryName != null && !categoryName.isEmpty()) {
+//            // If category name is provided, search by both description and category name
+//            inventoryList = inventoryService.searchInventoryByItemDescriptionAndName(description, categoryName);
+//        } else {
+//            // Otherwise, search by description only
+//            inventoryList = inventoryService.searchInventoryByItemDescription(description);
+//        }
+//
+//        // Log the received data and result
+//        System.out.println("Search Criteria: " + criteria);
+//        System.out.println("Result: " + inventoryList);
+//
+//        if (inventoryList.isEmpty()) {
+//            // If no results found, return 204 No Content
+//            return ResponseEntity.noContent().build();
+//        } else {
+//            // If results found, return the list
+//            return ResponseEntity.ok(inventoryList);
+//        }
+//    }
+
+    @PostMapping("/searchItem")
+    public List<Inventory> searchInventory(@RequestBody SearchCriteria searchCriteria) {
+        return inventoryService.searchInventoryByDescriptionAndCategoryName(searchCriteria);
+    }
+
 }
 
 

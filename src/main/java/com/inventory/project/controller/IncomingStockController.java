@@ -410,5 +410,10 @@ public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody Searc
     return ResponseEntity.ok(result);
 }
 
+    @PostMapping("/searchMaster")
+    public ResponseEntity<List<StockViewDto>> searchMasterIncomingStock(@RequestBody SearchCriteria searchCriteria) {
+        List<StockViewDto> result = incomingStockService.searchMasterIncomingStock(searchCriteria);
+        return ResponseEntity.ok(result);
+    }
 
 }

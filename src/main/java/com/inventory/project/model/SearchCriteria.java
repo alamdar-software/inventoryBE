@@ -27,6 +27,8 @@ public class SearchCriteria {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private String entityType;
+    private  String name;
+    private String categoryName;
     public SearchCriteria() {
     }
 
@@ -139,4 +141,19 @@ public class SearchCriteria {
         this.entityType = entityType;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

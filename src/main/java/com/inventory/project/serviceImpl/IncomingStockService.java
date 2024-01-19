@@ -4,6 +4,7 @@ import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
 //import jakarta.persistence.EntityNotFoundException;
 
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -235,6 +236,89 @@ public class IncomingStockService {
 
         return stockView;
     }
+
+    public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
+        List<IncomingStock> incomingStocks;
+        List<BulkStock> bulkStocks;
+
+        if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
+            // Search by entityName for incoming data
+            incomingStocks = searchByEntityName(searchCriteria.getEntityName());
+            bulkStocks = Collections.emptyList(); // Set empty list for bulk stocks
+        } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            // Search by date range for both incoming and bulk data
+            incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
+            // Search by locationName
+            incomingStocks = searchByLocation(searchCriteria.getLocationName());
+            bulkStocks = Collections.emptyList(); // Set empty list for bulk stocks
+        } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
+            // Search by description for both incoming and bulk data
+            incomingStocks = searchByDescriptionForIncoming(searchCriteria.getDescription());
+            bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
+        }
+        else {
+            // No or invalid criteria provided, return all
+            incomingStocks = getAllIncomingStockFromRepo();
+            bulkStocks = getAllBulkStockFromRepo();
+        }
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapIncomingStockToDTO(incomingStock);
+            stockView.setDataType("Incoming"); // Set data type to indicate mixed data
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapBulkStockToDTO(bulkStock);
+            stockView.setDataType("Bulk"); // Set data type to indicate mixed data
+            stockViewList.add(stockView);
+        }
+
+        return stockViewList;
+    }
+    private List<IncomingStock> searchByLocation(String locationName) {
+        return incomingStockRepo.findByLocation_LocationName(locationName);
+    }
+    // Add a new method to search by description for IncomingStock
+    private List<IncomingStock> searchByDescriptionForIncoming(String description) {
+        if (StringUtils.isNotEmpty(description)) {
+            List<IncomingStock> results = incomingStockRepo.findByItem_Description(description);
+            System.out.println("Search query: findByItem_Description(" + description + ")");
+            System.out.println("Results size: " + results.size());
+            return results;
+        } else {
+            // If the description is empty, return an empty list
+            return Collections.emptyList();
+        }
+    }
+
+
+    private List<BulkStock> searchByDescriptionForBulk(String description) {
+        return bulkStockRepo.findByDescription(description);
+    }
+
+    private List<IncomingStock> searchByLocationAndDescription(String locationName, String description) {
+        if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(description)) {
+            // Search by both locationName and description
+            return incomingStockRepo.findByLocation_LocationNameAndItem_Description(locationName, description);
+        } else if (StringUtils.isNotEmpty(locationName)) {
+            // Search by locationName only
+            return incomingStockRepo.findByLocation_LocationName(locationName);
+        } else if (StringUtils.isNotEmpty(description)) {
+            // Search by description only
+            return incomingStockRepo.findByItem_Description(description);
+        } else {
+            // Return all incoming stocks if no valid criteria provided
+            return getAllIncomingStockFromRepo();
+        }
+    }
+
+
+
 
 }
 

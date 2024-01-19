@@ -1,7 +1,6 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Inventory;
-import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +32,23 @@ public class InventoryService {
         return inventory != null ? Collections.singletonList(inventory) : Collections.emptyList();
     }
 
+    public List<Inventory> searchInventoryByItemDescription(String description) {
+        Inventory inventory=inventoryRepository.findByDescription(description);
+        return inventory != null ? Collections.singletonList(inventory): Collections.emptyList();
+    }
+
+
+    public List<Inventory> searchInventoryByItemCategory(String categoryName) {
+        System.out.println("Received Category Name in Service: " + categoryName);
+        List<Inventory> inventoryList = inventoryRepository.findByItem_Category_Name(categoryName);
+        System.out.println("Result in Service: " + inventoryList);
+        return inventoryList;
+    }
+    public List<Inventory> searchInventoryByDescriptionAndCategoryName(SearchCriteria searchCriteria) {
+        return inventoryRepository.findByDescriptionAndCategoryName(
+                searchCriteria.getDescription(),
+                searchCriteria.getName()
+        );
+    }
 
 }

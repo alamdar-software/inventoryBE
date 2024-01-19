@@ -1,13 +1,11 @@
 package com.inventory.project.repository;
 
-import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +30,14 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 
     List<Inventory> findByLocationName(String locationName);
 
+//    List<Inventory> findByDescriptionAndItem_Category_Name(String description, String item);
+
+    List<Inventory> findByItem_Category_Name(String categoryName);
+    @Query("SELECT i FROM Inventory i WHERE LOWER(i.description) = LOWER(:description) AND LOWER(i.item.category.name) = LOWER(:categoryName)")
+    List<Inventory> findByDescriptionAndCategoryName(
+            @Param("description") String description,
+            @Param("categoryName") String categoryName
+    );
 //    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
 
 
