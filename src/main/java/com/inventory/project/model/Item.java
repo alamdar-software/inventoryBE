@@ -36,7 +36,8 @@ public class Item {
     @Column(name = "unit_name")
     private String unitName;
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
+
     private List<Inventory> inventories;
 
     public Item() {

@@ -26,6 +26,15 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     String findItemNameByItemName(@Param("itemName") String itemName);
 
 
+    @Query("SELECT i FROM Item i WHERE LOWER(i.category.name) = LOWER(:categoryName) AND LOWER(i.description) = LOWER(:description)")
+    List<Item> findByCategoryNameAndDescription(
+            @Param("categoryName") String categoryName,
+            @Param("description") String description
+    );
+
+    @Query("SELECT i FROM Item i WHERE LOWER(i.category.name) = LOWER(:categoryName)")
+    List<Item> findByCategoryName(@Param("categoryName") String categoryName);
+
 
 //    Optional<Object> findById(String itemName);
 }

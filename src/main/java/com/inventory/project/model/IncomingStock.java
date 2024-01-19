@@ -318,5 +318,11 @@ public class IncomingStock {
         this.entity = entity;
     }
 
+    public Item getItem() {
+        return item;
+    }
 
+    public void setItem(Item item) {
+        this.item = item;
+    }
 }

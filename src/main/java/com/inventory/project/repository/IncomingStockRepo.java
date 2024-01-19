@@ -64,4 +64,17 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     List<IncomingStock> findByLocation_LocationName(String locationName);
 
     List<IncomingStock> findByItem_Description(String description);
+
+    List<IncomingStock> findByItemDescription(String itemDescription);
+
+    List<IncomingStock> findByLocation_LocationNameAndEntity_EntityNameAndItem_DescriptionAndDateBetween(
+            String locationName, String entityName, String description, LocalDate startDate, LocalDate endDate);
+
+    List<IncomingStock> findByLocation_LocationNameAndEntity_EntityNameAndDateBetween(
+            String locationName, String entityName, LocalDate startDate, LocalDate endDate);
+
+
+    List<IncomingStock> findByLocation_LocationNameAndDateBetween(String locationName, LocalDate startDate, LocalDate endDate);
+
+
 }

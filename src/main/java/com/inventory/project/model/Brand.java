@@ -24,6 +24,9 @@ public class Brand {
         this.brandName = brandName;
     }
 
+    public Brand(String brandName) {
+    }
+
     public Long getId() {
         return id;
     }

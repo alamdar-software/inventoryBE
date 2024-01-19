@@ -12,6 +12,12 @@ public class Entity {
     @Column(name="entity_name")
     String entityName;
 
+    public Entity() {
+    }
+
+    public Entity(String entityName) {
+    }
+
     public Long getId() {
         return id;
     }

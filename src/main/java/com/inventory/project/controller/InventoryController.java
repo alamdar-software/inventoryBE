@@ -297,8 +297,38 @@ public class InventoryController {
 //    }
 
     @PostMapping("/searchItem")
-    public List<Inventory> searchInventory(@RequestBody SearchCriteria searchCriteria) {
-        return inventoryService.searchInventoryByDescriptionAndCategoryName(searchCriteria);
+    public ResponseEntity<List<Item>> searchItemsByCategoryAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null) {
+            List<Item> allItems = inventoryService.getAllItems();
+            return ResponseEntity.ok(allItems);
+        }
+
+        List<Item> itemList;
+
+        if ((criteria.getDescription() == null || criteria.getDescription().isEmpty())
+                && (criteria.getName() == null || criteria.getName().isEmpty())) {
+            // If both description and categoryName are empty, fetch all data
+            itemList = inventoryService.getAllItems();
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getName() != null && !criteria.getName().isEmpty()) {
+            // Search by both description and categoryName
+            itemList = inventoryService.searchItemsByDescriptionAndCategoryName(
+                    criteria.getDescription(), criteria.getName());
+        } else if (criteria.getName() != null && !criteria.getName().isEmpty()) {
+            // Search by categoryName only
+            itemList = inventoryService.searchItemsByCategoryName(criteria.getName());
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            // Search by description only
+            itemList = inventoryService.searchItemsByDescription(criteria.getDescription());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Print criteria and result to check for issues
+        System.out.println("Received search criteria: " + criteria);
+        System.out.println("Returning item list: " + itemList);
+
+        return ResponseEntity.ok(itemList);
     }
 
 }

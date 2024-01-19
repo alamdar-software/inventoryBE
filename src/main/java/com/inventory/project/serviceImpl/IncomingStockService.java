@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class IncomingStockService {
@@ -238,28 +239,21 @@ public class IncomingStockService {
     }
 
     public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
-        List<IncomingStock> incomingStocks;
-        List<BulkStock> bulkStocks;
+        List<IncomingStock> incomingStocks = Collections.emptyList();
+        List<BulkStock> bulkStocks = Collections.emptyList();
 
-        if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
-            // Search by entityName for incoming data
+        if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
+            incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
+            // Optionally, you can add similar logic for bulkStockRepo as well
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
             incomingStocks = searchByEntityName(searchCriteria.getEntityName());
-            bulkStocks = Collections.emptyList(); // Set empty list for bulk stocks
         } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
-            // Search by date range for both incoming and bulk data
             incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
             bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
         } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
-            // Search by locationName
             incomingStocks = searchByLocation(searchCriteria.getLocationName());
-            bulkStocks = Collections.emptyList(); // Set empty list for bulk stocks
-        } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
-            // Search by description for both incoming and bulk data
-            incomingStocks = searchByDescriptionForIncoming(searchCriteria.getDescription());
-            bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
-        }
-        else {
-            // No or invalid criteria provided, return all
+        } else {
+            // Handle other cases or return all if no valid criteria provided
             incomingStocks = getAllIncomingStockFromRepo();
             bulkStocks = getAllBulkStockFromRepo();
         }
@@ -268,57 +262,170 @@ public class IncomingStockService {
 
         for (IncomingStock incomingStock : incomingStocks) {
             StockViewDto stockView = mapIncomingStockToDTO(incomingStock);
-            stockView.setDataType("Incoming"); // Set data type to indicate mixed data
+            stockView.setDataType("Incoming");
             stockViewList.add(stockView);
         }
 
         for (BulkStock bulkStock : bulkStocks) {
             StockViewDto stockView = mapBulkStockToDTO(bulkStock);
-            stockView.setDataType("Bulk"); // Set data type to indicate mixed data
+            stockView.setDataType("Bulk");
             stockViewList.add(stockView);
         }
 
         return stockViewList;
     }
+
     private List<IncomingStock> searchByLocation(String locationName) {
         return incomingStockRepo.findByLocation_LocationName(locationName);
     }
     // Add a new method to search by description for IncomingStock
-    private List<IncomingStock> searchByDescriptionForIncoming(String description) {
-        if (StringUtils.isNotEmpty(description)) {
-            List<IncomingStock> results = incomingStockRepo.findByItem_Description(description);
-            System.out.println("Search query: findByItem_Description(" + description + ")");
-            System.out.println("Results size: " + results.size());
-            return results;
-        } else {
-            // If the description is empty, return an empty list
-            return Collections.emptyList();
-        }
+    private List<IncomingStock> searchIncomingStockByDescription(String description) {
+        return incomingStockRepo.findByItem_Description(description);
     }
+
+
 
 
     private List<BulkStock> searchByDescriptionForBulk(String description) {
         return bulkStockRepo.findByDescription(description);
     }
 
-    private List<IncomingStock> searchByLocationAndDescription(String locationName, String description) {
-        if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(description)) {
-            // Search by both locationName and description
-            return incomingStockRepo.findByLocation_LocationNameAndItem_Description(locationName, description);
-        } else if (StringUtils.isNotEmpty(locationName)) {
-            // Search by locationName only
-            return incomingStockRepo.findByLocation_LocationName(locationName);
-        } else if (StringUtils.isNotEmpty(description)) {
-            // Search by description only
-            return incomingStockRepo.findByItem_Description(description);
+
+    private IncomingStockRequest mapBulkStockToIncomingStockRequest(BulkStock bulkStock) {
+        IncomingStockRequest incomingStockRequest = new IncomingStockRequest();
+
+        // Set relevant fields from BulkStock to IncomingStockRequest
+        incomingStockRequest.setQuantity(bulkStock.getQuantity().stream().mapToInt(Integer::intValue).sum());
+        incomingStockRequest.setUnitCost(bulkStock.getUnitCost().stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
+        incomingStockRequest.setExtendedValue(bulkStock.getExtendedValue().stream().mapToDouble(Double::doubleValue).sum());
+        incomingStockRequest.setDate(bulkStock.getDate());
+        incomingStockRequest.setPurchaseOrder(bulkStock.getPurchaseOrder());
+        incomingStockRequest.setPn(String.join(", ", bulkStock.getPn()));
+        incomingStockRequest.setSn(String.join(", ", bulkStock.getSn()));
+        incomingStockRequest.setPrice(bulkStock.getPrice().stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
+        incomingStockRequest.setDescription(String.join(", ", bulkStock.getDescription()));
+
+        // Assuming there are setter methods for these fields in IncomingStockRequest
+        incomingStockRequest.setLocationName(bulkStock.getLocationName());
+        incomingStockRequest.setAddress(bulkStock.getAddress());
+        incomingStockRequest.setRemarks(bulkStock.getRemarks());
+        incomingStockRequest.setBrandName(bulkStock.getBrandName().stream().findFirst().orElse(null));
+        incomingStockRequest.setStandardPrice(bulkStock.getStandardPrice().stream().findFirst().orElse(0.0));
+        incomingStockRequest.setEntityName(bulkStock.getEntityName().stream().findFirst().orElse(null));
+        incomingStockRequest.setStoreNo(bulkStock.getStoreNo().stream().findFirst().orElse(null));
+        incomingStockRequest.setImpaCode(bulkStock.getImpaCode().stream().findFirst().orElse(null));
+
+        // Map other fields accordingly
+
+        return incomingStockRequest;
+    }
+
+    private List<IncomingStock> searchByLocationAndDescription(
+            String locationName, String entityName, String description, LocalDate startDate, LocalDate endDate) {
+        if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(entityName) &&
+                StringUtils.isNotEmpty(description) && startDate != null && endDate != null) {
+            // Search by locationName, entityName, description, and date range for IncomingStock
+            List<IncomingStock> incomingStocks = incomingStockRepo.findByLocation_LocationNameAndEntity_EntityNameAndItem_DescriptionAndDateBetween(
+                    locationName, entityName, description, startDate, endDate.plusDays(1));
+
+            // Search by locationName, description, and date range for BulkStock
+            List<BulkStock> bulkStocks = bulkStockRepo.findByLocationNameAndDescriptionAndDateBetween(
+                    locationName, description, startDate, endDate.plusDays(1));
+
+            // Map BulkStocks to IncomingStocks
+            List<IncomingStock> incomingStockFromBulk = bulkStocks.stream()
+                    .map(this::mapBulkStockToIncomingStockRequest) // Corrected method reference
+                    .map(this::convertIncomingStockRequestToIncomingStock) // Added conversion step
+                    .collect(Collectors.toList());
+
+            // Combine the results
+            List<IncomingStock> result = new ArrayList<>(incomingStocks);
+            result.addAll(incomingStockFromBulk);
+
+            return result;
         } else {
-            // Return all incoming stocks if no valid criteria provided
+            // Handle other cases or return all if no valid criteria provided
             return getAllIncomingStockFromRepo();
         }
     }
 
 
+//    private List<IncomingStockRequest> convertIncomingStockEntitiesToRequests(List<IncomingStock> incomingStocks) {
+//        return incomingStocks.stream()
+//                .map(incomingStock -> {
+//                    // Assuming you have a method to convert IncomingStock to IncomingStockRequest
+//                    return convertIncomingStockToRequest(incomingStock);
+//                })
+//                .collect(Collectors.toList());
+//    }
 
+//    private IncomingStock convertIncomingStockRequestToIncomingStock(IncomingStockRequest incomingStockRequest) {
+//        IncomingStock incomingStock = new IncomingStock();
+//
+//        // Set relevant fields from IncomingStockRequest to IncomingStock
+//        incomingStock.setQuantity(incomingStockRequest.getQuantity());
+//        incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+//        incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+//        incomingStock.setDate(incomingStockRequest.getDate());
+//        incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+//        incomingStock.setPn(String.valueOf(incomingStockRequest.getPn().split(", ")));
+//        incomingStock.setSn(String.valueOf(incomingStockRequest.getSn().split(", ")));
+//
+//        incomingStock.setPrice(incomingStockRequest.getPrice());
+//        incomingStock.setItemDescription(incomingStockRequest.getDescription());
+//        incomingStock.setLocation(new Location(incomingStockRequest.getLocationName()));
+//        incomingStock.setRemarks(incomingStockRequest.getRemarks());
+//        incomingStock.setBrand(new Brand(incomingStockRequest.getBrandName()));
+//        incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+//        incomingStock.setEntity(new Entity(incomingStockRequest.getEntityName()));
+//        incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+//        incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+//
+//        // Map other fields accordingly
+//
+//        return incomingStock;
+//    }
+
+    private IncomingStock convertIncomingStockRequestToIncomingStock(IncomingStockRequest incomingStockRequest) {
+        IncomingStock incomingStock = new IncomingStock();
+
+        // Set relevant fields from IncomingStockRequest to IncomingStock
+        incomingStock.setQuantity(incomingStockRequest.getQuantity());
+        incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+        incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+        incomingStock.setDate(incomingStockRequest.getDate());
+        incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+
+        incomingStock.setPn(String.valueOf(StringUtils.isNotEmpty(incomingStockRequest.getPn()) ? incomingStockRequest.getPn().split(", ") : new String[]{}));
+        incomingStock.setSn(String.valueOf(StringUtils.isNotEmpty(incomingStockRequest.getSn()) ? incomingStockRequest.getSn().split(", ") : new String[]{}));
+
+
+        incomingStock.setPrice(incomingStockRequest.getPrice());
+        incomingStock.setItemDescription(incomingStockRequest.getDescription());
+
+        if (StringUtils.isNotEmpty(incomingStockRequest.getLocationName())) {
+            incomingStock.setLocation(new Location(incomingStockRequest.getLocationName()));
+        }
+
+        incomingStock.setRemarks(incomingStockRequest.getRemarks());
+
+        if (StringUtils.isNotEmpty(incomingStockRequest.getBrandName())) {
+            incomingStock.setBrand(new Brand(incomingStockRequest.getBrandName()));
+        }
+
+        incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+
+        if (StringUtils.isNotEmpty(incomingStockRequest.getEntityName())) {
+            incomingStock.setEntity(new Entity(incomingStockRequest.getEntityName()));
+        }
+
+        incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+        incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+
+        // Map other fields accordingly
+
+        return incomingStock;
+    }
 
 }
 

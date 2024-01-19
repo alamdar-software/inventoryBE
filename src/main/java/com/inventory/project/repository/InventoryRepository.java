@@ -33,11 +33,9 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 //    List<Inventory> findByDescriptionAndItem_Category_Name(String description, String item);
 
     List<Inventory> findByItem_Category_Name(String categoryName);
-    @Query("SELECT i FROM Inventory i WHERE LOWER(i.description) = LOWER(:description) AND LOWER(i.item.category.name) = LOWER(:categoryName)")
-    List<Inventory> findByDescriptionAndCategoryName(
-            @Param("description") String description,
-            @Param("categoryName") String categoryName
-    );
+
+
+
 //    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
 
 
