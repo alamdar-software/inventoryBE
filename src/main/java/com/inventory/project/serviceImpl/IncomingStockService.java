@@ -240,8 +240,8 @@ public class IncomingStockService {
     }
 
     public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
-        List<IncomingStock> incomingStocks = Collections.emptyList();
-        List<BulkStock> bulkStocks = Collections.emptyList();
+        List<IncomingStock> incomingStocks;
+        List<BulkStock> bulkStocks;
 
         if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
             incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
@@ -260,9 +260,12 @@ public class IncomingStockService {
             incomingStocks = searchByLocation(searchCriteria.getLocationName());
             bulkStocks = searchBulkByLocation(searchCriteria.getLocationName());
         } else {
-            // Handle other cases or return all if no valid criteria provided
-            incomingStocks = getAllIncomingStockFromRepo();
-            bulkStocks = getAllBulkStockFromRepo();
+            // Throw an exception if no valid criteria provided
+            throw new RuntimeException("No valid search criteria provided.");
+        }
+
+        if (incomingStocks.isEmpty() && bulkStocks.isEmpty()) {
+            throw new RuntimeException("No data found for the specified search criteria.");
         }
 
         List<StockViewDto> stockViewList = new ArrayList<>();
