@@ -15,6 +15,12 @@ public class Currency {
     @Column (name="currency_name")
     String currencyName;
 
+    public Currency() {
+    }
+
+    public Currency(String currencyName) {
+    }
+
     public Long getId() {
         return id;
     }
