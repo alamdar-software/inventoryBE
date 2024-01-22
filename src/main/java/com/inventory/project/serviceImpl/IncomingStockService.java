@@ -240,32 +240,33 @@ public class IncomingStockService {
     }
 
     public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
-        List<IncomingStock> incomingStocks;
-        List<BulkStock> bulkStocks;
+        List<IncomingStock> incomingStocks = Collections.emptyList();
+        List<BulkStock> bulkStocks = Collections.emptyList();
 
         if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
             incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
             bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
         } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) && StringUtils.isNotEmpty(searchCriteria.getLocationName()) && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             // Search by entityName, locationName, and date range for both incoming and bulk data
-            incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
-            bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
+                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            }
         } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
             incomingStocks = searchByEntityName(searchCriteria.getEntityName());
             bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName());
         } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
-            incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
-            bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            // Search by date range for both incoming and bulk data
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            }
         } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
             incomingStocks = searchByLocation(searchCriteria.getLocationName());
             bulkStocks = searchBulkByLocation(searchCriteria.getLocationName());
         } else {
-            // Throw an exception if no valid criteria provided
-            throw new RuntimeException("No valid search criteria provided.");
-        }
-
-        if (incomingStocks.isEmpty() && bulkStocks.isEmpty()) {
-            throw new RuntimeException("No data found for the specified search criteria.");
+            // No valid criteria provided, return an empty list or handle it based on your requirement
+            return Collections.emptyList();
         }
 
         List<StockViewDto> stockViewList = new ArrayList<>();
@@ -284,6 +285,7 @@ public class IncomingStockService {
 
         return stockViewList;
     }
+
 
     // Add new methods for searching bulk stock by entity name and location name with date range
     private List<IncomingStock> searchByLocationAndEntityNameAndDateRange(String locationName, String entityName, LocalDate startDate, LocalDate endDate) {
@@ -317,8 +319,15 @@ public class IncomingStockService {
 
 
     private List<IncomingStock> searchByLocation(String locationName) {
-        return incomingStockRepo.findByLocation_LocationName(locationName);
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByLocation_LocationName(locationName);
+
+        if (incomingStocks.isEmpty()) {
+            throw new RuntimeException("No data found for the specified locationName: " + locationName);
+        }
+
+        return incomingStocks;
     }
+
     // Add a new method to search by description for IncomingStock
     private List<IncomingStock> searchIncomingStockByDescription(String description) {
         return incomingStockRepo.findByItem_Description(description);
@@ -369,14 +378,24 @@ public class IncomingStockService {
             List<IncomingStock> incomingStocks = incomingStockRepo.findByLocation_LocationNameAndEntity_EntityNameAndItem_DescriptionAndDateBetween(
                     locationName, entityName, description, startDate, endDate.plusDays(1));
 
+            // Check if no results found for IncomingStock
+            if (incomingStocks.isEmpty()) {
+                return Collections.emptyList();
+            }
+
             // Search by locationName, description, and date range for BulkStock
             List<BulkStock> bulkStocks = bulkStockRepo.findByLocationNameAndDescriptionAndDateBetween(
                     locationName, description, startDate, endDate.plusDays(1));
 
+            // Check if no results found for BulkStock
+            if (bulkStocks.isEmpty()) {
+                return Collections.emptyList();
+            }
+
             // Map BulkStocks to IncomingStocks
             List<IncomingStock> incomingStockFromBulk = bulkStocks.stream()
-                    .map(this::mapBulkStockToIncomingStockRequest) // Corrected method reference
-                    .map(this::convertIncomingStockRequestToIncomingStock) // Added conversion step
+                    .map(this::mapBulkStockToIncomingStockRequest)
+                    .map(this::convertIncomingStockRequestToIncomingStock)
                     .collect(Collectors.toList());
 
             // Combine the results
@@ -389,6 +408,7 @@ public class IncomingStockService {
             return getAllIncomingStockFromRepo();
         }
     }
+
 
 
 //    private List<IncomingStockRequest> convertIncomingStockEntitiesToRequests(List<IncomingStock> incomingStocks) {

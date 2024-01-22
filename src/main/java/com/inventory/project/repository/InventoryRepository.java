@@ -35,12 +35,4 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     List<Inventory> findByItem_Category_Name(String categoryName);
 
 
-
-//    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
-
-
-//    @Query("SELECT i.quantity FROM Inventory i WHERE i.item = :item AND i.location = :location")
-//    Integer findQuantityByItemAndLocation(@Param("item") Item item, @Param("location") String location);
-
-
 }
