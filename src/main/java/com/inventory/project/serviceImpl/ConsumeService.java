@@ -69,87 +69,42 @@ public class ConsumeService {
         return consumedItemRepo.findAll();
     }
 
-//    public byte[] generateExcelFile(List<ConsumedItem> consumedItems) throws IOException {
-//        Workbook workbook = new XSSFWorkbook();
-//        Sheet sheet = workbook.createSheet("ConsumedItems");
-//
-//        // Create header row
-//        Row headerRow = sheet.createRow(0);
-//        headerRow.createCell(0).setCellValue("Location");
-//        headerRow.createCell(1).setCellValue("Transfer Date");
-//        headerRow.createCell(2).setCellValue("Item");
-//        headerRow.createCell(3).setCellValue("SubLocation");
-//        headerRow.createCell(4).setCellValue("Quantity");
-//        // Add more headers as needed
-//
-//        // Populate data rows
-//        int rowNum = 1;
-//        for (ConsumedItem consumedItem : consumedItems) {
-//            Row row = sheet.createRow(rowNum++);
-//            row.createCell(0).setCellValue(consumedItem.getLocationName());
-//            row.createCell(1).setCellValue(consumedItem.getTransferDate().toString());
-//            row.createCell(2).setCellValue(String.join(",", consumedItem.getItem()));
-//            row.createCell(3).setCellValue(String.join(",", consumedItem.getSubLocations()));
-//            row.createCell(4).setCellValue(String.join(",", consumedItem.getQuantity()));
-//            // Add more data as needed
-//        }
-//
-//        // Write the workbook content to a ByteArrayOutputStream
-//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        workbook.write(outputStream);
-//        workbook.close();
-//
-//        return outputStream.toByteArray();
-//    }
-//
-//    public byte[] generatePdfFile(List<ConsumedItem> consumedItems) throws IOException {
-//        PDDocument document = new PDDocument();
-//        PDPage page = new PDPage();
-//        document.addPage(page);
-//
-//        PDPageContentStream contentStream = new PDPageContentStream(document, page);
-//
-//        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-//        contentStream.newLineAtOffset(20, 700);
-//
-//        // Write headers
-//        contentStream.showText("Location");
-//        contentStream.newLineAtOffset(100, 0);
-//        contentStream.showText("Transfer Date");
-//        contentStream.newLineAtOffset(100, 0);
-//        contentStream.showText("Item");
-//        contentStream.newLineAtOffset(100, 0);
-//        contentStream.showText("SubLocation");
-//        contentStream.newLineAtOffset(100, 0);
-//        contentStream.showText("Quantity");
-//        // Add more headers as needed
-//
-//        contentStream.newLineAtOffset(-400, -15);
-//
-//        // Write data
-//        for (ConsumedItem consumedItem : consumedItems) {
-//            contentStream.showText(consumedItem.getLocationName());
-//            contentStream.newLineAtOffset(100, 0);
-//            contentStream.showText(consumedItem.getTransferDate().toString());
-//            contentStream.newLineAtOffset(100, 0);
-//            contentStream.showText(String.join(",", consumedItem.getItem()));
-//            contentStream.newLineAtOffset(100, 0);
-//            contentStream.showText(String.join(",", consumedItem.getSubLocations()));
-//            contentStream.newLineAtOffset(100, 0);
-//            contentStream.showText(String.join(",", consumedItem.getQuantity()));
-//            // Add more data as needed
-//
-//            contentStream.newLineAtOffset(-400, -15);
-//        }
-//
-//        contentStream.close();
-//
-//        // Write the PDF content to a ByteArrayOutputStream
-//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        document.save(outputStream);
-//        document.close();
-//
-//        return outputStream.toByteArray();
-//    }
+    public List<ConsumedItem> getCiplByDateRange(LocalDate startDate, LocalDate endDate) {
+        return consumedItemRepo.findByTransferDateBetween(startDate, endDate);
+    }
+    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Collections.emptyList(); // If any required parameter is null, return an empty list
+        }
+
+        List<ConsumedItem> ciplList;
+
+        if (locationName != null && !locationName.isEmpty()) {
+            // If locationName is provided, check if it exists in the date range
+            List<ConsumedItem> locationInRange = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+
+            if (locationInRange.isEmpty()) {
+                return Collections.emptyList(); // No matching records found for the provided locationName and date range
+            }
+        }
+
+        if (item != null && !item.isEmpty()) {
+            // If item is provided, filter by item
+            ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
+        } else if (locationName != null && !locationName.isEmpty()) {
+            // If only locationName is provided, filter by locationName
+            ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+        } else {
+            // If neither item nor locationName is provided, filter by date range only
+            ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
+        }
+
+        if (ciplList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided criteria
+        }
+
+        return ciplList; // Return the matching records
+    }
+
 
 }

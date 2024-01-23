@@ -21,4 +21,11 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
     List<ConsumedItem> findByTransferDate(LocalDate transferDate);
 
     List<ConsumedItem> findByLocationNameAndTransferDate(String locationName, LocalDate transferDate);
+
+    List<ConsumedItem> findByTransferDateBetween(LocalDate startDate, LocalDate endDate);
+
+
+    List<ConsumedItem> findByItemAndTransferDateBetween(String item, LocalDate startDate, LocalDate endDate);
+
+    List<ConsumedItem> findByLocationNameAndTransferDateBetween(String locationName, LocalDate startDate, LocalDate endDate);
 }

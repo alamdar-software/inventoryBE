@@ -215,32 +215,28 @@ private ConsumeService consumeService;
         return ResponseEntity.ok(ciplList);
     }
 
-//    @GetMapping("/download/excel")
-//    public ResponseEntity<Resource> downloadExcel() throws IOException {
-//        List<ConsumedItem> consumedItems = consumeService.getAll();
-//        byte[] excelContent = consumeService.generateExcelFile(consumedItems);
-//
-//        ByteArrayResource resource = new ByteArrayResource(excelContent);
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=consumedItems.xlsx")
-//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                .contentLength(excelContent.length)
-//                .body(resource);
-//    }
-//
-//    @GetMapping("/download/pdf")
-//    public ResponseEntity<Resource> downloadPdf() throws IOException {
-//        List<ConsumedItem> consumedItems = consumeService.getAll();
-//        byte[] pdfContent = consumeService.generatePdfFile(consumedItems);
-//
-//        ByteArrayResource resource = new ByteArrayResource(pdfContent);
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=consumedItems.pdf")
-//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                .contentLength(pdfContent.length)
-//                .body(resource);
-//    }
+
+
+@PostMapping("/searchReport")
+public ResponseEntity<List<ConsumedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+    if (criteria == null) {
+        List<ConsumedItem> allCipl = consumeService.getAll();
+        return ResponseEntity.ok(allCipl);
+    }
+
+    List<ConsumedItem> ciplList;
+
+    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+        ciplList = consumeService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
+
+        if (ciplList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+    } else {
+        return ResponseEntity.badRequest().build();
+    }
+
+    return ResponseEntity.ok(ciplList);
+}
 
 }

@@ -202,4 +202,27 @@ public class ScrappedItemController {
     }
 
 
+
+
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<ScrappedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null) {
+            List<ScrappedItem> allCipl = scrappedItemService.getAll();
+            return ResponseEntity.ok(allCipl);
+        }
+
+        List<ScrappedItem> ciplList;
+
+        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+            ciplList = scrappedItemService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
+
+            if (ciplList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(ciplList);
+    }
 }

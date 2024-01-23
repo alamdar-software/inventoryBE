@@ -295,33 +295,13 @@ public class InventoryController {
 //            return ResponseEntity.ok(inventoryList);
 //        }
 //    }
-//@PostMapping("/searchItem")
-//public ResponseEntity<List<InventoryItemViewDto>> searchInventoryItemsByDescriptionAndLocation(@RequestBody(required = false) SearchCriteria criteria) {
-//    if (criteria == null || (criteria.getDescription() == null && criteria.getName() == null)) {
-//        return ResponseEntity.badRequest().build();
-//    }
-//
-//    List<InventoryItemViewDto> inventoryItemList;
-//
-//    if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
-//            && criteria.getName() != null && !criteria.getName().isEmpty()) {
-//        // Search by both description and name
-//        inventoryItemList = inventoryService.searchInventoryItemsByDescriptionAndName(
-//                criteria.getDescription(), criteria.getName());
-//    } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-//        // Search by description only
-//        inventoryItemList = inventoryService.searchInventoryItemsByDescription(criteria.getDescription());
-//    } else if (criteria.getName() != null && !criteria.getName().isEmpty()) {
-//        // Search by name only
-//        inventoryItemList = inventoryService.searchInventoryItemsByName(criteria.getName());
-//    } else {
-//        return ResponseEntity.badRequest().build();
-//    }
-//
-//    return ResponseEntity.ok(inventoryItemList);
-//}
+@PostMapping("/searchItem")
+public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
+    List<ItemInventoryDto> result = inventoryService.searchItemsByDescriptionAndName(
+            searchRequest.getDescription(), searchRequest.getName());
 
-
+    return ResponseEntity.ok(result);
+}
 //    @PostMapping("/searchItem")
 //    public ResponseEntity<List<Item>> searchItemsByCategoryAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
 //        if (criteria == null) {

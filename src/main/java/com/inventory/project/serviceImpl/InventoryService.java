@@ -1,8 +1,9 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Inventory;
-import com.inventory.project.model.InventoryItemViewDto;
+
 import com.inventory.project.model.Item;
+import com.inventory.project.model.ItemInventoryDto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
@@ -71,40 +72,41 @@ public class InventoryService {
 //        }
 //    }
 
-//    public List<InventoryItemViewDto> searchInventoryItemsByDescriptionAndName(String description, String name) {
-//        List<Inventory> inventories = inventoryRepository.findByDescriptionAndName(description, name);
-//        initializeItems(inventories);
-//        return combineInventoryWithItemData(inventories);
-//    }
 
-//    public List<InventoryItemViewDto> searchInventoryItemsByName(String name) {
-//        List<Inventory> inventories = inventoryRepository.findByName(name);
-//        initializeItems(inventories);
-//        return combineInventoryWithItemData(inventories);
-//    }
-//
-//// Update combineInventoryWithItemData and initializeItems methods as needed
-//
-//
-//    public List<InventoryItemViewDto> searchInventoryItemsByDescription(String description) {
-//        List<Inventory> inventories = Collections.singletonList(inventoryRepository.findByDescription(description));
-//        initializeItems(inventories);
-//        return combineInventoryWithItemData(inventories);
-//    }
-//
-//    private List<InventoryItemViewDto> combineInventoryWithItemData(List<Inventory> inventories) {
-//        List<InventoryItemViewDto> result = new ArrayList<>();
-//        for (Inventory inventory : inventories) {
-//            InventoryItemViewDto inventoryItemViewDto = new InventoryItemViewDto(inventory.getItem(), inventory);
-//            result.add(inventoryItemViewDto);
-//        }
-//        return result;
-//    }
-//
-//    private void initializeItems(List<Inventory> inventories) {
-//        for (Inventory inventory : inventories) {
-//            Hibernate.initialize(inventory.getItem());
-//        }
-//    }
+    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String name) {
+        List<Item> items = itemRepository.findByNameAndDescription(name, description);
+        return mapItemsToItemInventoryDto(items);
+    }
 
+    public List<ItemInventoryDto> searchItemsByName(String name) {
+        List<Item> items = itemRepository.findByName(name);
+        return mapItemsToItemInventoryDto(items);
+    }
+
+    public List<ItemInventoryDto> searchItemsByDescription(String description) {
+        Item item = itemRepository.findByDescription(description);
+        List<Item> items = (item != null) ? Collections.singletonList(item) : Collections.emptyList();
+        return mapItemsToItemInventoryDto(items);
+    }
+
+    private List<ItemInventoryDto> mapItemsToItemInventoryDto(List<Item> items) {
+        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
+
+        for (Item item : items) {
+            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
+            itemInventoryDto.setName(item.getName());
+            itemInventoryDto.setDescription(item.getDescription());
+            itemInventoryDto.setItemName(item.getItemName());
+
+            // Assuming Inventory has a method called getTotalQuantity(), replace it with the actual method
+            itemInventoryDto.setQuantity(item.getInventories().stream().mapToInt(Inventory::getQuantity).sum());
+            // Set other fields as needed
+            itemInventoryDto.setDescription(item.getInventories().stream().findFirst().map(Inventory::getDescription).orElse(null));
+
+
+            itemInventoryDtos.add(itemInventoryDto);
+        }
+
+        return itemInventoryDtos;
+    }
 }
