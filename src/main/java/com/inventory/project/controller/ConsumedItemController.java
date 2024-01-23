@@ -218,54 +218,61 @@ private ConsumeService consumeService;
 
 
 
+
 //@PostMapping("/searchReport")
-//public ResponseEntity<List<ConsumedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
-//    if (criteria == null) {
-//        List<ConsumedItem> allCipl = consumeService.getAll();
-//        return ResponseEntity.ok(allCipl);
-//    }
-//
-//    List<ConsumedItem> ciplList;
+//public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
+//    List<ConsumedItem> result;
 //
 //    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-//        ciplList = consumeService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
-//
-//        if (ciplList.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
+//        // Search by date range
+//        result = consumeService.getCiplByDateRange(
+//                criteria.getItem(),
+//                criteria.getLocationName(),
+//                criteria.getStartDate(),
+//                criteria.getEndDate()
+//        );
+//    } else if (StringUtils.isNotEmpty(criteria.getItem())) {
+//        // Search by item
+//        result = consumeService.getCiplByItem(criteria.getItem());
+//    } else if (StringUtils.isNotEmpty(criteria.getLocationName())) {
+//        // Search by location name if only locationName is provided
+//        result = consumeService.getCiplByLocation(criteria.getLocationName());
 //    } else {
+//        // No valid criteria provided, return an empty list or handle it based on your requirement
 //        return ResponseEntity.badRequest().build();
 //    }
 //
-//    return ResponseEntity.ok(ciplList);
+//    if (result.isEmpty()) {
+//        return ResponseEntity.notFound().build();
+//    } else {
+//        return ResponseEntity.ok(result);
+//    }
 //}
-@PostMapping("/searchReport")
-public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
-    List<ConsumedItem> result;
 
-    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-        // Search by date range
-        result = consumeService.getCiplByDateRange(
-                criteria.getItem(),
-                criteria.getLocationName(),
-                criteria.getStartDate(),
-                criteria.getEndDate()
-        );
-    } else if (StringUtils.isNotEmpty(criteria.getItem())) {
-        // Search by item
-        result = consumeService.getCiplByItem(criteria.getItem());
-    } else if (StringUtils.isNotEmpty(criteria.getLocationName())) {
-        // Search by location name if only locationName is provided
-        result = consumeService.getCiplByLocation(criteria.getLocationName());
-    } else {
-        // No valid criteria provided, return an empty list or handle it based on your requirement
-        return ResponseEntity.badRequest().build();
-    }
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
+        List<ConsumedItem> result;
 
-    if (result.isEmpty()) {
-        return ResponseEntity.notFound().build();
-    } else {
-        return ResponseEntity.ok(result);
+        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+            // Search by date range
+            result = consumeService.getCiplByDateRange(
+                    criteria.getItem(),
+                    criteria.getLocationName(),
+                    criteria.getStartDate(),
+                    criteria.getEndDate()
+            );
+        } else if (StringUtils.isNotEmpty(criteria.getItem()) && StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by both item and locationName
+            result = consumeService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName());
+        } else {
+            // No valid criteria provided, return an empty list or handle it based on your requirement
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(result);
+        }
     }
-}
 }

@@ -239,12 +239,9 @@ public class ScrappedItemController {
                     criteria.getStartDate(),
                     criteria.getEndDate()
             );
-        } else if (StringUtils.isNotEmpty(criteria.getItem())) {
-            // Search by item
-            result = scrappedItemService.getCiplByItem(criteria.getItem());
-        } else if (StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by location name if only locationName is provided
-            result = scrappedItemService.getCiplByLocation(criteria.getLocationName());
+        } else if (StringUtils.isNotEmpty(criteria.getItem()) && StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by both item and locationName
+            result = scrappedItemService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName());
         } else {
             // No valid criteria provided, return an empty list or handle it based on your requirement
             return ResponseEntity.badRequest().build();

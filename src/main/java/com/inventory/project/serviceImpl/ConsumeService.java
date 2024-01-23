@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 //import org.apache.poi.ss.usermodel.*;
 //import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 //import org.apache.pdfbox.pdmodel.PDDocument;
@@ -102,6 +104,44 @@ public class ConsumeService {
 //    }
 //
 
+//    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+//        if (startDate == null || endDate == null) {
+//            return Collections.emptyList(); // If any required parameter is null, return an empty list
+//        }
+//
+//        List<ConsumedItem> ciplList;
+//
+//        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+//            // If either item or locationName is provided, filter by the provided criteria
+//            if (item != null && !item.isEmpty()) {
+//                // If item is provided, filter by item
+//                ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
+//            } else {
+//                // If only locationName is provided, filter by locationName
+//                ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+//            }
+//        } else {
+//            // If neither item nor locationName is provided, filter by date range only
+//            ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
+//        }
+//
+//        if (ciplList.isEmpty()) {
+//            return Collections.emptyList(); // No matching records found for the provided criteria
+//        }
+//
+//        return ciplList; // Return the matching records
+//    }
+//
+//    public List<ConsumedItem> getConsumerByItem(String item) {
+//        if (StringUtils.isNotEmpty(item)) {
+//            // If only item is provided, filter by item
+//            return consumedItemRepo.findByItem(item);
+//        } else {
+//            // If item is not provided, return an empty list or handle it based on your requirement
+//            return Collections.emptyList();
+//        }
+//    }
+
     public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             return Collections.emptyList(); // If any required parameter is null, return an empty list
@@ -130,14 +170,15 @@ public class ConsumeService {
         return ciplList; // Return the matching records
     }
 
-    public List<ConsumedItem> getConsumerByItem(String item) {
-        if (StringUtils.isNotEmpty(item)) {
-            // If only item is provided, filter by item
-            return consumedItemRepo.findByItem(item);
+    public List<ConsumedItem> getConsumedByItemAndLocation(String item, String locationName) {
+        if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+            // If both item and locationName are provided, filter by both
+            return consumedItemRepo.findByItemAndLocationName(item, locationName);
         } else {
-            // If item is not provided, return an empty list or handle it based on your requirement
+            // If either item or locationName is not provided, return an empty list or handle it based on your requirement
             return Collections.emptyList();
         }
     }
+
 
 }
