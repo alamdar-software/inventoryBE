@@ -5,6 +5,7 @@ import com.inventory.project.model.IncomingStock;
 import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.MtoRepository;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -170,6 +171,144 @@ public class MtoService {
 
     public List<Mto> getMtoEntitiesByRepairService(boolean repairService) {
         return mtoRepository.findMtoEntitiesByRepairService(repairService);
+    }
+
+
+//
+public List<Mto> getMtoByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate, boolean repairService) {
+    if (startDate == null || endDate == null) {
+        return Collections.emptyList(); // If any required parameter is null, return an empty list
+    }
+
+    List<Mto> ciplList;
+
+    if ((StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService)) {
+        // If either description, locationName, or repairService is provided, filter by the provided criteria
+        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService) {
+            // If description, locationName, and repairService are provided, filter by all
+            ciplList = mtoRepository.findByDescriptionAndLocationNameAndRepairServiceAndTransferDateBetween(
+                    description, locationName, repairService, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description) && repairService) {
+            // If description and repairService are provided, filter by description and repairService
+            ciplList = mtoRepository.findByDescriptionAndRepairServiceAndTransferDateBetween(
+                    description, repairService, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(locationName) && repairService) {
+            // If locationName and repairService are provided, filter by locationName and repairService
+            ciplList = mtoRepository.findByLocationNameAndRepairServiceAndTransferDateBetween(
+                    locationName, repairService, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+            // If description and locationName are provided, filter by description and locationName
+            ciplList = mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+                    description, locationName, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description)) {
+            // If only description is provided, filter by description
+            ciplList = mtoRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(locationName)) {
+            // If only locationName is provided, filter by locationName
+            ciplList = mtoRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+        } else if (repairService) {
+            // If only repairService is provided, filter by repairService
+            ciplList = mtoRepository.findByRepairServiceAndTransferDateBetween(repairService, startDate, endDate);
+
+            // Check if records were found with the specified repairService
+            if (ciplList.isEmpty()) {
+                return Collections.emptyList();
+            }
+        } else {
+            // If neither description, locationName, nor repairService is provided, filter by date range only
+            ciplList = mtoRepository.findByTransferDateBetween(startDate, endDate);
+        }
+    } else {
+        // If neither description, locationName, nor repairService is provided, filter by date range only
+        ciplList = mtoRepository.findByTransferDateBetween(startDate, endDate);
+    }
+
+    if (ciplList.isEmpty()) {
+        return Collections.emptyList(); // No matching records found for the provided criteria
+    }
+
+    return ciplList; // Return the matching records
+}
+
+    public List<Mto> getConsumedByItemAndLocation(String description, String locationName, boolean repairService) {
+        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService) {
+            // If either description, locationName, or repairService is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService) {
+                // If description, locationName, and repairService are provided, filter by all
+                List<Mto> result = mtoRepository.findByDescriptionAndLocationNameAndRepairService(
+                        description, locationName, repairService);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(description) && repairService) {
+                // If description and repairService are provided, filter by description and repairService
+                List<Mto> result = mtoRepository.findByDescriptionAndRepairService(description, repairService);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(locationName) && repairService) {
+                // If locationName and repairService are provided, filter by locationName and repairService
+                List<Mto> result = mtoRepository.findByLocationNameAndRepairService(locationName, repairService);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+                // If description and locationName are provided, filter by description and locationName
+                List<Mto> result = mtoRepository.findByDescriptionAndLocationName(description, locationName);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(description)) {
+                // If only description is provided, filter by description
+                List<Mto> result = mtoRepository.findByDescription(description);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                List<Mto> result = mtoRepository.findByLocationName(locationName);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (repairService) {
+                // If only repairService is provided, filter by repairService
+                List<Mto> result = mtoRepository.findByRepairService(repairService);
+
+                // Check if records were found with the specified repairService
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            }
+        }
+
+        // If no valid criteria provided, return an empty list
+        return Collections.emptyList();
     }
 
 }

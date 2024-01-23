@@ -5,6 +5,7 @@ import com.inventory.project.repository.ConsigneeRepository;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.repository.MtoRepository;
 import com.inventory.project.serviceImpl.MtoService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -181,5 +182,38 @@ public class MtoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
+        List<Mto> result;
+
+        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+            // Search by date range
+            result = mtoService.getMtoByDateRange(
+                    criteria.getDescription(),
+                    criteria.getLocationName(),
+                    criteria.getStartDate(),
+                    criteria.getEndDate(),
+                    criteria.isRepairService()
+            );
+        } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by either description or locationName
+            result = mtoService.getConsumedByItemAndLocation(
+                    criteria.getDescription(),
+                    criteria.getLocationName(),
+                    criteria.isRepairService()
+            );
+        } else {
+            // No valid criteria provided, return an empty list or handle it based on your requirement
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(result);
+        }
+    }
+
 
 }

@@ -41,4 +41,30 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByTransferDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<Mto> findMtoEntitiesByRepairService(boolean repairService);
+
+
+  
+
+    List<Mto> findByLocationNameAndTransferDateBetween(String locationName, LocalDate startDate, LocalDate endDate);
+
+
+    List<Mto> findByDescriptionAndLocationNameAndRepairService(String description, String locationName, boolean repairService);
+
+    List<Mto> findByDescriptionAndRepairService(String description, boolean repairService);
+
+    List<Mto> findByLocationNameAndRepairService(String locationName, boolean repairService);
+
+    List<Mto> findByRepairService(boolean repairService);
+
+    List<Mto> findByDescriptionAndLocationNameAndRepairServiceAndTransferDateBetween(String description, String locationName, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndRepairServiceAndTransferDateBetween(String description, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndTransferDateBetween(String description, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndLocationNameAndTransferDateBetween(String description, String locationName, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByRepairServiceAndTransferDateBetween(boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByLocationNameAndRepairServiceAndTransferDateBetween(String locationName, boolean repairService, LocalDate startDate, LocalDate endDate);
 }
