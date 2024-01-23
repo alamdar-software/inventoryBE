@@ -287,7 +287,7 @@ public class IncomingStockService {
         return stockViewList;
     }
 
-    
+
 
 
     private List<IncomingStock> searchByLocationAndEntityNameAndDateRange(String locationName, String entityName, LocalDate startDate, LocalDate endDate) {
