@@ -56,5 +56,5 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findByAddressesAddressIgnoreCase(@Param("address") String address);
 
 
-
+//    List<Location> findByLocationNameAndStartDateBeforeAndEndDateAfter(String locationName, LocalDate startDate, LocalDate endDate);
 }

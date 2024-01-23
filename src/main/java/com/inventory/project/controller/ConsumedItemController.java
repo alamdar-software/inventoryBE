@@ -5,6 +5,7 @@ import com.inventory.project.repository.ConsumedItemRepo;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.serviceImpl.ConsumeService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -217,26 +218,54 @@ private ConsumeService consumeService;
 
 
 
+//@PostMapping("/searchReport")
+//public ResponseEntity<List<ConsumedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+//    if (criteria == null) {
+//        List<ConsumedItem> allCipl = consumeService.getAll();
+//        return ResponseEntity.ok(allCipl);
+//    }
+//
+//    List<ConsumedItem> ciplList;
+//
+//    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+//        ciplList = consumeService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
+//
+//        if (ciplList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    } else {
+//        return ResponseEntity.badRequest().build();
+//    }
+//
+//    return ResponseEntity.ok(ciplList);
+//}
 @PostMapping("/searchReport")
-public ResponseEntity<List<ConsumedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
-    if (criteria == null) {
-        List<ConsumedItem> allCipl = consumeService.getAll();
-        return ResponseEntity.ok(allCipl);
-    }
-
-    List<ConsumedItem> ciplList;
+public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
+    List<ConsumedItem> result;
 
     if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-        ciplList = consumeService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
-
-        if (ciplList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        // Search by date range
+        result = consumeService.getCiplByDateRange(
+                criteria.getItem(),
+                criteria.getLocationName(),
+                criteria.getStartDate(),
+                criteria.getEndDate()
+        );
+    } else if (StringUtils.isNotEmpty(criteria.getItem())) {
+        // Search by item
+        result = consumeService.getCiplByItem(criteria.getItem());
+    } else if (StringUtils.isNotEmpty(criteria.getLocationName())) {
+        // Search by location name if only locationName is provided
+        result = consumeService.getCiplByLocation(criteria.getLocationName());
     } else {
+        // No valid criteria provided, return an empty list or handle it based on your requirement
         return ResponseEntity.badRequest().build();
     }
 
-    return ResponseEntity.ok(ciplList);
+    if (result.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    } else {
+        return ResponseEntity.ok(result);
+    }
 }
-
 }

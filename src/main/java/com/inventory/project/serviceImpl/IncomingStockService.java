@@ -239,6 +239,7 @@ public class IncomingStockService {
         return stockView;
     }
 
+
     public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
         List<IncomingStock> incomingStocks = Collections.emptyList();
         List<BulkStock> bulkStocks = Collections.emptyList();
@@ -286,8 +287,9 @@ public class IncomingStockService {
         return stockViewList;
     }
 
+    
 
-    // Add new methods for searching bulk stock by entity name and location name with date range
+
     private List<IncomingStock> searchByLocationAndEntityNameAndDateRange(String locationName, String entityName, LocalDate startDate, LocalDate endDate) {
         return incomingStockRepo.findByLocation_LocationNameAndEntity_EntityNameAndDateBetween(
                 locationName, entityName, startDate, endDate.plusDays(1));

@@ -4,6 +4,7 @@ import com.inventory.project.model.Cipl;
 import com.inventory.project.model.ConsumedItem;
 import com.inventory.project.repository.ConsumedItemRepo;
 import com.inventory.project.repository.InventoryRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,35 @@ public class ConsumeService {
     public List<ConsumedItem> getCiplByDateRange(LocalDate startDate, LocalDate endDate) {
         return consumedItemRepo.findByTransferDateBetween(startDate, endDate);
     }
+//    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+//        if (startDate == null || endDate == null) {
+//            return Collections.emptyList(); // If any required parameter is null, return an empty list
+//        }
+//
+//        List<ConsumedItem> ciplList;
+//
+//        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+//            // If either item or locationName is provided, filter by the provided criteria
+//            if (item != null && !item.isEmpty()) {
+//                // If item is provided, filter by item
+//                ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
+//            } else {
+//                // If only locationName is provided, filter by locationName
+//                ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+//            }
+//        } else {
+//            // If neither item nor locationName is provided, filter by date range only
+//            ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
+//        }
+//
+//        if (ciplList.isEmpty()) {
+//            return Collections.emptyList(); // No matching records found for the provided criteria
+//        }
+//
+//        return ciplList; // Return the matching records
+//    }
+//
+
     public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             return Collections.emptyList(); // If any required parameter is null, return an empty list
@@ -79,21 +109,15 @@ public class ConsumeService {
 
         List<ConsumedItem> ciplList;
 
-        if (locationName != null && !locationName.isEmpty()) {
-            // If locationName is provided, check if it exists in the date range
-            List<ConsumedItem> locationInRange = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
-
-            if (locationInRange.isEmpty()) {
-                return Collections.emptyList(); // No matching records found for the provided locationName and date range
+        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+            // If either item or locationName is provided, filter by the provided criteria
+            if (item != null && !item.isEmpty()) {
+                // If item is provided, filter by item
+                ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
+            } else {
+                // If only locationName is provided, filter by locationName
+                ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
             }
-        }
-
-        if (item != null && !item.isEmpty()) {
-            // If item is provided, filter by item
-            ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
-        } else if (locationName != null && !locationName.isEmpty()) {
-            // If only locationName is provided, filter by locationName
-            ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
         } else {
             // If neither item nor locationName is provided, filter by date range only
             ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
@@ -106,5 +130,14 @@ public class ConsumeService {
         return ciplList; // Return the matching records
     }
 
+    public List<ConsumedItem> getConsumerByItem(String item) {
+        if (StringUtils.isNotEmpty(item)) {
+            // If only item is provided, filter by item
+            return consumedItemRepo.findByItem(item);
+        } else {
+            // If item is not provided, return an empty list or handle it based on your requirement
+            return Collections.emptyList();
+        }
+    }
 
 }
