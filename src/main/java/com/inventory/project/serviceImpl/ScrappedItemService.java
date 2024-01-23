@@ -4,6 +4,7 @@ import com.inventory.project.model.ConsumedItem;
 import com.inventory.project.model.ScrappedItem;
 import com.inventory.project.repository.ConsumedItemRepo;
 import com.inventory.project.repository.ScrappedItemRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,38 +59,74 @@ public class ScrappedItemService {
 
 
 
-    public List<ScrappedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return Collections.emptyList(); // If any required parameter is null, return an empty list
-        }
+//    public List<ScrappedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+//        if (startDate == null || endDate == null) {
+//            return Collections.emptyList(); // If any required parameter is null, return an empty list
+//        }
+//
+//        List<ScrappedItem> ciplList;
+//
+//        if (locationName != null && !locationName.isEmpty()) {
+//            // If locationName is provided, check if it exists in the date range
+//            List<ScrappedItem> locationInRange = scrappedItemRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+//
+//            if (locationInRange.isEmpty()) {
+//                return Collections.emptyList(); // No matching records found for the provided locationName and date range
+//            }
+//        }
+//
+//        if (item != null && !item.isEmpty()) {
+//            // If item is provided, filter by item
+//            ciplList = scrappedItemRepository.findByItemAndTransferDateBetween(item, startDate, endDate);
+//        } else if (locationName != null && !locationName.isEmpty()) {
+//            // If only locationName is provided, filter by locationName
+//            ciplList = scrappedItemRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+//        } else {
+//            // If neither item nor locationName is provided, filter by date range only
+//            ciplList = scrappedItemRepository.findByTransferDateBetween(startDate, endDate);
+//        }
+//
+//        if (ciplList.isEmpty()) {
+//            return Collections.emptyList(); // No matching records found for the provided criteria
+//        }
+//
+//        return ciplList; // Return the matching records
+//    }
+public List<ScrappedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+    if (startDate == null || endDate == null) {
+        return Collections.emptyList(); // If any required parameter is null, return an empty list
+    }
 
-        List<ScrappedItem> ciplList;
+    List<ScrappedItem> ciplList;
 
-        if (locationName != null && !locationName.isEmpty()) {
-            // If locationName is provided, check if it exists in the date range
-            List<ScrappedItem> locationInRange = scrappedItemRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
-
-            if (locationInRange.isEmpty()) {
-                return Collections.emptyList(); // No matching records found for the provided locationName and date range
-            }
-        }
-
+    if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+        // If either item or locationName is provided, filter by the provided criteria
         if (item != null && !item.isEmpty()) {
             // If item is provided, filter by item
             ciplList = scrappedItemRepository.findByItemAndTransferDateBetween(item, startDate, endDate);
-        } else if (locationName != null && !locationName.isEmpty()) {
+        } else {
             // If only locationName is provided, filter by locationName
             ciplList = scrappedItemRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
-        } else {
-            // If neither item nor locationName is provided, filter by date range only
-            ciplList = scrappedItemRepository.findByTransferDateBetween(startDate, endDate);
         }
-
-        if (ciplList.isEmpty()) {
-            return Collections.emptyList(); // No matching records found for the provided criteria
-        }
-
-        return ciplList; // Return the matching records
+    } else {
+        // If neither item nor locationName is provided, filter by date range only
+        ciplList = scrappedItemRepository.findByTransferDateBetween(startDate, endDate);
     }
 
+    if (ciplList.isEmpty()) {
+        return Collections.emptyList(); // No matching records found for the provided criteria
+    }
+
+    return ciplList; // Return the matching records
+}
+
+    public List<ScrappedItem> getScrappedByItem(String item) {
+        if (StringUtils.isNotEmpty(item)) {
+            // If only item is provided, filter by item
+            return scrappedItemRepository.findByItem(item);
+        } else {
+            // If item is not provided, return an empty list or handle it based on your requirement
+            return Collections.emptyList();
+        }
+    }
 }

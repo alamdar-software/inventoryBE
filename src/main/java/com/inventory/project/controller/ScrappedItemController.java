@@ -7,6 +7,7 @@ import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ScrappedItemRepository;
 import com.inventory.project.serviceImpl.ScrappedItemService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -204,25 +205,55 @@ public class ScrappedItemController {
 
 
 
-    @PostMapping("/searchReport")
-    public ResponseEntity<List<ScrappedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
-        if (criteria == null) {
-            List<ScrappedItem> allCipl = scrappedItemService.getAll();
-            return ResponseEntity.ok(allCipl);
-        }
+//    @PostMapping("/searchReport")
+//    public ResponseEntity<List<ScrappedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+//        if (criteria == null) {
+//            List<ScrappedItem> allCipl = scrappedItemService.getAll();
+//            return ResponseEntity.ok(allCipl);
+//        }
+//
+//        List<ScrappedItem> ciplList;
+//
+//        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+//            ciplList = scrappedItemService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
+//
+//            if (ciplList.isEmpty()) {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } else {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        return ResponseEntity.ok(ciplList);
+//    }
 
-        List<ScrappedItem> ciplList;
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<ScrappedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
+        List<ScrappedItem> result;
 
         if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            ciplList = scrappedItemService.getCiplByDateRange(criteria.getItem(), criteria.getLocationName(), criteria.getStartDate(), criteria.getEndDate());
-
-            if (ciplList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
+            // Search by date range
+            result = scrappedItemService.getCiplByDateRange(
+                    criteria.getItem(),
+                    criteria.getLocationName(),
+                    criteria.getStartDate(),
+                    criteria.getEndDate()
+            );
+        } else if (StringUtils.isNotEmpty(criteria.getItem())) {
+            // Search by item
+            result = scrappedItemService.getCiplByItem(criteria.getItem());
+        } else if (StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by location name if only locationName is provided
+            result = scrappedItemService.getCiplByLocation(criteria.getLocationName());
         } else {
+            // No valid criteria provided, return an empty list or handle it based on your requirement
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(ciplList);
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(result);
+        }
     }
 }
