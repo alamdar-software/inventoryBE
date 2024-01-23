@@ -105,10 +105,13 @@ public class ScrappedItemService {
 
         List<ScrappedItem> ciplList;
 
-        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+        if ((StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName))) {
             // If either item or locationName is provided, filter by the provided criteria
-            if (item != null && !item.isEmpty()) {
-                // If item is provided, filter by item
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If both item and locationName are provided, filter by both
+                ciplList = scrappedItemRepository.findByItemAndLocationNameAndTransferDateBetween(item, locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(item)) {
+                // If only item is provided, filter by item
                 ciplList = scrappedItemRepository.findByItemAndTransferDateBetween(item, startDate, endDate);
             } else {
                 // If only locationName is provided, filter by locationName
@@ -127,12 +130,22 @@ public class ScrappedItemService {
     }
 
     public List<ScrappedItem> getConsumedByItemAndLocation(String item, String locationName) {
-        if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-            // If both item and locationName are provided, filter by both
-            return scrappedItemRepository.findByItemAndLocationName(item, locationName);
-        } else {
-            // If either item or locationName is not provided, return an empty list or handle it based on your requirement
-            return Collections.emptyList();
+        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName)) {
+            // If either item or locationName is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If both item and locationName are provided, filter by both
+                return scrappedItemRepository.findByItemAndLocationName(item, locationName);
+            } else if (StringUtils.isNotEmpty(item)) {
+                // If only item is provided, filter by item
+                return scrappedItemRepository.findByItem(item);
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                return scrappedItemRepository.findByLocationName(locationName);
+            }
         }
+
+        // If no valid criteria provided, return an empty list
+        return Collections.emptyList();
     }
+
 }

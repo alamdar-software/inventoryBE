@@ -104,44 +104,6 @@ public class ConsumeService {
 //    }
 //
 
-//    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
-//        if (startDate == null || endDate == null) {
-//            return Collections.emptyList(); // If any required parameter is null, return an empty list
-//        }
-//
-//        List<ConsumedItem> ciplList;
-//
-//        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
-//            // If either item or locationName is provided, filter by the provided criteria
-//            if (item != null && !item.isEmpty()) {
-//                // If item is provided, filter by item
-//                ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
-//            } else {
-//                // If only locationName is provided, filter by locationName
-//                ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
-//            }
-//        } else {
-//            // If neither item nor locationName is provided, filter by date range only
-//            ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
-//        }
-//
-//        if (ciplList.isEmpty()) {
-//            return Collections.emptyList(); // No matching records found for the provided criteria
-//        }
-//
-//        return ciplList; // Return the matching records
-//    }
-//
-//    public List<ConsumedItem> getConsumerByItem(String item) {
-//        if (StringUtils.isNotEmpty(item)) {
-//            // If only item is provided, filter by item
-//            return consumedItemRepo.findByItem(item);
-//        } else {
-//            // If item is not provided, return an empty list or handle it based on your requirement
-//            return Collections.emptyList();
-//        }
-//    }
-
     public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             return Collections.emptyList(); // If any required parameter is null, return an empty list
@@ -149,10 +111,13 @@ public class ConsumeService {
 
         List<ConsumedItem> ciplList;
 
-        if ((item != null && !item.isEmpty()) || (locationName != null && !locationName.isEmpty())) {
+        if ((StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName))) {
             // If either item or locationName is provided, filter by the provided criteria
-            if (item != null && !item.isEmpty()) {
-                // If item is provided, filter by item
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If both item and locationName are provided, filter by both
+                ciplList = consumedItemRepo.findByItemAndLocationNameAndTransferDateBetween(item, locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(item)) {
+                // If only item is provided, filter by item
                 ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
             } else {
                 // If only locationName is provided, filter by locationName
@@ -170,14 +135,37 @@ public class ConsumeService {
         return ciplList; // Return the matching records
     }
 
+//
+//    public List<ConsumedItem> getConsumerByItem(String item) {
+//        if (StringUtils.isNotEmpty(item)) {
+//            // If only item is provided, filter by item
+//            return consumedItemRepo.findByItem(item);
+//        } else {
+//            // If item is not provided, return an empty list or handle it based on your requirement
+//            return Collections.emptyList();
+//        }
+//    }
+
+
+
+
     public List<ConsumedItem> getConsumedByItemAndLocation(String item, String locationName) {
-        if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-            // If both item and locationName are provided, filter by both
-            return consumedItemRepo.findByItemAndLocationName(item, locationName);
-        } else {
-            // If either item or locationName is not provided, return an empty list or handle it based on your requirement
-            return Collections.emptyList();
+        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName)) {
+            // If either item or locationName is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If both item and locationName are provided, filter by both
+                return consumedItemRepo.findByItemAndLocationName(item, locationName);
+            } else if (StringUtils.isNotEmpty(item)) {
+                // If only item is provided, filter by item
+                return consumedItemRepo.findByItem(item);
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                return consumedItemRepo.findByLocationName(locationName);
+            }
         }
+
+        // If no valid criteria provided, return an empty list
+        return Collections.emptyList();
     }
 
 

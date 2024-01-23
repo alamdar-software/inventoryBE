@@ -261,8 +261,8 @@ private ConsumeService consumeService;
                     criteria.getStartDate(),
                     criteria.getEndDate()
             );
-        } else if (StringUtils.isNotEmpty(criteria.getItem()) && StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by both item and locationName
+        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by either item or locationName
             result = consumeService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName());
         } else {
             // No valid criteria provided, return an empty list or handle it based on your requirement
@@ -275,4 +275,5 @@ private ConsumeService consumeService;
             return ResponseEntity.ok(result);
         }
     }
+
 }
