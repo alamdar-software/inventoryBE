@@ -29,6 +29,8 @@ public class SearchCriteria {
     private String entityType;
     private  String name;
     private String categoryName;
+
+    private String consigneeName;
     public SearchCriteria() {
     }
 
@@ -157,5 +159,11 @@ public class SearchCriteria {
         this.categoryName = categoryName;
     }
 
+    public String getConsigneeName() {
+        return consigneeName;
+    }
 
+    public void setConsigneeName(String consigneeName) {
+        this.consigneeName = consigneeName;
+    }
 }

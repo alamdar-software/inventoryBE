@@ -1,8 +1,10 @@
 package com.inventory.project.repository;
 
 import com.inventory.project.model.Cipl;
+import com.inventory.project.model.Mto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -21,4 +23,33 @@ public interface CiplRepository extends JpaRepository<Cipl,Long> {
     List<Cipl> findByTransferDate(LocalDate transferDate);
 
     List<Cipl> findByLocationNameAndTransferDate(String locationName, LocalDate transferDate);
+
+ 
+//
+List<Cipl> findByItemAndRepairServiceAndTransferDateBetween(String item, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByShipperNameAndRepairServiceAndTransferDateBetween(String shipperName, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByItemAndShipperNameAndTransferDateBetween(String item, String shipperName, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByItemAndTransferDateBetween(String item, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByShipperNameAndTransferDateBetween(String shipperName, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByRepairServiceAndTransferDateBetween(boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByTransferDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByItemAndRepairService(String item, boolean repairService);
+
+    List<Cipl> findByShipperNameAndRepairService(String shipperName, boolean repairService);
+
+    List<Cipl> findByRepairService(boolean repairService);
+
+
+    List<Cipl> findByConsigneeNameAndTransferDateBetween(String consigneeName, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByItemAndShipperNameAndConsigneeNameAndRepairService(String item, String shipperName, String consigneeName, boolean repairService);
+
+    List<Cipl> findByItemAndShipperNameAndConsigneeNameAndRepairServiceAndTransferDateBetween(String item, String shipperName, String consigneeName, boolean repairService, LocalDate startDate, LocalDate endDate);
 }

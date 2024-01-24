@@ -4,6 +4,7 @@ import com.inventory.project.model.*;
 import com.inventory.project.model.Currency;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.CiplService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -223,5 +224,50 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<Cipl>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
+        List<Cipl> result;
+
+        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+            // Search by date range
+            if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+                // Search by date range along with other criteria
+                result = ciplService.getMtoByDateRange(
+                        criteria.getItem(),
+                        criteria.getLocationName(),
+                        criteria.getConsigneeName(),
+                        criteria.getStartDate(),
+                        criteria.getEndDate(),
+                        criteria.isRepairService()
+                );
+            } else {
+                result = ciplService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
+            }
+        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by either description or locationName
+            result = ciplService.getConsumedByItemAndLocation(
+                    criteria.getItem(),
+                    criteria.getLocationName(),
+                    criteria.getConsigneeName(),
+                    criteria.isRepairService()
+            );
+        } else if (criteria.isRepairService()) {
+            // Search by repairService only
+            result = ciplService.getMtoByRepairService(criteria.isRepairService());
+        } else {
+            // No valid criteria provided, return an empty list or handle it based on your requirement
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(result);
+        }
+    }
+
+
 
 }
