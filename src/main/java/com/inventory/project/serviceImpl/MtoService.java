@@ -311,4 +311,25 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         return Collections.emptyList();
     }
 
+    public List<Mto> getMtoByDateRangeOnly(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Collections.emptyList(); // If any required parameter is null, return an empty list
+        }
+
+        return mtoRepository.findByTransferDateBetween(startDate, endDate);
+    }
+
+    // Add this method in your service
+    public List<Mto> getMtoByRepairService(boolean repairService) {
+        // Always filter by repairService, regardless of its value (true or false)
+        List<Mto> result = mtoRepository.findByRepairService(repairService);
+
+        // Check if records were found with the specified repairService
+        if (result.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return result;
+    }
+
 }

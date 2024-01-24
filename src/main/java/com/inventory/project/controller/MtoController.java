@@ -183,12 +183,52 @@ public class MtoController {
         }
     }
 
-    @PostMapping("/searchReport")
-    public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
-        List<Mto> result;
 
-        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            // Search by date range
+//    @PostMapping("/searchReport")
+//    public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
+//        List<Mto> result;
+//
+//        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+//            // Search by date range
+//            if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+//                // Search by date range along with other criteria
+//                result = mtoService.getMtoByDateRange(
+//                        criteria.getDescription(),
+//                        criteria.getLocationName(),
+//                        criteria.getStartDate(),
+//                        criteria.getEndDate(),
+//                        criteria.isRepairService()
+//                );
+//            } else {
+//                // Search by date range only
+//                result = mtoService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
+//            }
+//        } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+//            // Search by either description or locationName
+//            result = mtoService.getConsumedByItemAndLocation(
+//                    criteria.getDescription(),
+//                    criteria.getLocationName(),
+//                    criteria.isRepairService()
+//            );
+//        } else {
+//            // No valid criteria provided, return an empty list or handle it based on your requirement
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        if (result.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(result);
+//        }
+//    }
+@PostMapping("/searchReport")
+public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
+    List<Mto> result;
+
+    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+        // Search by date range
+        if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+            // Search by date range along with other criteria
             result = mtoService.getMtoByDateRange(
                     criteria.getDescription(),
                     criteria.getLocationName(),
@@ -196,24 +236,31 @@ public class MtoController {
                     criteria.getEndDate(),
                     criteria.isRepairService()
             );
-        } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by either description or locationName
-            result = mtoService.getConsumedByItemAndLocation(
-                    criteria.getDescription(),
-                    criteria.getLocationName(),
-                    criteria.isRepairService()
-            );
         } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
-            return ResponseEntity.badRequest().build();
+            // Search by date range only
+            result = mtoService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
         }
-
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(result);
-        }
+    } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+        // Search by either description or locationName
+        result = mtoService.getConsumedByItemAndLocation(
+                criteria.getDescription(),
+                criteria.getLocationName(),
+                criteria.isRepairService()
+        );
+    } else if (criteria.isRepairService()) {
+        // Search by repairService only
+        result = mtoService.getMtoByRepairService(criteria.isRepairService());
+    } else {
+        // No valid criteria provided, return an empty list or handle it based on your requirement
+        return ResponseEntity.badRequest().build();
     }
+
+    if (result.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    } else {
+        return ResponseEntity.ok(result);
+    }
+}
 
 
 }
