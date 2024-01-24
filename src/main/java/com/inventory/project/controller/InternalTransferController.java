@@ -4,6 +4,7 @@ import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.serviceImpl.InternalTransferService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,5 +99,43 @@ public class InternalTransferController {
 
         return ResponseEntity.ok(mtoList);
     }
+
+
+    @PostMapping("/searchReport")
+    public ResponseEntity<List<InternalTransfer>> searchITReportByCriteria(@RequestBody SearchCriteria criteria) {
+        List<InternalTransfer> result;
+
+        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+            // Search by date range
+            if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+                // Search by date range along with other criteria
+                result = internalTransferService.getItByDateRange(
+                        criteria.getDescription(),
+                        criteria.getLocationName(),
+                        criteria.getStartDate(),
+                        criteria.getEndDate()
+                );
+            } else {
+                // Search by date range only
+                result = internalTransferService.getItByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
+            }
+        } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
+            // Search by either description or locationName
+            result = internalTransferService.getConsumedByItemAndLocation(
+                    criteria.getDescription(),
+                    criteria.getLocationName()
+            );
+        } else {
+            // No valid criteria provided, return an empty list or handle it based on your requirement
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(result);
+        }
+    }
+
 
 }

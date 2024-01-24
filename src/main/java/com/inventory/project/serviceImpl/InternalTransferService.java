@@ -4,6 +4,7 @@ import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InternalTransferRepo;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -184,5 +185,96 @@ public class InternalTransferService {
     public List<InternalTransfer> searchByDateRange(LocalDate startDate, LocalDate endDate) {
         return internalTransferRepository.findByTransferDateBetween(startDate, endDate.plusDays(1));
     }
+
+//
+
+    public List<InternalTransfer> getItByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Collections.emptyList(); // If any required parameter is null, return an empty list
+        }
+
+        List<InternalTransfer> itList;
+
+        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName)) {
+            // If either description or locationName is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+                // If both description and locationName are provided, filter by both
+                itList = internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+                        description, locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(description)) {
+                // If only description is provided, filter by description
+                itList = internalTransferRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                itList = internalTransferRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+            } else {
+                // If neither description nor locationName is provided, filter by date range only
+                itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+            }
+        } else {
+            // If neither description nor locationName is provided, filter by date range only
+            itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+        }
+
+        if (itList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided criteria
+        }
+
+        return itList; // Return the matching records
+    }
+
+    public List<InternalTransfer> getItByDateRangeOnly(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Collections.emptyList(); // If any required parameter is null, return an empty list
+        }
+
+        return internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+    }
+
+    public List<InternalTransfer> getConsumedByItemAndLocation(String description, String locationName) {
+        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName)) {
+            // If either description or locationName is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+                // If both description and locationName are provided, filter by both
+                List<InternalTransfer> result = internalTransferRepository.findByDescriptionAndLocationName(
+                        description, locationName);
+
+                // Check if records were found
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(description)) {
+                // If only description is provided, filter by description
+                List<InternalTransfer> result = internalTransferRepository.findByDescription(description);
+
+                // Check if records were found
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                List<InternalTransfer> result = internalTransferRepository.findByLocationName(locationName);
+
+                // Check if records were found
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            }
+        }
+
+        // If no valid criteria provided, return an empty list
+        return Collections.emptyList();
+    }
+
+//    public List<InternalTransfer> getItByRepairService() {
+//        // Without the repairService parameter
+//        return internalTransferRepository.findAll();
+//    }
 
 }
