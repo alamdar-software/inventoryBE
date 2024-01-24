@@ -239,7 +239,8 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         } else if (StringUtils.isNotEmpty(consigneeName)) {
             // If only consigneeName is provided, filter by consigneeName
             ciplList = ciplRepository.findByConsigneeNameAndTransferDateBetween(consigneeName, startDate, endDate);
-        } else if (repairService) {
+        }
+        else if (repairService) {
             // If only repairService is provided, filter by repairService
             ciplList = ciplRepository.findByRepairServiceAndTransferDateBetween(repairService, startDate, endDate);
 
@@ -317,27 +318,27 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
                 }
 
                 return result;
-            } else if (StringUtils.isNotEmpty(shipperName)) {
-                // If only shipperName is provided, filter by shipperName
-                List<Cipl> result = ciplRepository.findByLocationName(shipperName);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
-            } else if (StringUtils.isNotEmpty(consigneeName)) {
+            }else if (StringUtils.isNotEmpty(shipperName)) {
                 // If only consigneeName is provided, filter by consigneeName
-                List<Cipl> result = ciplRepository.findByLocationName(consigneeName);
+                List<Cipl> result = ciplRepository.findByShipperName(shipperName);
 
-                // Check if records were found with the specified repairService
+                // Check if records were found with the specified consigneeName
                 if (result.isEmpty()) {
                     return Collections.emptyList();
                 }
 
                 return result;
-            } else if (repairService) {
+            }  else if (StringUtils.isNotEmpty(consigneeName)) {
+                // If only consigneeName is provided, filter by consigneeName
+                List<Cipl> result = ciplRepository.findByConsigneeName(consigneeName);
+
+                // Check if records were found with the specified consigneeName
+                if (result.isEmpty()) {
+                    return Collections.emptyList();
+                }
+
+                return result;
+            }  else if (repairService) {
                 // If only repairService is provided, filter by repairService
                 List<Cipl> result = ciplRepository.findByRepairService(repairService);
 

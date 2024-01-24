@@ -232,11 +232,11 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
 
         if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
             // Search by date range
-            if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+            if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName()) || criteria.isRepairService()) {
                 // Search by date range along with other criteria
                 result = ciplService.getMtoByDateRange(
                         criteria.getItem(),
-                        criteria.getLocationName(),
+                        criteria.getShipperName(),
                         criteria.getConsigneeName(),
                         criteria.getStartDate(),
                         criteria.getEndDate(),
@@ -245,11 +245,11 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             } else {
                 result = ciplService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
             }
-        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by either description or locationName
+        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName())) {
+            // Search by either item, consigneeName, or shipperName
             result = ciplService.getConsumedByItemAndLocation(
                     criteria.getItem(),
-                    criteria.getLocationName(),
+                    criteria.getShipperName(),
                     criteria.getConsigneeName(),
                     criteria.isRepairService()
             );

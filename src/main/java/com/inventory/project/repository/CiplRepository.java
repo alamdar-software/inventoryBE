@@ -52,4 +52,8 @@ List<Cipl> findByItemAndRepairServiceAndTransferDateBetween(String item, boolean
     List<Cipl> findByItemAndShipperNameAndConsigneeNameAndRepairService(String item, String shipperName, String consigneeName, boolean repairService);
 
     List<Cipl> findByItemAndShipperNameAndConsigneeNameAndRepairServiceAndTransferDateBetween(String item, String shipperName, String consigneeName, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Cipl> findByConsigneeName(String consigneeName);
+
+    List<Cipl> findByShipperName(String shipperName);
 }
