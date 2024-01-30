@@ -276,5 +276,50 @@ public class InternalTransferService {
 //        // Without the repairService parameter
 //        return internalTransferRepository.findAll();
 //    }
+public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
+        String locationName,
+        String description,
+        LocalDate startDate,
+        LocalDate endDate
+) {
+    return internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+            locationName,
+            description,
+            startDate,
+            LocalDate.from(endDate.plusDays(1).atStartOfDay().minusSeconds(1))
+    );
+}
+
+
+    public List<InternalTransfer> searchByLocationAndDescription(String locationName, String description) {
+        return  internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
+    }
+    public List<InternalTransfer> searchByLocationName(String locationName) {
+        return internalTransferRepository.findByLocationName(locationName);
+    }
+
+    public List<InternalTransfer> searchByDescription(String description) {
+        return internalTransferRepository.findByDescription(description);
+    }
+    public List<InternalTransfer> searchByDateRangeAndDescription(LocalDate startDate, LocalDate endDate, String description) {
+        if (startDate != null && endDate != null && description != null && !description.isEmpty()) {
+            return internalTransferRepository.findByTransferDateBetweenAndDescription(startDate, endDate, description);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<InternalTransfer> searchByDateRangeAndLocationName(LocalDate startDate, LocalDate endDate, String locationName) {
+        if (startDate != null && endDate != null && locationName != null && !locationName.isEmpty()) {
+            return internalTransferRepository.findByTransferDateBetweenAndLocationName(startDate, endDate, locationName);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    public List<InternalTransfer> searchByLocationNameAndDateRangeAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String description) {
+        return internalTransferRepository.findByLocationNameAndTransferDateBetweenAndDescription(locationName, startDate, endDate, description);
+    }
+
+
 
 }

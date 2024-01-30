@@ -56,4 +56,9 @@ public ResponseEntity<List<Object>> searchEntities(@RequestBody SearchCriteria s
     List<Object> searchResults = combinedSearchService.searchBoth(searchCriteria);
     return new ResponseEntity<>(searchResults, HttpStatus.OK);
 }
+    @PostMapping("/searchAll")
+    public List<Object> searchAllEntities(@RequestBody SearchCriteria searchCriteria) {
+        return combinedSearchService.searchAllEntities(searchCriteria);
+    }
+
 }

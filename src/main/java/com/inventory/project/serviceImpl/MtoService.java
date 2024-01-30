@@ -1,9 +1,6 @@
 package com.inventory.project.serviceImpl;
 
-import com.inventory.project.model.Cipl;
-import com.inventory.project.model.IncomingStock;
-import com.inventory.project.model.Mto;
-import com.inventory.project.model.SearchCriteria;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.MtoRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
@@ -18,6 +15,7 @@ public class MtoService {
 
     private final MtoRepository mtoRepository;
 
+    private  MtoService mtoService;
     private final Map<String, Integer> locationReferenceMap = new HashMap<>();
 
     @Autowired
@@ -331,5 +329,71 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
 
         return result;
     }
+    public List<Mto> searchByLocationAndDescriptionAndDateRange(String locationName, String description, LocalDate startDate, LocalDate endDate) {
+        return mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(locationName, description, startDate, endDate);
+    }
 
+    public List<Mto> searchByLocationAndDescription(String locationName, String description) {
+        return  mtoRepository.findByDescriptionAndLocationName(description, locationName);
+    }
+    public List<Mto> searchByLocation(String locationName) {
+
+        return mtoRepository.findByLocationName(locationName);
+    }
+    public List<Mto> searchByDescription(String description) {
+
+        return mtoRepository.findByDescription(description);
+    }
+
+    public List<Mto> searchByLocationAndDateRange(String locationName, LocalDate startDate, LocalDate endDate) {
+
+        return mtoRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+    }
+
+    public List<Mto> searchByDescriptionAndDateRange(String description, LocalDate startDate, LocalDate endDate) {
+        // Check if only description is provided
+        if (description != null && !description.isEmpty() &&
+                (startDate != null && endDate != null)) {
+            // Search by description and date range
+            return mtoRepository.findByDescriptionAndTransferDateBetween(
+                    description,
+                    startDate,
+                    endDate
+            );
+        } else {
+            // Other cases or return an empty list as needed
+            return Collections.emptyList();
+        }
+    }
+    public List<Mto> searchByLocationNameAndDateRange(String locationName, LocalDate startDate, LocalDate endDate) {
+        List<Mto> mtoList = mtoService.getAllMto(); // Assuming this method retrieves all MTOs
+        List<Mto> filteredList = new ArrayList<>();
+
+        for (Mto mto : mtoList) {
+            if (mto.getLocationName().equalsIgnoreCase(locationName)
+                    && isDateInRange(mto.getTransferDate(), startDate, endDate)) {
+                filteredList.add(mto);
+            }
+        }
+
+        return filteredList;
+    }
+
+    private boolean isDateInRange(LocalDate dateToCheck, LocalDate startDate, LocalDate endDate) {
+        return !dateToCheck.isBefore(startDate) && !dateToCheck.isAfter(endDate);
+    }
+
+    public List<Mto> searchBylocationNameAndDateAndDescription(
+            String locationName,
+            String description,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+                locationName,
+                description,
+                startDate,
+                LocalDate.from(endDate.plusDays(1).atStartOfDay().minusSeconds(1))
+        );
+    }
 }

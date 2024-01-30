@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -67,4 +68,11 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByRepairServiceAndTransferDateBetween(boolean repairService, LocalDate startDate, LocalDate endDate);
 
     List<Mto> findByLocationNameAndRepairServiceAndTransferDateBetween(String locationName, boolean repairService, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByTransferDateBetweenAndDescription(LocalDate startDate, LocalDate endDate, String description);
+
+    List<Mto> findByTransferDateBetweenAndLocationName(LocalDate startDate, LocalDate endDate, String locationName);
+
+    List<Mto> findByLocationNameAndTransferDateBetweenAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String description);
+
 }

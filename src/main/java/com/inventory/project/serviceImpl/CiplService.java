@@ -1,7 +1,9 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Cipl;
+import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.CiplRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,7 @@ public class CiplService {
 
     private final Map<String, Integer> locationReferenceMap = new HashMap<>();
 
+    private CiplService ciplService;
     @Autowired
     public CiplService(CiplRepository ciplRepository) {
         this.ciplRepository = ciplRepository;
@@ -184,7 +187,9 @@ public class CiplService {
     public List<Cipl> getCiplByTransferDate(LocalDate transferDate) {
         return ciplRepository.findByTransferDate(transferDate);
     }
-
+    public List<Cipl> searchByDateRange(LocalDate startDate, LocalDate endDate) {
+        return ciplRepository.findByTransferDateBetween(startDate, endDate.plusDays(1));
+    }
     public List<Cipl> getCiplByLocationAndTransferDate(String locationName, LocalDate transferDate) {
         return ciplRepository.findByLocationNameAndTransferDate(locationName,transferDate);
 
@@ -374,5 +379,44 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         }
 
         return result;
+    }
+
+    public List<Cipl> searchByLocationAndItemAndDateRange(String locationName, String item, LocalDate startDate, LocalDate endDate) {
+        return ciplRepository.findByLocationNameAndItemAndTransferDateBetween(locationName, item, startDate, endDate);
+    }
+
+    public List<Cipl> searchByLocationAndItem(String locationName, String item) {
+        return  ciplRepository.findByItemAndLocationName(item, locationName);
+    }
+    public List<Cipl> searchByLocationName(String locationName) {
+        return ciplRepository.findByLocationName(locationName);
+    }
+
+
+    public List<Cipl> searchByDescription(String description) {
+        return ciplRepository.findByItem(description);
+    }
+
+    public List<Cipl> searchByDateRangeAndDescription(LocalDate startDate, LocalDate endDate, String item) {
+        if (startDate != null && endDate != null && item != null && !item.isEmpty()) {
+            return ciplRepository.findByTransferDateBetweenAndItem(startDate, endDate, item);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<Cipl> searchByDateRangeAndLocationName(LocalDate startDate, LocalDate endDate, String locationName) {
+        if (startDate != null && endDate != null && locationName != null && !locationName.isEmpty()) {
+            return ciplRepository.findByTransferDateBetweenAndLocationName(startDate, endDate, locationName);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    public List<Cipl> searchByLocationNameAndDateRangeAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String item) {
+        return ciplRepository.findByLocationNameAndTransferDateBetweenAndItem(locationName, startDate, endDate, item);
+    }
+
+    public List<Cipl> searchByLocationAndDescription(String locationName, String item) {
+        return ciplRepository.findByItemAndLocationName(item, locationName);
     }
 }
