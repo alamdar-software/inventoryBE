@@ -148,14 +148,13 @@ public class InventoryController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> getAllInventories() {
+    public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
         List<Map<String, Object>> inventoryList = new ArrayList<>();
 
         for (Inventory inventory : inventories) {
             Map<String, Object> inventoryDetails = new HashMap<>();
             inventoryDetails.put("id", inventory.getId()); // Include the ID
-
             inventoryDetails.put("description", inventory.getDescription() + " (" + inventory.getQuantity() + ")");
             // Include other fields if needed
             inventoryDetails.put("locationName", inventory.getLocationName());
@@ -166,18 +165,20 @@ public class InventoryController {
             inventoryList.add(inventoryDetails);
         }
 
-        // Include total count
-        int totalCount = inventories.size();
-
-        // Create response map
-        Map<String, Object> response = new HashMap<>();
-        response.put("totalCount", totalCount);
-        response.put("inventoryList", inventoryList);
+        // Create the response object
+        List<Map<String, Object>> response = new ArrayList<>();
+        response.add(getTotalCountObject(inventories.size())); // Add totalCount as the first item
+        response.addAll(inventoryList); // Add inventoryList items
 
         return ResponseEntity.ok(response);
     }
 
-
+    // Method to create the totalCount object
+    private Map<String, Object> getTotalCountObject(int totalCount) {
+        Map<String, Object> totalCountObject = new HashMap<>();
+        totalCountObject.put("totalCount", totalCount);
+        return totalCountObject;
+    }
 
     @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
