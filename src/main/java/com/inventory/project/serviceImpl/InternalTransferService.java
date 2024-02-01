@@ -321,5 +321,6 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
     }
 
 
-
+    public List<InternalTransfer> searchByLocationNameAndDescription(String description, String locationName) {
+       return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);}
 }

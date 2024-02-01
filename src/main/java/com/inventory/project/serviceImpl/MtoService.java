@@ -383,17 +383,34 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         return !dateToCheck.isBefore(startDate) && !dateToCheck.isAfter(endDate);
     }
 
-    public List<Mto> searchBylocationNameAndDateAndDescription(
-            String locationName,
+    public List<Mto> searchByLocationNameAndDateAndDescription(
             String description,
+            String locationName,
             LocalDate startDate,
             LocalDate endDate
     ) {
         return mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
-                locationName,
                 description,
+                locationName,
                 startDate,
                 LocalDate.from(endDate.plusDays(1).atStartOfDay().minusSeconds(1))
         );
     }
+
+    public List<Mto> searchByLocationNameAndDescription(String locationName, String description) {
+        // Assuming this method retrieves all MTOs
+        List<Mto> mtoList = mtoService.getAllMto();
+        List<Mto> filteredList = new ArrayList<>();
+
+        for (Mto mto : mtoList) {
+            if (mto.getLocationName().equalsIgnoreCase(locationName)
+                    && mto.getDescription().contains(description)) {
+                filteredList.add(mto);
+            }
+        }
+
+        return filteredList;
+    }
+
+
 }

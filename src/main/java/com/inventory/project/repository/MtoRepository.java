@@ -4,6 +4,7 @@ import com.inventory.project.model.Cipl;
 import com.inventory.project.model.IncomingStock;
 import com.inventory.project.model.Mto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -74,5 +75,6 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByTransferDateBetweenAndLocationName(LocalDate startDate, LocalDate endDate, String locationName);
 
     List<Mto> findByLocationNameAndTransferDateBetweenAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String description);
-
+    @Query("SELECT m FROM Mto m WHERE m.locationName = :locationName AND :description MEMBER OF m.description")
+    List<Mto> findByLocationNameAndDescription(String locationName, String description);
 }

@@ -351,17 +351,18 @@ public List<InternalTransfer> searchInternalTransferEntities(SearchCriteria sear
         } else if (searchCriteria.getDescription() != null && !searchCriteria.getDescription().isEmpty()) {
             // If only description is provided, filter by description
             return filterByDescription(searchCriteria);
-        } else if (searchCriteria.getDescription() != null && searchCriteria.getLocationName() != null) {
-            // If description and locationName are provided, filter by description and locationName
-            return filterByDescriptionAndLocation(searchCriteria);
+        } else if (searchCriteria.getLocationName() != null && searchCriteria.getDescription() != null) {
+            // If locationName and description are provided, filter by description and locationName
+            return filterByLocationNameAndDescription(searchCriteria);
         } else if (searchCriteria.getLocationName() != null && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             // If locationName, startDate, and endDate are provided, filter by all criteria
             return filterByAllCriteria(searchCriteria);
         } else {
-            // If either description, locationName, or date range is provided, return empty list
-            return new ArrayList<>();
+            // If either description or locationName is missing, return empty list
+            return Collections.emptyList();
         }
     }
+
 
     private List<Object> filterByAllCriteria(SearchCriteria searchCriteria) {
         List<Object> filteredResults = new ArrayList<>();
@@ -378,7 +379,7 @@ public List<InternalTransfer> searchInternalTransferEntities(SearchCriteria sear
             filteredResults.addAll(internalTransfers);
 
             // MTO
-            List<Mto> mto = mtoService.searchBylocationNameAndDateAndDescription(description, locationName, startDate, endDate);
+            List<Mto> mto = mtoService.searchByLocationNameAndDateAndDescription(description, locationName, startDate, endDate);
             filteredResults.addAll(mto);
 
             // CIPL
@@ -491,27 +492,71 @@ public List<InternalTransfer> searchInternalTransferEntities(SearchCriteria sear
 
         return filteredResults;
     }
-
-    private List<Object> filterByDescriptionAndLocation(SearchCriteria searchCriteria) {
-        List<Object> filteredResults = new ArrayList<>();
-        String description = searchCriteria.getDescription();
-        String locationName = searchCriteria.getLocationName();
-
-        // Internal Transfer
-        List<InternalTransfer> internalTransfers = internalTransferService.searchByLocationAndDescription(locationName, description);
-        filteredResults.addAll(internalTransfers);
-
-        // MTO
-        List<Mto> mtos = mtoService.searchByLocationAndDescription(locationName, description);
-        filteredResults.addAll(mtos);
-
-        // CIPL
-        List<Cipl> cipls = ciplService.searchByLocationAndDescription(locationName, description);
-        filteredResults.addAll(cipls);
-
-        return filteredResults;
+    private List<Mto> mtoList; // Placeholder for Mto data
+    private List<Cipl> ciplList; // Placeholder for Cipl data
+    private List<InternalTransfer> internalTransferList;
+    public List<Mto> searchMtoByLocationNameAndDescription(String locationName, String description) {
+        List<Mto> results = new ArrayList<>();
+        for (Mto mto : mtoList) {
+            if (mto.getLocationName().equalsIgnoreCase(locationName) && mto.getDescription().contains(description)) {
+                results.add(mto);
+            }
+        }
+        return results;
     }
 
+    // Implement the method to search Cipl entities by locationName and description
+    public List<Cipl> searchCiplByLocationNameAndDescription(String locationName, String description) {
+        List<Cipl> results = new ArrayList<>();
+        for (Cipl cipl : ciplList) {
+            if (cipl.getLocationName().equalsIgnoreCase(locationName) && cipl.getItem().contains(description)) {
+                results.add(cipl);
+            }
+        }
+        return results;
+    }
+
+    // Implement the method to search InternalTransfer entities by locationName and description
+    public List<InternalTransfer> searchInternalTransferByLocationNameAndDescription(String locationName, String description) {
+        List<InternalTransfer> results = new ArrayList<>();
+        for (InternalTransfer transfer : internalTransferList) {
+            if (transfer.getLocationName().equalsIgnoreCase(locationName) && transfer.getDescription().contains(description)) {
+                results.add(transfer);
+            }
+        }
+        return results;
+    }
+
+    // Implement the method to filter entities by locationName and description
+    private List<Object> filterByLocationNameAndDescription(SearchCriteria searchCriteria) {
+        List<Object> filteredResults = new ArrayList<>();
+        String description = searchCriteria.getDescription(); // Convert to lowercase
+        String locationName = searchCriteria.getLocationName();
+
+        // MTO
+        List<Mto> mtos = searchMtoByLocationNameAndDescription(locationName, description);
+        for (Mto mto : mtos) {
+            filteredResults.add(mto);
+            return filteredResults; // Return the first matching Mto entity
+        }
+
+        // CIPL
+        List<Cipl> cipls = searchCiplByLocationNameAndDescription(locationName, description);
+        for (Cipl cipl : cipls) {
+            filteredResults.add(cipl);
+            return filteredResults; // Return the first matching Cipl entity
+        }
+
+        // Internal Transfer
+        List<InternalTransfer> internalTransfers = searchInternalTransferByLocationNameAndDescription(locationName, description);
+        for (InternalTransfer transfer : internalTransfers) {
+            filteredResults.add(transfer);
+            return filteredResults; // Return the first matching InternalTransfer entity
+        }
+
+        // If no matching data found, return an empty list
+        return filteredResults;
+    }
 
 
     private List<Object> filterByLocationAndDateRange(SearchCriteria searchCriteria) {

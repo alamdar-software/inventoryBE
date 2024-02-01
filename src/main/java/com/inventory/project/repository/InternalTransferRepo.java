@@ -36,4 +36,6 @@ public interface InternalTransferRepo extends JpaRepository<InternalTransfer,Lon
     List<InternalTransfer> findByTransferDateBetweenAndDescription(LocalDate startDate, LocalDate endDate, String description);
 
     List<InternalTransfer> findByLocationNameAndTransferDateBetweenAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String description);
+
+    List<InternalTransfer> findByLocationNameAndDescription(String locationName, String description);
 }

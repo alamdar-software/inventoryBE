@@ -147,9 +147,8 @@ public class InventoryController {
         }
     }
 
-
     @GetMapping("/view")
-    public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
+    public ResponseEntity<Map<String, Object>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
         List<Map<String, Object>> inventoryList = new ArrayList<>();
 
@@ -167,8 +166,17 @@ public class InventoryController {
             inventoryList.add(inventoryDetails);
         }
 
-        return ResponseEntity.ok(inventoryList);
+        // Include total count
+        int totalCount = inventories.size();
+
+        // Create response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", totalCount);
+        response.put("inventoryList", inventoryList);
+
+        return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("get/{id}")
