@@ -329,8 +329,13 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
         return ResponseEntity.badRequest().build();
     }
 
-    return ResponseEntity.ok(result);
+    if (result.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    } else {
+        return ResponseEntity.ok(result);
+    }
 }
+
 
 
 

@@ -144,14 +144,20 @@ public class InventoryService {
 //        return itemInventoryDtos;
 //    }
 
-    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String locationName) {
-        List<Inventory> items = inventoryRepository.findByLocationNameAndDescription(locationName, description);
-        return mapItemsToItemInventoryDtoFromInventory(items);
+    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String name) {
+        if (name == null || name.trim().isEmpty()) {
+            // If the name is null or empty, return an empty list since it won't match anything
+            return Collections.emptyList();
+        }
+
+        List<Item> items = itemRepository.findByNameAndDescription(name, description);
+        return mapItemsToItemInventoryDtoFromItem(items);
     }
 
-    public List<ItemInventoryDto> searchItemsByName(String locationName) {
-        List<Inventory> items = inventoryRepository.findByLocationName(locationName);
-        return mapItemsToItemInventoryDtoFromInventory(items);
+
+    public List<ItemInventoryDto> searchItemsByName(String name) {
+        List<Item> items = itemRepository.findByName(name);
+        return mapItemsToItemInventoryDtoFromItem(items);
     }
 
     public List<ItemInventoryDto> searchItemsByDescription(String description) {
