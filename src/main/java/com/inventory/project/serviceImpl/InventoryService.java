@@ -72,41 +72,135 @@ public class InventoryService {
 //        }
 //    }
 
+//    public List<ItemInventoryDto> searchItemsByLocationAndDescription(String locationName, String description) {
+//        List<Inventory> inventories = inventoryRepository.findByLocationNameAndDescription(locationName, description);
+//        return mapInventoriesToItemInventoryDto(inventories);
+//    }
+//
+//    private List<ItemInventoryDto> mapInventoriesToItemInventoryDto(List<Inventory> inventories) {
+//        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
+//
+//        for (Inventory inventory : inventories) {
+//            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
+//
+//            // Assuming you have access to Item entity from the Inventory
+//            Item item = inventory.getItem();
+//
+//            itemInventoryDto.setName(item.getName());
+//            itemInventoryDto.setMinimumStock(item.getMinimumStock());
+//            itemInventoryDto.setItemName(item.getItemName());
+//            itemInventoryDto.setQuantity(inventory.getQuantity());
+//            itemInventoryDto.setDescription(inventory.getDescription());
+//
+//            // Set other fields as needed
+//
+//            itemInventoryDtos.add(itemInventoryDto);
+//        }
+//
+//        return itemInventoryDtos;
+//    }
 
-    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String name) {
-        List<Item> items = itemRepository.findByNameAndDescription(name, description);
-        return mapItemsToItemInventoryDto(items);
+
+//    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String locationName) {
+//        List<Item> items = itemRepository.findByNameAndDescription(locationName, description);
+//        return mapItemsToItemInventoryDto(items);
+//    }
+//
+//    public List<ItemInventoryDto> searchItemsByName(String name) {
+//        List<Item> items = itemRepository.findByName(name);
+//        return mapItemsToItemInventoryDto(items);
+//    }
+//
+//    public List<ItemInventoryDto> searchItemsByDescription(String description) {
+//        Item item = itemRepository.findByDescription(description);
+//        List<Item> items = (item != null) ? Collections.singletonList(item) : Collections.emptyList();
+//        return mapItemsToItemInventoryDto(items);
+//    }
+//    private List<ItemInventoryDto> mapItemsToItemInventoryDto(List<Item> items) {
+//        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
+//
+//        for (Item item : items) {
+//            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
+//            itemInventoryDto.setName(item.getName());
+//            itemInventoryDto.setMinimumStock(item.getMinimumStock());
+//            itemInventoryDto.setItemName(item.getItemName());
+//
+//            // Assuming you want to aggregate quantity and description of all inventories for an item
+//            int totalQuantity = 0;
+//            StringBuilder descriptions = new StringBuilder();
+//            for (Inventory inventory : item.getInventories()) {
+//                totalQuantity += inventory.getQuantity();
+//                descriptions.append(inventory.getDescription()).append(", ");
+//            }
+//            // Remove the trailing ", "
+//            String description = descriptions.length() > 0 ? descriptions.substring(0, descriptions.length() - 2) : "";
+//
+//            itemInventoryDto.setQuantity(totalQuantity);
+//            itemInventoryDto.setDescription(description);
+//
+//            itemInventoryDtos.add(itemInventoryDto);
+//        }
+//
+//        return itemInventoryDtos;
+//    }
+
+    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String locationName) {
+        List<Inventory> items = inventoryRepository.findByLocationNameAndDescription(locationName, description);
+        return mapItemsToItemInventoryDtoFromInventory(items);
     }
 
-    public List<ItemInventoryDto> searchItemsByName(String name) {
-        List<Item> items = itemRepository.findByName(name);
-        return mapItemsToItemInventoryDto(items);
+    public List<ItemInventoryDto> searchItemsByName(String locationName) {
+        List<Inventory> items = inventoryRepository.findByLocationName(locationName);
+        return mapItemsToItemInventoryDtoFromInventory(items);
     }
 
     public List<ItemInventoryDto> searchItemsByDescription(String description) {
         Item item = itemRepository.findByDescription(description);
         List<Item> items = (item != null) ? Collections.singletonList(item) : Collections.emptyList();
-        return mapItemsToItemInventoryDto(items);
+        return mapItemsToItemInventoryDtoFromItem(items);
     }
 
-    private List<ItemInventoryDto> mapItemsToItemInventoryDto(List<Item> items) {
+    private List<ItemInventoryDto> mapItemsToItemInventoryDtoFromInventory(List<Inventory> inventories) {
+        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
+
+        for (Inventory inventory : inventories) {
+            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
+
+            // Assuming you have access to Item entity from the Inventory
+            Item item = inventory.getItem();
+
+            if (item != null) {
+                itemInventoryDto.setName(item.getName());
+                itemInventoryDto.setMinimumStock(item.getMinimumStock());
+                itemInventoryDto.setItemName(item.getItemName());
+                itemInventoryDto.setDescription(inventory.getDescription());
+                itemInventoryDto.setQuantity(inventory.getQuantity());
+                // Set other fields as needed
+
+                itemInventoryDtos.add(itemInventoryDto);
+            }
+        }
+
+        return itemInventoryDtos;
+    }
+
+    private List<ItemInventoryDto> mapItemsToItemInventoryDtoFromItem(List<Item> items) {
         List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
 
         for (Item item : items) {
             ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
             itemInventoryDto.setName(item.getName());
-            itemInventoryDto.setDescription(item.getDescription());
+            itemInventoryDto.setMinimumStock(item.getMinimumStock());
             itemInventoryDto.setItemName(item.getItemName());
-
-            // Assuming Inventory has a method called getTotalQuantity(), replace it with the actual method
-            itemInventoryDto.setQuantity(item.getInventories().stream().mapToInt(Inventory::getQuantity).sum());
+            itemInventoryDto.setDescription(item.getDescription());
             // Set other fields as needed
-            itemInventoryDto.setDescription(item.getInventories().stream().findFirst().map(Inventory::getDescription).orElse(null));
-
 
             itemInventoryDtos.add(itemInventoryDto);
         }
 
         return itemInventoryDtos;
     }
+
+
+
 }

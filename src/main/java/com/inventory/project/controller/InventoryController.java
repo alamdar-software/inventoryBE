@@ -165,10 +165,9 @@ public class InventoryController {
             inventoryList.add(inventoryDetails);
         }
 
-        // Create the response object
         List<Map<String, Object>> response = new ArrayList<>();
-        response.add(getTotalCountObject(inventories.size())); // Add totalCount as the first item
-        response.addAll(inventoryList); // Add inventoryList items
+        response.add(getTotalCountObject(inventories.size()));
+        response.addAll(inventoryList);
 
         return ResponseEntity.ok(response);
     }
@@ -304,47 +303,36 @@ public class InventoryController {
 //            return ResponseEntity.ok(inventoryList);
 //        }
 //    }
-@PostMapping("/searchItem")
-public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
-    List<ItemInventoryDto> result = inventoryService.searchItemsByDescriptionAndName(
-            searchRequest.getDescription(), searchRequest.getName());
 
-    return ResponseEntity.ok(result);
-}
 //    @PostMapping("/searchItem")
-//    public ResponseEntity<List<Item>> searchItemsByCategoryAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
-//        if (criteria == null) {
-//            List<Item> allItems = inventoryService.getAllItems();
-//            return ResponseEntity.ok(allItems);
-//        }
-//
-//        List<Item> itemList;
-//
-//        if ((criteria.getDescription() == null || criteria.getDescription().isEmpty())
-//                && (criteria.getName() == null || criteria.getName().isEmpty())) {
-//            // If both description and categoryName are empty, fetch all data
-//            itemList = inventoryService.getAllItems();
-//        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
-//                && criteria.getName() != null && !criteria.getName().isEmpty()) {
-//            // Search by both description and categoryName
-//            itemList = inventoryService.searchItemsByDescriptionAndCategoryName(
-//                    criteria.getDescription(), criteria.getName());
-//        } else if (criteria.getName() != null && !criteria.getName().isEmpty()) {
-//            // Search by categoryName only
-//            itemList = inventoryService.searchItemsByCategoryName(criteria.getName());
-//        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-//            // Search by description only
-//            itemList = inventoryService.searchItemsByDescription(criteria.getDescription());
-//        } else {
+//    public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
+//        if (searchRequest.getLocationName() == null || searchRequest.getDescription() == null) {
+//            // Handle invalid search request
 //            return ResponseEntity.badRequest().build();
 //        }
 //
-//        // Print criteria and result to check for issues
-//        System.out.println("Received search criteria: " + criteria);
-//        System.out.println("Returning item list: " + itemList);
-//
-//        return ResponseEntity.ok(itemList);
+//        List<ItemInventoryDto> result = inventoryService.searchItemsByLocationAndDescription(searchRequest.getLocationName(), searchRequest.getDescription());
+//        return ResponseEntity.ok(result);
 //    }
+@PostMapping("/searchItem")
+public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
+    List<ItemInventoryDto> result;
+
+    if (searchRequest.getDescription() != null && searchRequest.getName() != null) {
+        result = inventoryService.searchItemsByDescriptionAndName(searchRequest.getDescription(), searchRequest.getName());
+    } else if (searchRequest.getName() != null) {
+        result = inventoryService.searchItemsByName(searchRequest.getName());
+    } else if (searchRequest.getDescription() != null) {
+        result = inventoryService.searchItemsByDescription(searchRequest.getDescription());
+    } else {
+        // Handle invalid search request
+        return ResponseEntity.badRequest().build();
+    }
+
+    return ResponseEntity.ok(result);
+}
+
+
 
 }
 
