@@ -175,7 +175,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
     Item item = new Item();
     item.setDescription(incomingStockRequest.getDescription());
-    Address address = addressRepository.findByAddress(incomingStockRequest.getAddress());
+    Address address = addressRepository.findFirstByAddressIgnoreCase(incomingStockRequest.getAddress());
     Category category=categoryRepository.findByName((incomingStockRequest.getName()));
     Brand  brand =brandRepository.findByBrandName(incomingStockRequest.getBrandName());
     Unit unit=unitRepository.findByUnitName(incomingStockRequest.getUnitName());
