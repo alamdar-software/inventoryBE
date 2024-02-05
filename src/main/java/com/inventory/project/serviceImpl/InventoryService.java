@@ -40,113 +40,11 @@ public class InventoryService {
         return inventory != null ? Collections.singletonList(inventory) : Collections.emptyList();
     }
 
-//public List<Item> searchItemsByDescriptionAndCategoryName(String description, String categoryName) {
-//    List<Item> items = itemRepository.findByCategoryNameAndDescription(categoryName, description);
-//    initializeInventories(items);
-//    return items;
-//}
-//
-//    public List<Item> searchItemsByCategoryName(String categoryName) {
-//        List<Item> items = itemRepository.findByCategoryName(categoryName);
-//        initializeInventories(items);
-//        return items;
-//    }
-//
-//    public List<Item> searchItemsByDescription(String description) {
-//        Item item = itemRepository.findByDescription(description);
-//        if (item != null) {
-//            initializeInventories(Collections.singletonList(item));
-//        }
-//        return item != null ? Collections.singletonList(item) : Collections.emptyList();
-//    }
-//
-//    public List<Item> getAllItems() {
-//        List<Item> items = itemRepository.findAll();
-//        initializeInventories(items);
-//        return items;
-//    }
-//
-//    private void initializeInventories(List<Item> items) {
-//        for (Item item : items) {
-//            Hibernate.initialize(item.getInventories());
-//        }
-//    }
 
-//    public List<ItemInventoryDto> searchItemsByLocationAndDescription(String locationName, String description) {
-//        List<Inventory> inventories = inventoryRepository.findByLocationNameAndDescription(locationName, description);
-//        return mapInventoriesToItemInventoryDto(inventories);
-//    }
-//
-//    private List<ItemInventoryDto> mapInventoriesToItemInventoryDto(List<Inventory> inventories) {
-//        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
-//
-//        for (Inventory inventory : inventories) {
-//            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
-//
-//            // Assuming you have access to Item entity from the Inventory
-//            Item item = inventory.getItem();
-//
-//            itemInventoryDto.setName(item.getName());
-//            itemInventoryDto.setMinimumStock(item.getMinimumStock());
-//            itemInventoryDto.setItemName(item.getItemName());
-//            itemInventoryDto.setQuantity(inventory.getQuantity());
-//            itemInventoryDto.setDescription(inventory.getDescription());
-//
-//            // Set other fields as needed
-//
-//            itemInventoryDtos.add(itemInventoryDto);
-//        }
-//
-//        return itemInventoryDtos;
-//    }
-
-
-//    public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String locationName) {
-//        List<Item> items = itemRepository.findByNameAndDescription(locationName, description);
-//        return mapItemsToItemInventoryDto(items);
-//    }
-//
-//    public List<ItemInventoryDto> searchItemsByName(String name) {
-//        List<Item> items = itemRepository.findByName(name);
-//        return mapItemsToItemInventoryDto(items);
-//    }
-//
-//    public List<ItemInventoryDto> searchItemsByDescription(String description) {
-//        Item item = itemRepository.findByDescription(description);
-//        List<Item> items = (item != null) ? Collections.singletonList(item) : Collections.emptyList();
-//        return mapItemsToItemInventoryDto(items);
-//    }
-//    private List<ItemInventoryDto> mapItemsToItemInventoryDto(List<Item> items) {
-//        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
-//
-//        for (Item item : items) {
-//            ItemInventoryDto itemInventoryDto = new ItemInventoryDto();
-//            itemInventoryDto.setName(item.getName());
-//            itemInventoryDto.setMinimumStock(item.getMinimumStock());
-//            itemInventoryDto.setItemName(item.getItemName());
-//
-//            // Assuming you want to aggregate quantity and description of all inventories for an item
-//            int totalQuantity = 0;
-//            StringBuilder descriptions = new StringBuilder();
-//            for (Inventory inventory : item.getInventories()) {
-//                totalQuantity += inventory.getQuantity();
-//                descriptions.append(inventory.getDescription()).append(", ");
-//            }
-//            // Remove the trailing ", "
-//            String description = descriptions.length() > 0 ? descriptions.substring(0, descriptions.length() - 2) : "";
-//
-//            itemInventoryDto.setQuantity(totalQuantity);
-//            itemInventoryDto.setDescription(description);
-//
-//            itemInventoryDtos.add(itemInventoryDto);
-//        }
-//
-//        return itemInventoryDtos;
-//    }
 
     public List<ItemInventoryDto> searchItemsByDescriptionAndName(String description, String name) {
-        if (name == null || name.trim().isEmpty()) {
-            // If the name is null or empty, return an empty list since it won't match anything
+        if (name == null || name.trim().isEmpty() || description == null || description.trim().isEmpty()) {
+            // If the name or description is null or empty, return an empty list since it won't match anything
             return Collections.emptyList();
         }
 

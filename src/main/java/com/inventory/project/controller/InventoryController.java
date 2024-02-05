@@ -318,14 +318,25 @@ public class InventoryController {
 public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
     List<ItemInventoryDto> result;
 
-    if (searchRequest.getDescription() != null && searchRequest.getName() != null) {
-        result = inventoryService.searchItemsByDescriptionAndName(searchRequest.getDescription(), searchRequest.getName());
-    } else if (searchRequest.getName() != null) {
-        result = inventoryService.searchItemsByName(searchRequest.getName());
-    } else if (searchRequest.getDescription() != null) {
-        result = inventoryService.searchItemsByDescription(searchRequest.getDescription());
+    String name = searchRequest.getName();
+    String description = searchRequest.getDescription();
+
+    if ((name == null || name.isEmpty()) && (description == null || description.isEmpty())) {
+        // Both name and description are empty, return bad request
+        return ResponseEntity.badRequest().build();
+    }
+
+    if (name != null && !name.isEmpty() && description != null && !description.isEmpty()) {
+        // Both name and description are provided
+        result = inventoryService.searchItemsByDescriptionAndName(description, name);
+    } else if (name != null && !name.isEmpty()) {
+        // Only name is provided
+        result = inventoryService.searchItemsByName(name);
+    } else if (description != null && !description.isEmpty()) {
+        // Only description is provided
+        result = inventoryService.searchItemsByDescription(description);
     } else {
-        // Handle invalid search request
+        // Invalid search request, return bad request
         return ResponseEntity.badRequest().build();
     }
 
@@ -335,6 +346,7 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
         return ResponseEntity.ok(result);
     }
 }
+
 
 
 
