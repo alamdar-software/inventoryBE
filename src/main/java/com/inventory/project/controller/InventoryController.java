@@ -147,6 +147,37 @@ public class InventoryController {
         }
     }
 
+//    @GetMapping("/view")
+//    public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
+//        List<Inventory> inventories = inventoryRepo.findAll();
+//        List<Map<String, Object>> inventoryList = new ArrayList<>();
+//
+//        for (Inventory inventory : inventories) {
+//            Map<String, Object> inventoryDetails = new HashMap<>();
+//            inventoryDetails.put("id", inventory.getId()); // Include the ID
+//            inventoryDetails.put("description", inventory.getDescription() + " (" + inventory.getQuantity() + ")");
+//            // Include other fields if needed
+//            inventoryDetails.put("locationName", inventory.getLocationName());
+//            inventoryDetails.put("address", inventory.getAddress());
+//            inventoryDetails.put("quantity", inventory.getQuantity());
+//            inventoryDetails.put("consumedItem", inventory.getConsumedItem());
+//            inventoryDetails.put("scrappedItem", inventory.getScrappedItem());
+//            inventoryList.add(inventoryDetails);
+//        }
+//
+//        List<Map<String, Object>> response = new ArrayList<>();
+//        response.add(getTotalCountObject(inventories.size()));
+//        response.addAll(inventoryList);
+//
+//        return ResponseEntity.ok(response);
+//    }
+
+    // Method to create the totalCount object
+//    private Map<String, Object> getTotalCountObject(int totalCount) {
+//        Map<String, Object> totalCountObject = new HashMap<>();
+//        totalCountObject.put("totalCount", totalCount);
+//        return totalCountObject;
+//    }
     @GetMapping("/view")
     public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
@@ -165,18 +196,7 @@ public class InventoryController {
             inventoryList.add(inventoryDetails);
         }
 
-        List<Map<String, Object>> response = new ArrayList<>();
-        response.add(getTotalCountObject(inventories.size()));
-        response.addAll(inventoryList);
-
-        return ResponseEntity.ok(response);
-    }
-
-    // Method to create the totalCount object
-    private Map<String, Object> getTotalCountObject(int totalCount) {
-        Map<String, Object> totalCountObject = new HashMap<>();
-        totalCountObject.put("totalCount", totalCount);
-        return totalCountObject;
+        return ResponseEntity.ok(inventoryList);
     }
 
     @GetMapping("get/{id}")

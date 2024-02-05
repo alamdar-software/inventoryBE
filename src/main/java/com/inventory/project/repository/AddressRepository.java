@@ -13,7 +13,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
     Address findByAddressEquals(String address);
 //    List<Address> findByAddressId(Long addressId);
 
- 
+
 
 
     Address findFirstByAddressIgnoreCase(String address);
