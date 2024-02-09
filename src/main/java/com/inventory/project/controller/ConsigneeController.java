@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,7 @@ public class ConsigneeController {
 
     @Autowired
     private LocationRepository locationRepo;
-
-
+    @PreAuthorize("hasRole('SUPERADMIN')")
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
     Map<String, Object> response = new HashMap<>();
@@ -106,6 +106,8 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteConsignee(@PathVariable("id") Long id, HttpSession session) {
         try {
@@ -116,6 +118,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Consignee>> getAllConsignees() {

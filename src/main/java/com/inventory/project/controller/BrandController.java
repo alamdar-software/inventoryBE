@@ -50,11 +50,13 @@ public class BrandController {
 //        return ResponseEntity.ok(response);
 //    }
 @GetMapping("/view")
-@PreAuthorize("hasRole('SUPERADMIN')")
+@PreAuthorize("hasRole('SUPERADMIN','USER')")
 public ResponseEntity<List<Brand>> viewAllBrands() {
     List<Brand> brandList = brandRepository.findAll();
     return ResponseEntity.ok(brandList);
 }
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @PostMapping("/add")
     public ResponseEntity<Object> addAndSaveBrand(@RequestBody @Validated Brand brand, BindingResult result, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -155,6 +157,7 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteBrand(@PathVariable Long id) {

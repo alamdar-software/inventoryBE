@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -41,6 +42,7 @@ public class CiplController {
         this.ciplService = ciplService;
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipl() {
@@ -197,6 +199,8 @@ public class CiplController {
 //        Cipl newCipl = ciplService.createCipl(cipl);
 //        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
 //    }
+@PreAuthorize("hasRole('SUPERADMIN')")
+
 @PostMapping("/add")
 public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
     try {
@@ -206,6 +210,7 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCipl(@PathVariable Long id) {

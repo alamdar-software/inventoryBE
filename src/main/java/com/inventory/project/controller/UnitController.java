@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,7 @@ public class UnitController {
 
     @Autowired
     private UnitRepository unitRepo;
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<String> addUnit(@RequestBody Unit unit) {
@@ -51,6 +53,7 @@ public class UnitController {
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<Page<Unit>> viewUnits(@RequestParam(defaultValue = "1") int page,
@@ -74,6 +77,7 @@ public class UnitController {
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUnit(@PathVariable("id") Long id) {

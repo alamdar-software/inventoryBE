@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -24,6 +25,7 @@ public class CurrencyController {
 
     @Autowired
     private CurrencyRepository currencyRepo;
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<Currency> create(@RequestBody Currency currency) {
@@ -76,6 +78,8 @@ public class CurrencyController {
             }    } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)                .body("Error updating currency: " + e.getMessage());
         }}
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> viewCurrencies(@RequestParam(defaultValue = "0") int page) {
         try {
@@ -93,6 +97,8 @@ public class CurrencyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Error fetching currencies: " + e.getMessage()));
         }
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCurrency(@PathVariable Long id) {
         try {

@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ public class ShipperController {
 
     @Autowired
     private LocationRepository locationRepository;
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addAndSaveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
@@ -99,6 +101,7 @@ public class ShipperController {
 
 
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Shipper>> getAllShippers(
@@ -123,6 +126,7 @@ public class ShipperController {
         return shipper.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteShipper(@PathVariable("id") Long id, HttpSession session) {

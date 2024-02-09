@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -44,6 +45,8 @@ public class LocationController {
 //        return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
 //    }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @PostMapping("/add")
     public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
         Location addedLocation = locationService.addAddressToLocation(
@@ -57,6 +60,8 @@ public class LocationController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/getAll")
     public ResponseEntity<List<Location>> getAllLocations() {
@@ -92,6 +97,7 @@ public class LocationController {
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteLocation(@PathVariable(value = "id") Long id) {

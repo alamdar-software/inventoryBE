@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class EntityController {
     @Autowired
     private EntityRepository entityRepository;
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<Entity> addEntity(@RequestBody Entity entity) {
@@ -60,11 +62,15 @@ public class EntityController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<List<Entity>> getAllEntities() {
         List<Entity> entities = entityRepository.findAll();
         return ResponseEntity.ok(entities);
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteEntity(@PathVariable("id") Long id) {

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -36,6 +37,8 @@ public class ConsumedItemController {
 
 @Autowired
 private ConsumeService consumeService;
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
@@ -116,6 +119,8 @@ private ConsumeService consumeService;
         return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<List<ConsumedItem>> getAllConsumedItems() {
         List<ConsumedItem> consumedItems = consumedItemRepo.findAll();
@@ -157,6 +162,7 @@ private ConsumeService consumeService;
         }
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteConsumedItemById(@PathVariable Long id) {
         Optional<ConsumedItem> consumedItemOptional = consumedItemRepo.findById(id);

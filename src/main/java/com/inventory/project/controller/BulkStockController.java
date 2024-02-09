@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -58,8 +59,8 @@ IncomingStockRepo incomingStockRepo;
 //        List<BulkStock> bulkStocks = bulkStockService.getAllBulk();
 //        return new ResponseEntity<>(bulkStocks, HttpStatus.OK);
 //    }
-
-    @PostMapping("/add")
+@PreAuthorize("hasRole('SUPERADMIN')")
+@PostMapping("/add")
     public ResponseEntity<BulkStock> addBulkStock(@RequestBody BulkStock bulkStock) {
         BulkStock newBulkStock = bulkStockService.createBulk(bulkStock);
         if (newBulkStock != null) {
@@ -108,13 +109,14 @@ IncomingStockRepo incomingStockRepo;
         return bulkStock.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deleteBulkStock(@PathVariable Long id) {
         bulkStockService.deleteBulkById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
+    @PreAuthorize("hasRole('SUPERADMIN')")
 @GetMapping("/view")
 public ResponseEntity<StockViewResponse> getStockView() {
     List<IncomingStock> incomingStocks = incomingStockRepo.findAll();

@@ -8,6 +8,7 @@ import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -22,6 +23,8 @@ public class InternalTransferController {
     public InternalTransferController(InternalTransferService internalTransferService) {
         this.internalTransferService = internalTransferService;
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllItWithCount() {
@@ -49,12 +52,16 @@ public class InternalTransferController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @PostMapping("/add")
     public ResponseEntity<InternalTransfer> createInternalTransfer(@RequestBody InternalTransfer internalTransfer) {
         InternalTransfer newInternalTransfer = internalTransferService.createInternalTransfer(internalTransfer);
 
         return new ResponseEntity<>(newInternalTransfer, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteInternalTransfer(@PathVariable Long id) {

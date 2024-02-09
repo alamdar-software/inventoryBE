@@ -11,6 +11,7 @@ import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,6 +32,8 @@ public class ScrappedItemController {
 
     @Autowired
     private ScrappedItemService scrappedItemService;
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @PostMapping("/add")
     public ResponseEntity<?> addScrappedItem(@RequestBody ScrappedItem scrappedItem) {
         List<String> items = scrappedItem.getItem();
@@ -109,6 +112,7 @@ public class ScrappedItemController {
         scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ScrappedItem>> getAllScrappedItems() {
@@ -122,6 +126,7 @@ public class ScrappedItemController {
         Optional<ScrappedItem> scrappedItem = scrappedItemRepository.findById(id);
         return scrappedItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteScrappedItemById(@PathVariable("id") Long id) {

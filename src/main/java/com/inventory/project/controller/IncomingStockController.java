@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -156,6 +157,8 @@ public class IncomingStockController {
 //        return ResponseEntity.ok("Incoming Stock added successfully");
 //    }
 // Your API endpoint
+@PreAuthorize("hasRole('SUPERADMIN')")
+
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
     IncomingStock incomingStock = new IncomingStock();
@@ -297,6 +300,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return responseDTO;
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<?> viewAllIncomingStocks() {
         List<IncomingStock> allIncomingStocks = incomingStockRepo.findAll();
@@ -322,6 +327,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 //        IncomingStock incomingStock = incomingStockOptional.get();
 //        return ResponseEntity.ok(incomingStock);
 //    }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteIncomingStock(@PathVariable Long id) {

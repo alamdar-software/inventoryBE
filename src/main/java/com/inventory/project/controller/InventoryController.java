@@ -9,6 +9,7 @@ import com.inventory.project.serviceImpl.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,6 +31,8 @@ public class InventoryController {
 
     @Autowired
     InventoryService inventoryService;
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
@@ -178,6 +181,8 @@ public class InventoryController {
 //        totalCountObject.put("totalCount", totalCount);
 //        return totalCountObject;
 //    }
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
         List<Inventory> inventories = inventoryRepo.findAll();
@@ -204,6 +209,8 @@ public class InventoryController {
         Optional<Inventory> inventory = inventoryRepo.findById(id);
         return inventory.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteInventory(@PathVariable Long id) {

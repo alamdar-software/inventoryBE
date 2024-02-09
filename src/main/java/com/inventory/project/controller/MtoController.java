@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -36,6 +37,8 @@ public class MtoController {
         this.mtoService = mtoService;
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllMtoWithCount() {
         List<Mto> mtoList = mtoService.getAllMto();
@@ -55,11 +58,15 @@ public class MtoController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
+
     @PostMapping("/add")
     public ResponseEntity<Mto> addMto(@RequestBody Mto mto) {
         Mto newMto = mtoService.createMto(mto);
         return new ResponseEntity<>(newMto, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteMto(@PathVariable Long id) {

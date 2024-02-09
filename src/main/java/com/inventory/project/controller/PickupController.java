@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class PickupController {
         Optional<Pickup> pickup = pickupRepository.findById(id);
         return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Pickup>> getAllPickups(
@@ -44,6 +46,7 @@ public class PickupController {
             return ResponseEntity.noContent().build();
         }
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @PostMapping("/add")
     public ResponseEntity<?> createPickup(@RequestBody Pickup pickup) {
@@ -76,6 +79,7 @@ public class PickupController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deletePickup(@PathVariable("id") Long id) {
