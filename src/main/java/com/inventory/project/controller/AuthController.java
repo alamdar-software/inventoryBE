@@ -9,6 +9,7 @@ import com.inventory.project.exception.ErrorResponse;
 import com.inventory.project.payload.request.AddUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -75,6 +76,7 @@ public class AuthController {
                          roles));
   }
 
+  @PreAuthorize("hasRole('SUPERADMIN')")
   @PostMapping("/addUser")
   public ResponseEntity<?> registerUser(@Valid @RequestBody AddUser addUser,
                                         BindingResult bindingResult) {
