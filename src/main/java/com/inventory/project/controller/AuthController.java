@@ -1,5 +1,6 @@
 package com.inventory.project.controller;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.inventory.project.exception.ErrorResponse;
 import com.inventory.project.payload.request.AddUser;
+import com.inventory.project.payload.request.UpdatePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +28,6 @@ import com.inventory.project.constants.ERole;
 import com.inventory.project.model.Role;
 import com.inventory.project.model.User;
 import com.inventory.project.payload.request.LoginRequest;
-import com.inventory.project.payload.request.SignupRequest;
 import com.inventory.project.payload.response.JwtResponse;
 import com.inventory.project.payload.response.MessageResponse;
 import com.inventory.project.repository.RoleRepository;
@@ -137,4 +138,18 @@ public class AuthController {
 
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
+  @PostMapping("/updatePassword")
+  public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest,
+                                          Authentication authentication, Principal principal) {
+    User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (!encoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())) {
+      return ResponseEntity.badRequest().body(new MessageResponse("Old password is incorrect!"));
+    }
+
+    user.setPassword(encoder.encode(updatePasswordRequest.getNewPassword()));
+    userRepository.save(user);
+    return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
+  }
+
 }
