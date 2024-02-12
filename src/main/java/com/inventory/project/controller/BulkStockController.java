@@ -117,16 +117,16 @@ IncomingStockRepo incomingStockRepo;
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PreAuthorize("hasRole('SUPERADMIN')")
-@GetMapping("/view")
-public ResponseEntity<StockViewResponse> getStockView() {
-    List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
-    List<BulkStock> bulkStocks = bulkStockRepo.findAll();
+    @GetMapping("/view")
+    public ResponseEntity<StockViewResponse> getStockView() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
+        List<BulkStock> bulkStocks = bulkStockRepo.findAll();
 
-    int incomingStockCount = incomingStocks.size();
-    int bulkStockCount = bulkStocks.size();
-    int totalCount = incomingStockCount + bulkStockCount;
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
 
-    List<StockViewDto> stockViewList = new ArrayList<>();
+        List<StockViewDto> stockViewList = new ArrayList<>();
 
     for (IncomingStock incomingStock : incomingStocks) {
         StockViewDto stockView = mapIncomingStockToDTO(incomingStock);

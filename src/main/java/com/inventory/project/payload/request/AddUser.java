@@ -25,6 +25,7 @@ public class AddUser {
     @Size(min = 8, message = "Password must be 8 characters!")
     private String password;
 
+    private Long contactNumber;
     public String getUsername() {
         return username;
     }
@@ -63,5 +64,13 @@ public class AddUser {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(Long contactNumber) {
+        this.contactNumber = contactNumber;
     }
 }
