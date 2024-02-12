@@ -26,7 +26,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // View details of all users
     @GetMapping("/view")
     @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<?> getAllUsers() {
