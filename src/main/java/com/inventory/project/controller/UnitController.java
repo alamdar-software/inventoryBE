@@ -17,7 +17,7 @@ public class UnitController {
 
     @Autowired
     private UnitRepository unitRepo;
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<String> addUnit(@RequestBody Unit unit) {
@@ -53,7 +53,7 @@ public class UnitController {
         }
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<Page<Unit>> viewUnits(@RequestParam(defaultValue = "1") int page,

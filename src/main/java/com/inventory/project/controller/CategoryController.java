@@ -18,7 +18,7 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
     @PostMapping("/add")
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
         try {
@@ -63,7 +63,7 @@ public class CategoryController {
         }
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<Page<Category>> viewCategories(@RequestParam(defaultValue = "1") int page,

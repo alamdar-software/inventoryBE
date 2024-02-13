@@ -50,12 +50,12 @@ public class BrandController {
 //        return ResponseEntity.ok(response);
 //    }
 @GetMapping("/view")
-@PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 public ResponseEntity<List<Brand>> viewAllBrands() {
     List<Brand> brandList = brandRepository.findAll();
     return ResponseEntity.ok(brandList);
 }
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Object> addAndSaveBrand(@RequestBody @Validated Brand brand, BindingResult result, HttpSession session) {

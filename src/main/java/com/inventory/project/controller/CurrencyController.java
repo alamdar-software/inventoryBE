@@ -25,7 +25,7 @@ public class CurrencyController {
 
     @Autowired
     private CurrencyRepository currencyRepo;
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Currency> create(@RequestBody Currency currency) {
@@ -78,7 +78,7 @@ public class CurrencyController {
             }    } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)                .body("Error updating currency: " + e.getMessage());
         }}
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> viewCurrencies(@RequestParam(defaultValue = "0") int page) {

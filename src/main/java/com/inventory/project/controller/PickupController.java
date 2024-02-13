@@ -30,7 +30,7 @@ public class PickupController {
         Optional<Pickup> pickup = pickupRepository.findById(id);
         return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Pickup>> getAllPickups(
@@ -46,7 +46,7 @@ public class PickupController {
             return ResponseEntity.noContent().build();
         }
     }
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> createPickup(@RequestBody Pickup pickup) {
