@@ -7,8 +7,8 @@ public class UpdatePasswordRequest {
     @NotBlank
     private String oldPassword;
 
-    @NotBlank
-    @Size(min = 6, max = 40)
+    @NotBlank(message = "newPassword generated successfully!")
+    @Size(min = 6, max = 40,message = "newPassword must be 6 characters!")
     private String newPassword;
 
     // Getters and Setters

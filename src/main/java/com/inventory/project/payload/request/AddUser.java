@@ -26,6 +26,7 @@ public class AddUser {
     private String password;
 
     private Long contactNumber;
+
     public String getUsername() {
         return username;
     }
