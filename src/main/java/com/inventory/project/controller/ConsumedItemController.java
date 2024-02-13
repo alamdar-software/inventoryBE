@@ -38,7 +38,7 @@ public class ConsumedItemController {
 @Autowired
 private ConsumeService consumeService;
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
@@ -119,7 +119,7 @@ private ConsumeService consumeService;
         return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ConsumedItem>> getAllConsumedItems() {

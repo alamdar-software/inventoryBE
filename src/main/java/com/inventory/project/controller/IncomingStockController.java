@@ -157,7 +157,7 @@ public class IncomingStockController {
 //        return ResponseEntity.ok("Incoming Stock added successfully");
 //    }
 // Your API endpoint
-@PreAuthorize("hasRole('SUPERADMIN')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
@@ -300,7 +300,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return responseDTO;
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<?> viewAllIncomingStocks() {

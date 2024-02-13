@@ -32,7 +32,7 @@ public class ScrappedItemController {
 
     @Autowired
     private ScrappedItemService scrappedItemService;
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addScrappedItem(@RequestBody ScrappedItem scrappedItem) {
@@ -112,7 +112,7 @@ public class ScrappedItemController {
         scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ScrappedItem>> getAllScrappedItems() {
