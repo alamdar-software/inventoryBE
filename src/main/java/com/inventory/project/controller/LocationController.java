@@ -45,7 +45,7 @@ public class LocationController {
 //        return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
 //    }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
@@ -61,7 +61,7 @@ public class LocationController {
         }
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/getAll")
     public ResponseEntity<List<Location>> getAllLocations() {

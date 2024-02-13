@@ -29,7 +29,7 @@ public class ConsigneeController {
 
     @Autowired
     private LocationRepository locationRepo;
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
     Map<String, Object> response = new HashMap<>();
@@ -118,7 +118,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
         }
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Consignee>> getAllConsignees() {

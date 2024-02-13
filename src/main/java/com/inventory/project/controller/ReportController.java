@@ -9,6 +9,7 @@ import com.inventory.project.serviceImpl.MtoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -51,11 +52,14 @@ public class ReportController {
 //    List<Object> searchResults = combinedSearchService.searchBoth(searchCriteria);
 //    return new ResponseEntity<>(searchResults, HttpStatus.OK);
 //}
+
 @PostMapping("/search")
 public ResponseEntity<List<Object>> searchEntities(@RequestBody SearchCriteria searchCriteria) {
     List<Object> searchResults = combinedSearchService.searchBoth(searchCriteria);
     return new ResponseEntity<>(searchResults, HttpStatus.OK);
 }
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+
     @PostMapping("/searchAll")
     public List<Object> searchAllEntities(@RequestBody SearchCriteria searchCriteria) {
         return combinedSearchService.searchAllEntities(searchCriteria);

@@ -68,7 +68,7 @@ public class ItemController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //        }
 //    }
-@PreAuthorize("hasRole('SUPERADMIN')")
+@PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
@@ -185,7 +185,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
 //        }
 //    }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Item>> viewAllItems(HttpSession session) {

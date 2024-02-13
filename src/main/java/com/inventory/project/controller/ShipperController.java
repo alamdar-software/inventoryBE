@@ -30,7 +30,7 @@ public class ShipperController {
 
     @Autowired
     private LocationRepository locationRepository;
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addAndSaveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
@@ -101,7 +101,7 @@ public class ShipperController {
 
 
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Shipper>> getAllShippers(
