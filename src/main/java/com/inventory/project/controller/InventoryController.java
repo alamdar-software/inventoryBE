@@ -32,7 +32,7 @@ public class InventoryController {
     @Autowired
     InventoryService inventoryService;
 
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
@@ -181,7 +181,7 @@ public class InventoryController {
 //        totalCountObject.put("totalCount", totalCount);
 //        return totalCountObject;
 //    }
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
