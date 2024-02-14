@@ -237,9 +237,7 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         List<Cipl> result;
 
         if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            // Search by date range
             if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName()) || criteria.isRepairService()) {
-                // Search by date range along with other criteria
                 result = ciplService.getMtoByDateRange(
                         criteria.getItem(),
                         criteria.getShipperName(),
@@ -252,7 +250,6 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
                 result = ciplService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
             }
         } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName())) {
-            // Search by either item, consigneeName, or shipperName
             result = ciplService.getConsumedByItemAndLocation(
                     criteria.getItem(),
                     criteria.getShipperName(),
@@ -260,10 +257,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
                     criteria.isRepairService()
             );
         } else if (criteria.isRepairService()) {
-            // Search by repairService only
             result = ciplService.getMtoByRepairService(criteria.isRepairService());
         } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
             return ResponseEntity.badRequest().build();
         }
 
