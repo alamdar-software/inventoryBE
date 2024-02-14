@@ -58,7 +58,7 @@ public ResponseEntity<List<Object>> searchEntities(@RequestBody SearchCriteria s
     List<Object> searchResults = combinedSearchService.searchBoth(searchCriteria);
     return new ResponseEntity<>(searchResults, HttpStatus.OK);
 }
-    @PreAuthorize("hasRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
 
     @PostMapping("/searchAll")
     public List<Object> searchAllEntities(@RequestBody SearchCriteria searchCriteria) {

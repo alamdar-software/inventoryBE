@@ -226,6 +226,8 @@ public class InventoryController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+
     @PostMapping("/searchReport")
     public ResponseEntity<List<Inventory>> searchInventoryByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {

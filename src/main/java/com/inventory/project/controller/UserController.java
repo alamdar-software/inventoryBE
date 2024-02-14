@@ -26,7 +26,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // View details of a specific user by ID
     @GetMapping("getById/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
@@ -40,7 +39,7 @@ public class UserController {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
     }
-    // Update details of a specific user by ID
+
     @PutMapping("/update/{userId}")
     public ResponseEntity<?> updateUserById(@PathVariable Long userId, @RequestBody Map<String, Object> requestBody) {
         User existingUser = userRepository.findById(userId)
@@ -103,4 +102,5 @@ public class UserController {
         userRepository.deleteById(userId);
         return ResponseEntity.ok("User deleted successfully");
     }
+
 }
