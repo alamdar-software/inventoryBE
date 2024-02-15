@@ -94,6 +94,7 @@ public class UserController {
 
         User savedUser = userRepository.save(existingUser);
         return ResponseEntity.ok(savedUser);
+
     }
 
 

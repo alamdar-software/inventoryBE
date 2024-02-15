@@ -251,7 +251,6 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.badRequest().body("Location not found.");
     }
 
-    // ... (rest of your existing code)
 }
 
     @GetMapping("/get/{id}")
