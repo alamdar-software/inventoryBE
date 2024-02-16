@@ -32,7 +32,7 @@ public class InventoryController {
     @Autowired
     InventoryService inventoryService;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
@@ -116,7 +116,7 @@ public class InventoryController {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //    }
 //}
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updateInventory(@PathVariable Long id, @RequestBody Inventory updatedInventory) {
@@ -182,7 +182,7 @@ public class InventoryController {
 //        totalCountObject.put("totalCount", totalCount);
 //        return totalCountObject;
 //    }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
@@ -204,7 +204,7 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {

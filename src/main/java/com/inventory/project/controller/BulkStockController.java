@@ -59,7 +59,7 @@ IncomingStockRepo incomingStockRepo;
 //        List<BulkStock> bulkStocks = bulkStockService.getAllBulk();
 //        return new ResponseEntity<>(bulkStocks, HttpStatus.OK);
 //    }
-@PreAuthorize("hasRole('SUPERADMIN')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 @PostMapping("/add")
     public ResponseEntity<BulkStock> addBulkStock(@RequestBody BulkStock bulkStock) {
         BulkStock newBulkStock = bulkStockService.createBulk(bulkStock);
@@ -70,6 +70,7 @@ IncomingStockRepo incomingStockRepo;
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateStock(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates) {
@@ -101,6 +102,7 @@ IncomingStockRepo incomingStockRepo;
             // Handle exception as per your application's requirements
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<BulkStock> getBulkStockById(@PathVariable Long id) {
@@ -116,7 +118,7 @@ IncomingStockRepo incomingStockRepo;
         bulkStockService.deleteBulkById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
     @GetMapping("/view")
     public ResponseEntity<StockViewResponse> getStockView() {
         List<IncomingStock> incomingStocks = incomingStockRepo.findAll();
