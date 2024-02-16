@@ -64,6 +64,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
                 consignee.getPhoneNumber() == null || consignee.getDeliveryAddress() == null;
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> updateConsignee(@PathVariable Long id, @RequestBody Consignee consignee) {
@@ -90,6 +91,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getConsigneeById(@PathVariable Long id) {

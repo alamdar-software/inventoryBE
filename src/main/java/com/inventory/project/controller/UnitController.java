@@ -37,6 +37,7 @@ public class UnitController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editUnit(@PathVariable("id") Long id, @RequestBody Unit unit) {
@@ -66,6 +67,8 @@ public class UnitController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+
     @GetMapping("get/{id}")
     public ResponseEntity<Unit> getUnitById(@PathVariable("id") Long id) {
         try {

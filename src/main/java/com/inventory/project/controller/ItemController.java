@@ -151,6 +151,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
 //        }
 //    }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getItemById(@PathVariable Long id) {
@@ -201,6 +202,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateItem(@PathVariable("id") Long id, @RequestBody Item itemDetails) {

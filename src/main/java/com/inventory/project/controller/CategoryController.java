@@ -31,6 +31,7 @@ public class CategoryController {
             return ResponseEntity.status(500).body("Error saving category");
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getCategoryById(@PathVariable Long id) {
@@ -47,6 +48,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editCategory(@PathVariable("id") Long id, @RequestBody Category category) {

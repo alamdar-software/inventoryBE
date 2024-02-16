@@ -24,7 +24,7 @@ public class InternalTransferController {
         this.internalTransferService = internalTransferService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllItWithCount() {
@@ -38,6 +38,7 @@ public class InternalTransferController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<InternalTransfer> getInternalTransferById(@PathVariable Long id) {
@@ -45,6 +46,8 @@ public class InternalTransferController {
         return internalTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @GetMapping("/createpdf/{id}")
     public ResponseEntity<InternalTransfer> createpdfById(@PathVariable Long id) {
         Optional<InternalTransfer> internalTransfer = internalTransferService.getInternalTransferById(id);
@@ -52,7 +55,7 @@ public class InternalTransferController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/add")
     public ResponseEntity<InternalTransfer> createInternalTransfer(@RequestBody InternalTransfer internalTransfer) {
@@ -76,6 +79,7 @@ public class InternalTransferController {
         return updatedTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<InternalTransfer>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {

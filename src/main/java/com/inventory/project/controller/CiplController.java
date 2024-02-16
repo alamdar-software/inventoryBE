@@ -42,7 +42,7 @@ public class CiplController {
         this.ciplService = ciplService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipl() {
@@ -131,6 +131,7 @@ public class CiplController {
 //
 //        return ResponseEntity.ok(ciplList);
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
@@ -180,6 +181,7 @@ public class CiplController {
     }
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Cipl> getCiplById(@PathVariable Long id) {
@@ -187,6 +189,8 @@ public class CiplController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @GetMapping("/createpdf/{id}")
     public ResponseEntity<Cipl> creatPdfById(@PathVariable Long id) {
         return ciplService.getCiplById(id)
@@ -199,7 +203,7 @@ public class CiplController {
 //        Cipl newCipl = ciplService.createCipl(cipl);
 //        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
 @PostMapping("/add")
 public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
@@ -217,6 +221,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         ciplService.deleteCiplById(id);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Cipl> updateCiplStock(@PathVariable Long id, @RequestBody Cipl  cipl) {
         Optional<Cipl> existingBulkStock = ciplService.getCiplById(id);

@@ -36,6 +36,7 @@ public class CurrencyController {
         Currency currency1 = currencyRepo.save(currency);
         return ResponseEntity.ok(currency1);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getCurrencyById(@PathVariable Long id) {
@@ -68,6 +69,8 @@ public class CurrencyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving currency: " + e.getMessage());
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+
     @PutMapping("/update/{id}")public ResponseEntity<String> updateCurrency(@PathVariable("id") Long id, @RequestBody Currency currency) {
         try {        Optional<Currency> existingCurrency = currencyRepo.findById(id);
             if (existingCurrency.isPresent()) {

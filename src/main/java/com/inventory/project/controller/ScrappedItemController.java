@@ -120,7 +120,7 @@ public class ScrappedItemController {
         return ResponseEntity.ok(scrappedItems);
     }
 
-    // GET scrapped item by ID
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
     @GetMapping("/get/{id}")
     public ResponseEntity<ScrappedItem> getScrappedItemById(@PathVariable("id") Long id) {
         Optional<ScrappedItem> scrappedItem = scrappedItemRepository.findById(id);
@@ -137,6 +137,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ScrappedItem> updateScrappedItemById(@PathVariable("id") Long id, @RequestBody ScrappedItem updatedScrappedItem) {
@@ -159,6 +160,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<ScrappedItem>> searchScrappedByCriteria(@RequestBody(required = false) SearchCriteria criteria) {

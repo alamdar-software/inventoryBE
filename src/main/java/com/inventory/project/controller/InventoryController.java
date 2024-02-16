@@ -116,6 +116,7 @@ public class InventoryController {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //    }
 //}
+@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updateInventory(@PathVariable Long id, @RequestBody Inventory updatedInventory) {
@@ -203,6 +204,7 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
@@ -343,6 +345,7 @@ public class InventoryController {
 //        List<ItemInventoryDto> result = inventoryService.searchItemsByLocationAndDescription(searchRequest.getLocationName(), searchRequest.getDescription());
 //        return ResponseEntity.ok(result);
 //    }
+
 @PostMapping("/searchItem")
 public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
     List<ItemInventoryDto> result;

@@ -95,6 +95,8 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
         model.addAttribute("totalPages", list.getTotalPages());
         model.addAttribute("totalItems", list.getTotalElements());
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<Object> editAndUpdateBrand(
             @PathVariable("id") Long id,
@@ -138,6 +140,7 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getBrandById(@PathVariable Long id) {

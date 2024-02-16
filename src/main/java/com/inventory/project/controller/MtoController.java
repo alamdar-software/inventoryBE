@@ -37,7 +37,7 @@ public class MtoController {
         this.mtoService = mtoService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllMtoWithCount() {
@@ -50,6 +50,7 @@ public class MtoController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Mto> getMtoById(@PathVariable Long id) {
@@ -58,7 +59,7 @@ public class MtoController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/add")
     public ResponseEntity<Mto> addMto(@RequestBody Mto mto) {
@@ -73,12 +74,16 @@ public class MtoController {
         mtoService.deleteMtoById(id);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @GetMapping("/createpdf/{id}")
     public ResponseEntity<Mto> creatPdfById(@PathVariable Long id) {
         return mtoService.getMtoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @PostMapping("/search")
     public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
@@ -176,6 +181,7 @@ public class MtoController {
 //
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Mto> updateMto(@PathVariable Long id, @RequestBody Mto mto) {

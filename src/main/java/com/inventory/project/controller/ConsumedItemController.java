@@ -129,6 +129,8 @@ private ConsumeService consumeService;
         }
         return ResponseEntity.ok(consumedItems);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @GetMapping("/get/{id}")
     public ResponseEntity<ConsumedItem> getConsumedItemById(@PathVariable("id") Long id) {
         Optional<ConsumedItem> consumedItem = consumedItemRepo.findById(id);
@@ -136,6 +138,7 @@ private ConsumeService consumeService;
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateConsumedItemById(@PathVariable Long id, @RequestBody ConsumedItem updatedConsumedItem) {
@@ -174,6 +177,7 @@ private ConsumeService consumeService;
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<ConsumedItem>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {

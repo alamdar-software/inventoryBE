@@ -59,6 +59,7 @@ public class ShipperController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
@@ -119,6 +120,7 @@ public class ShipperController {
     }
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Shipper> getShipperById(@PathVariable("id") Long id) {
