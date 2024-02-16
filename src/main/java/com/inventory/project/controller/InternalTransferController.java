@@ -24,7 +24,7 @@ public class InternalTransferController {
         this.internalTransferService = internalTransferService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllItWithCount() {
@@ -52,7 +52,7 @@ public class InternalTransferController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
     @PostMapping("/add")
     public ResponseEntity<InternalTransfer> createInternalTransfer(@RequestBody InternalTransfer internalTransfer) {

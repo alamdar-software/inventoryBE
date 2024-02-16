@@ -38,7 +38,7 @@ public class ConsumedItemController {
 @Autowired
 private ConsumeService consumeService;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
@@ -119,7 +119,7 @@ private ConsumeService consumeService;
         return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ConsumedItem>> getAllConsumedItems() {
@@ -254,6 +254,7 @@ private ConsumeService consumeService;
 //        return ResponseEntity.ok(result);
 //    }
 //}
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
