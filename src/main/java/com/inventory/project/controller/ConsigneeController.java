@@ -29,7 +29,7 @@ public class ConsigneeController {
 
     @Autowired
     private LocationRepository locationRepo;
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
     Map<String, Object> response = new HashMap<>();
@@ -64,7 +64,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
                 consignee.getPhoneNumber() == null || consignee.getDeliveryAddress() == null;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> updateConsignee(@PathVariable Long id, @RequestBody Consignee consignee) {
@@ -91,7 +91,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getConsigneeById(@PathVariable Long id) {
@@ -120,7 +120,7 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Consignee>> getAllConsignees() {

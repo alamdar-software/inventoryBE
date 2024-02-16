@@ -17,7 +17,7 @@ public class UnitController {
 
     @Autowired
     private UnitRepository unitRepo;
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/add")
     public ResponseEntity<String> addUnit(@RequestBody Unit unit) {
@@ -37,7 +37,7 @@ public class UnitController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editUnit(@PathVariable("id") Long id, @RequestBody Unit unit) {
@@ -54,7 +54,7 @@ public class UnitController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<Page<Unit>> viewUnits(@RequestParam(defaultValue = "1") int page,
@@ -67,7 +67,7 @@ public class UnitController {
             return ResponseEntity.status(500).body(null);
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Unit> getUnitById(@PathVariable("id") Long id) {

@@ -71,6 +71,8 @@ public class InternalTransferController {
         internalTransferService.deleteInternalTransferById(id);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @PutMapping("/update/{id}")
     public ResponseEntity<InternalTransfer> updateInternalTransfer(
             @PathVariable Long id, @RequestBody InternalTransfer updatedInternalTransfer) {
