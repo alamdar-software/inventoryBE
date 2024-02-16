@@ -37,7 +37,7 @@ public class MtoController {
         this.mtoService = mtoService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> getAllMtoWithCount() {
@@ -58,7 +58,7 @@ public class MtoController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Mto> addMto(@RequestBody Mto mto) {

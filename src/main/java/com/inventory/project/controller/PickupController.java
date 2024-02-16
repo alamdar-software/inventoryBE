@@ -24,6 +24,7 @@ public class PickupController {
     private PickupRepository pickupRepository;
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Pickup> getPickupById(@PathVariable("id") Long id) {
@@ -62,6 +63,7 @@ public class PickupController {
         return ResponseEntity.ok(newPickup);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Pickup> updatePickup(@PathVariable("id") Long id, @RequestBody Pickup pickupDetails) {

@@ -42,7 +42,7 @@ public class CiplController {
         this.ciplService = ciplService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipl() {
@@ -199,7 +199,7 @@ public class CiplController {
 //        Cipl newCipl = ciplService.createCipl(cipl);
 //        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
 @PostMapping("/add")
 public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {

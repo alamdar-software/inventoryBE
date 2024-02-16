@@ -157,7 +157,7 @@ public class IncomingStockController {
 //        return ResponseEntity.ok("Incoming Stock added successfully");
 //    }
 // Your API endpoint
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
@@ -299,7 +299,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return responseDTO;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
 
     @GetMapping("/view")
     public ResponseEntity<?> viewAllIncomingStocks() {
@@ -409,14 +409,12 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
 @PostMapping("/searchReport")
 public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
     List<StockViewDto> result = incomingStockService.searchIncomingStock(searchCriteria);
     return ResponseEntity.ok(result);
 }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
 
     @PostMapping("/searchMaster")
     public ResponseEntity<List<StockViewDto>> searchMasterIncomingStock(@RequestBody SearchCriteria searchCriteria) {

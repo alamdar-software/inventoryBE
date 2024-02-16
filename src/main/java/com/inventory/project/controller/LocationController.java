@@ -45,7 +45,7 @@ public class LocationController {
 //        return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
 //    }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PostMapping("/add")
     public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
@@ -72,6 +72,8 @@ public class LocationController {
         return ResponseEntity.ok(locations);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getLocationById(@PathVariable Long id) {
         try {
@@ -86,6 +88,7 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching location: " + e.getMessage());
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("/edit/{id}")
     public ResponseEntity<Location> editLocation(@PathVariable("id") Long id) {
@@ -108,6 +111,7 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion Unsuccessful");
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @PutMapping("/update/{locationId}/addresses/{addressId}")
     public ResponseEntity<Location> updateAddress(
@@ -141,6 +145,7 @@ public class LocationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
 
     @GetMapping("getLocation/{locationId}/{addressId}")
     public ResponseEntity<Object> getAddressByLocationAndAddressId(
