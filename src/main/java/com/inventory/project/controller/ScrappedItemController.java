@@ -160,7 +160,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<ScrappedItem>> searchScrappedByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
@@ -233,6 +233,7 @@ public class ScrappedItemController {
 //
 //        return ResponseEntity.ok(ciplList);
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<ScrappedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {

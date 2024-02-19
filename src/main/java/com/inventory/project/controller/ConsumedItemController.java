@@ -258,7 +258,7 @@ private ConsumeService consumeService;
 //        return ResponseEntity.ok(result);
 //    }
 //}
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {

@@ -236,7 +236,7 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<Cipl>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {

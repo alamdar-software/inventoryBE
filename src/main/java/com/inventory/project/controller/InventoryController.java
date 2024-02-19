@@ -264,6 +264,7 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<Inventory>> searchInventorysByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
@@ -345,6 +346,7 @@ public class InventoryController {
 //        List<ItemInventoryDto> result = inventoryService.searchItemsByLocationAndDescription(searchRequest.getLocationName(), searchRequest.getDescription());
 //        return ResponseEntity.ok(result);
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/searchItem")
 public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {

@@ -410,12 +410,14 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/searchReport")
 public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
     List<StockViewDto> result = incomingStockService.searchIncomingStock(searchCriteria);
     return ResponseEntity.ok(result);
 }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchMaster")
     public ResponseEntity<List<StockViewDto>> searchMasterIncomingStock(@RequestBody SearchCriteria searchCriteria) {

@@ -81,7 +81,7 @@ public class InternalTransferController {
         return updatedTransfer.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<InternalTransfer>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
@@ -113,6 +113,7 @@ public class InternalTransferController {
         return ResponseEntity.ok(mtoList);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<InternalTransfer>> searchITReportByCriteria(@RequestBody SearchCriteria criteria) {

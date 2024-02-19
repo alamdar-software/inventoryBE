@@ -234,6 +234,8 @@ public class MtoController {
 //            return ResponseEntity.ok(result);
 //        }
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
 @PostMapping("/searchReport")
 public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
     List<Mto> result;
