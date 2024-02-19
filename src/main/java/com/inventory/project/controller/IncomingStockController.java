@@ -157,7 +157,7 @@ public class IncomingStockController {
 //        return ResponseEntity.ok("Incoming Stock added successfully");
 //    }
 // Your API endpoint
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
@@ -252,7 +252,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     }
 
 }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> viewIncomingStock(@PathVariable Long id) {
@@ -300,7 +300,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return responseDTO;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<?> viewAllIncomingStocks() {
@@ -345,7 +345,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
         return ResponseEntity.ok("Incoming Stock deleted successfully");
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateIncomingStock(
             @PathVariable Long id,

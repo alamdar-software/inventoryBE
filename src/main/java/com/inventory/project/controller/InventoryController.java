@@ -32,7 +32,7 @@ public class InventoryController {
     @Autowired
     InventoryService inventoryService;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
@@ -116,7 +116,7 @@ public class InventoryController {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //    }
 //}
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updateInventory(@PathVariable Long id, @RequestBody Inventory updatedInventory) {
@@ -182,7 +182,7 @@ public class InventoryController {
 //        totalCountObject.put("totalCount", totalCount);
 //        return totalCountObject;
 //    }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Map<String, Object>>> getAllInventories() {
@@ -204,7 +204,7 @@ public class InventoryController {
 
         return ResponseEntity.ok(inventoryList);
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
@@ -228,7 +228,7 @@ public class InventoryController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<Inventory>> searchInventoryByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {

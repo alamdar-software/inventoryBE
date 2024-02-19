@@ -32,7 +32,7 @@ public class ScrappedItemController {
 
     @Autowired
     private ScrappedItemService scrappedItemService;
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addScrappedItem(@RequestBody ScrappedItem scrappedItem) {
@@ -112,7 +112,7 @@ public class ScrappedItemController {
         scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER','VERIFIER','APPROVAL')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ScrappedItem>> getAllScrappedItems() {
@@ -120,7 +120,7 @@ public class ScrappedItemController {
         return ResponseEntity.ok(scrappedItems);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @GetMapping("/get/{id}")
     public ResponseEntity<ScrappedItem> getScrappedItemById(@PathVariable("id") Long id) {
         Optional<ScrappedItem> scrappedItem = scrappedItemRepository.findById(id);
@@ -137,7 +137,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ScrappedItem> updateScrappedItemById(@PathVariable("id") Long id, @RequestBody ScrappedItem updatedScrappedItem) {

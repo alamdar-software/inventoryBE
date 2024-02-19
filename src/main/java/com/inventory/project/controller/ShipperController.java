@@ -30,7 +30,7 @@ public class ShipperController {
 
     @Autowired
     private LocationRepository locationRepository;
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addAndSaveShipper(@RequestBody @Validated Shipper shipper, BindingResult result, HttpSession session) {
@@ -59,7 +59,7 @@ public class ShipperController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Map<String, Object>> editAndUpdateShipper(@PathVariable("id") Long id,
@@ -102,7 +102,7 @@ public class ShipperController {
 
 
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Shipper>> getAllShippers(
@@ -120,7 +120,7 @@ public class ShipperController {
     }
 
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Shipper> getShipperById(@PathVariable("id") Long id) {

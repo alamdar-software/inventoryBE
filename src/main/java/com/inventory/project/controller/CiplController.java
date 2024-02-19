@@ -203,7 +203,7 @@ public class CiplController {
 //        Cipl newCipl = ciplService.createCipl(cipl);
 //        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/add")
 public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
@@ -221,7 +221,7 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         ciplService.deleteCiplById(id);
         return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Cipl> updateCiplStock(@PathVariable Long id, @RequestBody Cipl  cipl) {

@@ -68,7 +68,7 @@ public class ItemController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //        }
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
@@ -151,7 +151,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
 //        }
 //    }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getItemById(@PathVariable Long id) {
@@ -186,7 +186,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
 //        }
 //    }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Item>> viewAllItems(HttpSession session) {
@@ -202,7 +202,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateItem(@PathVariable("id") Long id, @RequestBody Item itemDetails) {
