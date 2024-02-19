@@ -18,7 +18,7 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @PostMapping("/add")
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
         try {
@@ -31,6 +31,7 @@ public class CategoryController {
             return ResponseEntity.status(500).body("Error saving category");
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getCategoryById(@PathVariable Long id) {
@@ -47,6 +48,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editCategory(@PathVariable("id") Long id, @RequestBody Category category) {
@@ -63,7 +65,7 @@ public class CategoryController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<Page<Category>> viewCategories(@RequestParam(defaultValue = "1") int page,

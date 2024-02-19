@@ -42,7 +42,7 @@ public class CiplController {
         this.ciplService = ciplService;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Cipl>> getAllCipl() {
@@ -131,6 +131,7 @@ public class CiplController {
 //
 //        return ResponseEntity.ok(ciplList);
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
@@ -180,6 +181,7 @@ public class CiplController {
     }
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Cipl> getCiplById(@PathVariable Long id) {
@@ -187,6 +189,8 @@ public class CiplController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
+
     @GetMapping("/createpdf/{id}")
     public ResponseEntity<Cipl> creatPdfById(@PathVariable Long id) {
         return ciplService.getCiplById(id)
@@ -199,7 +203,7 @@ public class CiplController {
 //        Cipl newCipl = ciplService.createCipl(cipl);
 //        return new ResponseEntity<>(newCipl, HttpStatus.CREATED);
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/add")
 public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
@@ -217,6 +221,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         ciplService.deleteCiplById(id);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Cipl> updateCiplStock(@PathVariable Long id, @RequestBody Cipl  cipl) {
         Optional<Cipl> existingBulkStock = ciplService.getCiplById(id);
@@ -230,16 +236,14 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','OTHER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<Cipl>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
         List<Cipl> result;
 
         if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            // Search by date range
             if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName()) || criteria.isRepairService()) {
-                // Search by date range along with other criteria
                 result = ciplService.getMtoByDateRange(
                         criteria.getItem(),
                         criteria.getShipperName(),
@@ -252,7 +256,6 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
                 result = ciplService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
             }
         } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName())) {
-            // Search by either item, consigneeName, or shipperName
             result = ciplService.getConsumedByItemAndLocation(
                     criteria.getItem(),
                     criteria.getShipperName(),
@@ -260,10 +263,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
                     criteria.isRepairService()
             );
         } else if (criteria.isRepairService()) {
-            // Search by repairService only
             result = ciplService.getMtoByRepairService(criteria.isRepairService());
         } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
             return ResponseEntity.badRequest().build();
         }
 

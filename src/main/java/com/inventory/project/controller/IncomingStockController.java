@@ -157,7 +157,7 @@ public class IncomingStockController {
 //        return ResponseEntity.ok("Incoming Stock added successfully");
 //    }
 // Your API endpoint
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
@@ -251,8 +251,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.badRequest().body("Location not found.");
     }
 
-    // ... (rest of your existing code)
 }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> viewIncomingStock(@PathVariable Long id) {
@@ -300,7 +300,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return responseDTO;
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<?> viewAllIncomingStocks() {
@@ -345,7 +345,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
         return ResponseEntity.ok("Incoming Stock deleted successfully");
     }
-    // Update an existing IncomingStock
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateIncomingStock(
             @PathVariable Long id,
@@ -410,12 +410,14 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.ok("Incoming Stock updated successfully");
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
 @PostMapping("/searchReport")
 public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody SearchCriteria searchCriteria) {
     List<StockViewDto> result = incomingStockService.searchIncomingStock(searchCriteria);
     return ResponseEntity.ok(result);
 }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchMaster")
     public ResponseEntity<List<StockViewDto>> searchMasterIncomingStock(@RequestBody SearchCriteria searchCriteria) {

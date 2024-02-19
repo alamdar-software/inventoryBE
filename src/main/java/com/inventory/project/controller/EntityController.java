@@ -24,7 +24,7 @@ public class EntityController {
     @Autowired
     private EntityRepository entityRepository;
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<Entity> addEntity(@RequestBody Entity entity) {
@@ -41,6 +41,7 @@ public class EntityController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEntity);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Entity> updateEntity(@PathVariable("id") Long id, @RequestBody Entity updatedEntity) {
@@ -54,6 +55,7 @@ public class EntityController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Entity> getEntityById(@PathVariable("id") Long id) {
@@ -62,7 +64,7 @@ public class EntityController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Entity>> getAllEntities() {

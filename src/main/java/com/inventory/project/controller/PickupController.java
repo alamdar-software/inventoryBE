@@ -24,13 +24,14 @@ public class PickupController {
     private PickupRepository pickupRepository;
 
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("get/{id}")
     public ResponseEntity<Pickup> getPickupById(@PathVariable("id") Long id) {
         Optional<Pickup> pickup = pickupRepository.findById(id);
         return pickup.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<Pickup>> getAllPickups(
@@ -46,7 +47,7 @@ public class PickupController {
             return ResponseEntity.noContent().build();
         }
     }
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> createPickup(@RequestBody Pickup pickup) {
@@ -62,6 +63,7 @@ public class PickupController {
         return ResponseEntity.ok(newPickup);
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<Pickup> updatePickup(@PathVariable("id") Long id, @RequestBody Pickup pickupDetails) {

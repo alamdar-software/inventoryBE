@@ -25,7 +25,7 @@ public class CurrencyController {
 
     @Autowired
     private CurrencyRepository currencyRepo;
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<Currency> create(@RequestBody Currency currency) {
@@ -36,6 +36,7 @@ public class CurrencyController {
         Currency currency1 = currencyRepo.save(currency);
         return ResponseEntity.ok(currency1);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getCurrencyById(@PathVariable Long id) {
@@ -68,6 +69,8 @@ public class CurrencyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving currency: " + e.getMessage());
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
     @PutMapping("/update/{id}")public ResponseEntity<String> updateCurrency(@PathVariable("id") Long id, @RequestBody Currency currency) {
         try {        Optional<Currency> existingCurrency = currencyRepo.findById(id);
             if (existingCurrency.isPresent()) {
@@ -78,7 +81,7 @@ public class CurrencyController {
             }    } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)                .body("Error updating currency: " + e.getMessage());
         }}
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> viewCurrencies(@RequestParam(defaultValue = "0") int page) {

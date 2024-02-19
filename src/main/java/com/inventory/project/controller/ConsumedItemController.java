@@ -38,7 +38,7 @@ public class ConsumedItemController {
 @Autowired
 private ConsumeService consumeService;
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
@@ -119,7 +119,7 @@ private ConsumeService consumeService;
         return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
     }
 
-    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
     public ResponseEntity<List<ConsumedItem>> getAllConsumedItems() {
@@ -129,6 +129,8 @@ private ConsumeService consumeService;
         }
         return ResponseEntity.ok(consumedItems);
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
     @GetMapping("/get/{id}")
     public ResponseEntity<ConsumedItem> getConsumedItemById(@PathVariable("id") Long id) {
         Optional<ConsumedItem> consumedItem = consumedItemRepo.findById(id);
@@ -136,6 +138,7 @@ private ConsumeService consumeService;
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateConsumedItemById(@PathVariable Long id, @RequestBody ConsumedItem updatedConsumedItem) {
@@ -174,6 +177,7 @@ private ConsumeService consumeService;
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
     public ResponseEntity<List<ConsumedItem>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
@@ -254,6 +258,7 @@ private ConsumeService consumeService;
 //        return ResponseEntity.ok(result);
 //    }
 //}
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {

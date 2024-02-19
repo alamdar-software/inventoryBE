@@ -50,12 +50,12 @@ public class BrandController {
 //        return ResponseEntity.ok(response);
 //    }
 @GetMapping("/view")
-@PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 public ResponseEntity<List<Brand>> viewAllBrands() {
     List<Brand> brandList = brandRepository.findAll();
     return ResponseEntity.ok(brandList);
 }
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'PREPARER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
     public ResponseEntity<Object> addAndSaveBrand(@RequestBody @Validated Brand brand, BindingResult result, HttpSession session) {
@@ -95,6 +95,8 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
         model.addAttribute("totalPages", list.getTotalPages());
         model.addAttribute("totalItems", list.getTotalElements());
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<Object> editAndUpdateBrand(
             @PathVariable("id") Long id,
@@ -138,6 +140,7 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getBrandById(@PathVariable Long id) {
