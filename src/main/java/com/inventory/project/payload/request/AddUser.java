@@ -74,4 +74,5 @@ public class AddUser {
     public void setContactNumber(Long contactNumber) {
         this.contactNumber = contactNumber;
     }
+
 }
