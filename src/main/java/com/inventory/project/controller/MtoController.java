@@ -277,5 +277,90 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
     }
 }
 
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Mto> updateMto(@PathVariable Long id, @RequestBody Mto updatedMto, @RequestParam(required = false) String action) {
+        Optional<Mto> existingMtoOptional = mtoService.getMtoById(id);
+        if (existingMtoOptional.isPresent()) {
+            Mto existingMto = existingMtoOptional.get();
 
+            // Update all fields of the existing Mto entity with the values from the updated Mto entity
+            existingMto.setLocationName(updatedMto.getLocationName());
+            existingMto.setTransferDate(updatedMto.getTransferDate());
+            existingMto.setConsigneeName(updatedMto.getConsigneeName());
+            existingMto.setRepairService(updatedMto.isRepairService());
+            existingMto.setQuantity(updatedMto.getQuantity());
+            existingMto.setPurchase(updatedMto.getPurchase());
+            existingMto.setPn(updatedMto.getPn());
+            existingMto.setSn(updatedMto.getSn());
+            existingMto.setDescription(updatedMto.getDescription());
+            existingMto.setSubLocation(updatedMto.getSubLocation());
+            existingMto.setRemarks(updatedMto.getRemarks());
+            existingMto.setReferenceNo(updatedMto.getReferenceNo());
+            existingMto.setStatus(updatedMto.getStatus());
+            // Add other fields of Mto entity that need to be updated
+
+            // Set the referenceNo field
+            String locationName = updatedMto.getLocationName();
+            int referenceNumber = mtoService.getNextReferenceNumber(locationName);
+            String formattedReferenceNumber = mtoService.generateReferenceNumber(locationName, referenceNumber);
+            existingMto.setReferenceNo(formattedReferenceNumber);
+
+            // Check if action is provided (verify or reject)
+            if (action != null && !action.isEmpty()) {
+                if (action.equalsIgnoreCase("verify")) {
+                    existingMto.setStatus("verified");
+                } else if (action.equalsIgnoreCase("reject")) {
+                    existingMto.setStatus("rejected");
+                }
+            } else {
+                // If no action is provided, update the status from the updated Mto entity
+                existingMto.setStatus(updatedMto.getStatus());
+            }
+
+            // Save the updated Mto entity
+            Mto updatedMtoEntity = mtoService.updateMto(existingMto);
+
+            // Return the updated Mto entity including referenceNo
+            return ResponseEntity.ok(updatedMtoEntity);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/created")
+    public ResponseEntity<List<Mto>> getCreatedMtos() {
+        try {
+            List<Mto> createdMtos = mtoRepository.findByStatus("Created");
+            if (createdMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(createdMtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping("/verified")
+    public ResponseEntity<List<Mto>> getVerifiedMtos() {
+        try {
+            List<Mto> verifiedMtos = mtoRepository.findByStatus("Verified");
+            if (verifiedMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(verifiedMtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<Mto>> getRejectedMtos() {
+        try {
+            List<Mto> rejectedMtos = mtoRepository.findByStatus("Rejected");
+            if (rejectedMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(rejectedMtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

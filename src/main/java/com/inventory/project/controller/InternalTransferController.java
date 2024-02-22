@@ -3,6 +3,7 @@ package com.inventory.project.controller;
 import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
+import com.inventory.project.repository.InternalTransferRepo;
 import com.inventory.project.serviceImpl.InternalTransferService;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,13 @@ import java.util.*;
 public class InternalTransferController {
     private final InternalTransferService internalTransferService;
 
+    private InternalTransferRepo internalTransferRepo;
     @Autowired
-    public InternalTransferController(InternalTransferService internalTransferService) {
+    public InternalTransferController(InternalTransferService internalTransferService, InternalTransferRepo internalTransferRepo) {
         this.internalTransferService = internalTransferService;
+        this.internalTransferRepo = internalTransferRepo;
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
@@ -151,5 +155,86 @@ public class InternalTransferController {
         }
     }
 
+    @PutMapping("/status/{id}")
+    public ResponseEntity<InternalTransfer> updateInternalTransferStatus(@PathVariable Long id, @RequestBody InternalTransfer updatedInternalTransfer, @RequestParam(required = false) String action) {
+        Optional<InternalTransfer> existingInternalTransferOptional = internalTransferService.getInternalTransferById(id);
+        if (existingInternalTransferOptional.isPresent()) {
+            InternalTransfer existingInternalTransfer = existingInternalTransferOptional.get();
 
+            // Update all fields of the existing InternalTransfer entity with the values from the updated InternalTransfer entity
+            existingInternalTransfer.setLocationName(updatedInternalTransfer.getLocationName());
+            existingInternalTransfer.setTransferDate(updatedInternalTransfer.getTransferDate());
+            existingInternalTransfer.setDestination(updatedInternalTransfer.getDestination());
+            existingInternalTransfer.setSubLocation(updatedInternalTransfer.getSubLocation());
+            existingInternalTransfer.setDescription(updatedInternalTransfer.getDescription());
+            existingInternalTransfer.setSn(updatedInternalTransfer.getSn());
+            existingInternalTransfer.setPartNumber(updatedInternalTransfer.getPartNumber());
+            existingInternalTransfer.setPurchase(updatedInternalTransfer.getPurchase());
+            existingInternalTransfer.setQuantity(updatedInternalTransfer.getQuantity());
+            existingInternalTransfer.setRemarks(updatedInternalTransfer.getRemarks());
+
+            // Set the referenceNo field
+            String locationName = updatedInternalTransfer.getLocationName();
+            int referenceNumber = internalTransferService.getNextReferenceNumber(locationName);
+            String formattedReferenceNumber = internalTransferService.generateReferenceNumber(locationName, referenceNumber);
+            existingInternalTransfer.setReferenceNo(formattedReferenceNumber);
+
+            // Check if action is provided (verify or reject)
+            if (action != null && !action.isEmpty()) {
+                if (action.equalsIgnoreCase("verify")) {
+                    existingInternalTransfer.setStatus("verified");
+                } else if (action.equalsIgnoreCase("reject")) {
+                    existingInternalTransfer.setStatus("rejected");
+                }
+            } else {
+                // If no action is provided, update the status from the updated InternalTransfer entity
+                existingInternalTransfer.setStatus(updatedInternalTransfer.getStatus());
+            }
+
+            // Save the updated InternalTransfer entity
+            InternalTransfer updatedInternalTransferEntity = internalTransferService.updateIT(existingInternalTransfer);
+
+            // Return the updated InternalTransfer entity including referenceNo
+            return ResponseEntity.ok(updatedInternalTransferEntity);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/created")
+    public ResponseEntity<List<InternalTransfer>> getCreatedInternalTransfers() {
+        try {
+            List<InternalTransfer> createdTransfers = internalTransferRepo.findByStatus("Created");
+            if (createdTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(createdTransfers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping("/verified")
+    public ResponseEntity<List<InternalTransfer>> getVerifiedInternalTransfers() {
+        try {
+            List<InternalTransfer> verifiedTransfers = internalTransferRepo.findByStatus("Verified");
+            if (verifiedTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(verifiedTransfers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<InternalTransfer>> getRejectedInternalTransfers() {
+        try {
+            List<InternalTransfer> rejectedTransfers = internalTransferRepo.findByStatus("Rejected");
+            if (rejectedTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(rejectedTransfers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
