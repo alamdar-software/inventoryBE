@@ -48,6 +48,9 @@ public class CiplService {
         ciplRepository.deleteById(id);
     }
 
+    public Cipl updateCipl(Cipl cipl) {
+        return ciplRepository.save(cipl);
+    }
 
     // Other methods for CRUD operations...
 //    public List<Cipl> getCiplByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
@@ -98,6 +101,8 @@ public class CiplService {
 
     @Transactional
     public Cipl createCipl(Cipl cipl) {
+        cipl.setStatus("Created");
+
         String locationName = cipl.getLocationName();
 
         int referenceNumber;
@@ -135,11 +140,11 @@ public class CiplService {
     }
 
 
-    private int getNextReferenceNumber(String locationName) {
+    public int getNextReferenceNumber(String locationName) {
         return locationReferenceMap.getOrDefault(locationName, 1);
     }
 
-    private String generateReferenceNumber(String locationName, int referenceNumber) {
+    public String generateReferenceNumber(String locationName, int referenceNumber) {
         int year = LocalDate.now().getYear();
         return String.format("%s_%d_%04d", locationName, year, referenceNumber);
     }

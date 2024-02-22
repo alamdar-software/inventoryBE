@@ -274,7 +274,79 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             return ResponseEntity.ok(result);
         }
     }
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Cipl> updateCipl(@PathVariable Long id, @RequestBody Cipl updatedCipl, @RequestParam(required = false) String action) {
+        Optional<Cipl> existingCiplOptional = ciplService.getCiplById(id);
+        if (existingCiplOptional.isPresent()) {
+            Cipl existingCipl = existingCiplOptional.get();
 
+            // Update all fields of the existing CIPL entity with the values from the updated CIPL entity
+            existingCipl.setCurrencyRate(updatedCipl.getCurrencyRate());
+            existingCipl.setRepairService(updatedCipl.getRepairService());
+            existingCipl.setTransferDate(updatedCipl.getTransferDate());
+            existingCipl.setShipperName(updatedCipl.getShipperName());
+            existingCipl.setConsigneeName(updatedCipl.getConsigneeName());
+            existingCipl.setLocationName(updatedCipl.getLocationName());
+            existingCipl.setPickupAddress(updatedCipl.getPickupAddress());
+            existingCipl.setCurrencyName(updatedCipl.getCurrencyName());
+            existingCipl.setItemName(updatedCipl.getItemName());
+            existingCipl.setHs(updatedCipl.getHs());
+            existingCipl.setSn(updatedCipl.getSn());
+            existingCipl.setDimension(updatedCipl.getDimension());
+            existingCipl.setRemarks(updatedCipl.getRemarks());
+            existingCipl.setPackageName(updatedCipl.getPackageName());
+            existingCipl.setCor(updatedCipl.getCor());
+            existingCipl.setWeights(updatedCipl.getWeights());
+            existingCipl.setAmount(updatedCipl.getAmount());
+            existingCipl.setItem(updatedCipl.getItem());
+            existingCipl.setPurchase(updatedCipl.getPurchase());
+            existingCipl.setBrand(updatedCipl.getBrand());
+            existingCipl.setUnitPrice(updatedCipl.getUnitPrice());
+            existingCipl.setPo(updatedCipl.getPo());
+            existingCipl.setSubLocations(updatedCipl.getSubLocations());
+            existingCipl.setDate(updatedCipl.getDate());
+            existingCipl.setPartNo(updatedCipl.getPartNo());
+            existingCipl.setQuantity(updatedCipl.getQuantity());
+            existingCipl.setTransferType(updatedCipl.getTransferType());
 
+            // Set the referenceNo field
+            String locationName = updatedCipl.getLocationName();
+            int referenceNumber = ciplService.getNextReferenceNumber(locationName);
+            String formattedReferenceNumber = ciplService.generateReferenceNumber(locationName, referenceNumber);
+            existingCipl.setReferenceNo(formattedReferenceNumber);
+
+            // Check if action is provided (verify or reject)
+            if (action != null && !action.isEmpty()) {
+                if (action.equalsIgnoreCase("verify")) {
+                    existingCipl.setStatus("verified");
+                } else if (action.equalsIgnoreCase("reject")) {
+                    existingCipl.setStatus("rejected");
+                }
+            } else {
+                // If no action is provided, update the status from the updated CIPL entity
+                existingCipl.setStatus(updatedCipl.getStatus());
+            }
+
+            // Save the updated CIPL entity
+            Cipl updatedCiplEntity = ciplService.updateCipl(existingCipl);
+
+            // Return the updated CIPL entity including referenceNo
+            return ResponseEntity.ok(updatedCiplEntity);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/created")
+    public ResponseEntity<List<Cipl>> getCreatedCiplItems() {
+        try {
+            List<Cipl> createdCiplItems = ciplRepository.findByStatus("Created");
+            if (createdCiplItems.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(createdCiplItems, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

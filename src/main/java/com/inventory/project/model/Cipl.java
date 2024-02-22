@@ -124,6 +124,7 @@ public class Cipl {
     private String totalPackage;
     private String totalAmount;
 
+    private String status;
     public Long getId() {
         return id;
     }
@@ -385,5 +386,13 @@ public class Cipl {
 
     public void setTransferType(String transferType) {
         this.transferType = transferType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
