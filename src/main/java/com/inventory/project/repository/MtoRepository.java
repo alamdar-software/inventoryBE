@@ -77,4 +77,6 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByLocationNameAndTransferDateBetweenAndDescription(String locationName, LocalDate startDate, LocalDate endDate, String description);
     @Query("SELECT m FROM Mto m WHERE m.locationName = :locationName AND :description MEMBER OF m.description")
     List<Mto> findByLocationNameAndDescription(String locationName, String description);
+
+    List<Mto> findByStatus(String created);
 }

@@ -1,5 +1,6 @@
 package com.inventory.project.serviceImpl;
 
+import com.inventory.project.model.Cipl;
 import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
@@ -31,7 +32,9 @@ public class InternalTransferService {
         return internalTransferRepository.findById(id);
     }
 
-
+    public InternalTransfer updateIT(InternalTransfer internalTransfer) {
+        return internalTransferRepository.save(internalTransfer);
+    }
 
     public void deleteInternalTransferById(Long id) {
         internalTransferRepository.deleteById(id);
@@ -63,6 +66,8 @@ public class InternalTransferService {
     }
     @Transactional
     public InternalTransfer createInternalTransfer(InternalTransfer internalTransfer) {
+        internalTransfer.setStatus("Created");
+
         String locationName = internalTransfer.getLocationName();
 
         int referenceNumber;
@@ -100,11 +105,11 @@ public class InternalTransferService {
     }
 
 
-    private int getNextReferenceNumber(String locationName) {
+    public int getNextReferenceNumber(String locationName) {
         return locationReferenceMap.getOrDefault(locationName, 1);
     }
 
-    private String generateReferenceNumber(String locationName, int referenceNumber) {
+    public String generateReferenceNumber(String locationName, int referenceNumber) {
         int year = LocalDate.now().getYear();
         return String.format("%s_%d_%04d", locationName, year, referenceNumber);
     }
@@ -323,4 +328,6 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
 
     public List<InternalTransfer> searchByLocationNameAndDescription(String description, String locationName) {
        return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);}
+
+
 }

@@ -39,13 +39,17 @@ public class MtoService {
         mtoRepository.deleteById(id);
     }
 
-
+    public Mto updateMto(Mto mto) {
+        return mtoRepository.save(mto);
+    }
 //    public List<Mto> getMtoByItemAndLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
 //        return mtoRepository.findByItemInAndLocationNameAndTransferDate(item, locationName, transferDate);
 //    }
 
     @Transactional
     public Mto createMto(Mto mto) {
+        mto.setStatus("Created");
+
         String locationName = mto.getLocationName();
 
         int referenceNumber;
@@ -83,11 +87,11 @@ public class MtoService {
     }
 
 
-    private int getNextReferenceNumber(String locationName) {
+    public int getNextReferenceNumber(String locationName) {
         return locationReferenceMap.getOrDefault(locationName, 1);
     }
 
-    private String generateReferenceNumber(String locationName, int referenceNumber) {
+    public String generateReferenceNumber(String locationName, int referenceNumber) {
         int year = LocalDate.now().getYear();
         return String.format("%s_%d_%04d", locationName, year, referenceNumber);
     }

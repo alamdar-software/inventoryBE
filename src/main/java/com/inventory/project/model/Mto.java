@@ -59,6 +59,7 @@ public class Mto {
     @Column(name="reference_no")
     private String referenceNo;
 
+    private String status;
     public Mto() {
     }
 
@@ -172,5 +173,13 @@ public class Mto {
 
     public List<String> getDescription() {
         return description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
