@@ -349,4 +349,29 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
+    @GetMapping("/verified")
+    public ResponseEntity<List<Cipl>> getVerifiedCiplItems() {
+        try {
+            List<Cipl> verifiedCiplItems = ciplRepository.findByStatus("Verified");
+            if (verifiedCiplItems.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(verifiedCiplItems, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/rejected")
+    public ResponseEntity<List<Cipl>> getRejectedCiplItems() {
+        try {
+            List<Cipl> rejectedCiplItems = ciplRepository.findByStatus("Rejected");
+            if (rejectedCiplItems.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(rejectedCiplItems, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
