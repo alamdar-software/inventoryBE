@@ -32,7 +32,7 @@ public class IncomingStockRequest {
     private String storeNo;
     private String entityName; // ID for Entity entity
     private String currencyName;
-
+    private String status;
 //    @OneToMany(mappedBy = "incomingStockRequest", cascade = CascadeType.ALL)
 //    private List<BulkStock> bulkStocks;
     public IncomingStockRequest() {
@@ -228,6 +228,11 @@ public class IncomingStockRequest {
         this.setInventory(inventory);
     }
 
+    public String getStatus() {
+        return status;
+    }
 
-
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

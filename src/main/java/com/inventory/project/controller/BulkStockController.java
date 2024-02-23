@@ -235,5 +235,193 @@ IncomingStockRepo incomingStockRepo;
         return ResponseEntity.ok(result);
     }
 
+//    @PutMapping("/status/{id}")
+//    public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates) {
+//        Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
+//        Optional<IncomingStock> existingIncomingStock = incomingStockService.getById(id);
+//
+//        if (existingBulkStock.isPresent()) {
+//            BulkStock existingBulk = existingBulkStock.get();
+//            updateBulkStock(existingBulk, stockUpdates);
+//            BulkStock updatedBulkStock = bulkStockService.save(existingBulk);
+//            return ResponseEntity.ok(updatedBulkStock);
+//        } else if (existingIncomingStock.isPresent()) {
+//            IncomingStock existingIncoming = existingIncomingStock.get();
+//            updateIncomingStock(existingIncoming, stockUpdates);
+//            IncomingStock updatedIncomingStock = incomingStockService.save(existingIncoming);
+//            return ResponseEntity.ok(updatedIncomingStock);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+//
+//    private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates) {
+//
+//        bulkStock.setLocationName((String) updates.get("locationName"));
+//        bulkStock.setAddress((String) updates.get("address"));
+//        bulkStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+//        bulkStock.setRemarks((String) updates.get("remarks"));
+//        bulkStock.setDate(LocalDate.parse((String) updates.get("date")));
+//        bulkStock.setUnitCost((List<Double>) updates.get("unitCost"));
+//        bulkStock.setName((List<String>) updates.get("name"));
+//        bulkStock.setQuantity((List<Integer>) updates.get("quantity"));
+//        bulkStock.setItem((List<String>) updates.get("item"));
+//        bulkStock.setBrandName((List<String>) updates.get("brandName"));
+//        bulkStock.setPrice((List<Double>) updates.get("price"));
+//        bulkStock.setUnitName((List<String>) updates.get("unitName"));
+//        bulkStock.setStandardPrice((List<Double>) updates.get("standardPrice"));
+//        bulkStock.setExtendedValue((List<Double>) updates.get("extendedValue"));
+//        bulkStock.setSn((List<String>) updates.get("sn"));
+//        bulkStock.setPn((List<String>) updates.get("pn"));
+//        bulkStock.setEntityName((List<String>) updates.get("entityName"));
+//        bulkStock.setStoreNo((List<String>) updates.get("storeNo"));
+//        bulkStock.setImpaCode((List<String>) updates.get("impaCode"));
+//        bulkStock.setDescription((List<String>) updates.get("description"));
+//        bulkStock.setStatus((String) updates.get("status")); // Update status field
+//
+//
+//    }
+//
+//    private void updateIncomingStock(IncomingStock incomingStock, Map<String, Object> updates) {
+//        incomingStock.setQuantity((Integer) updates.get("quantity"));
+//        incomingStock.setUnitCost((Double) updates.get("unitCost"));
+//        incomingStock.setExtendedValue((Double) updates.get("extendedValue"));
+//        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
+//        incomingStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+//        incomingStock.setPn((String) updates.get("pn"));
+//        incomingStock.setSn((String) updates.get("sn"));
+//        incomingStock.setPrice((Double) updates.get("price"));
+//        incomingStock.setRemarks((String) updates.get("remarks"));
+//        incomingStock.setStandardPrice((Double) updates.get("standardPrice"));
+//        incomingStock.setImpaCode((String) updates.get("impaCode"));
+//        incomingStock.setStoreNo((String) updates.get("storeNo"));
+//        incomingStock.setStatus((String) updates.get("status")); // Update status field
+//
+//        // You may add more fields here if needed
+//    }
+@PutMapping("/status/{id}")
+public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates, @RequestParam(required = false) String action) {
+    Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
+    Optional<IncomingStock> existingIncomingStock = incomingStockService.getById(id);
+
+    if (existingBulkStock.isPresent()) {
+        BulkStock existingBulk = existingBulkStock.get();
+        updateBulkStock(existingBulk, stockUpdates, action); // Pass action parameter
+        BulkStock updatedBulkStock = bulkStockService.save(existingBulk);
+        return ResponseEntity.ok(updatedBulkStock);
+    } else if (existingIncomingStock.isPresent()) {
+        IncomingStock existingIncoming = existingIncomingStock.get();
+        updateIncomingStock(existingIncoming, stockUpdates, action); // Pass action parameter
+        IncomingStock updatedIncomingStock = incomingStockService.save(existingIncoming);
+        return ResponseEntity.ok(updatedIncomingStock);
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
+
+    private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
+        // Set all fields similar to updateStockStatus
+        bulkStock.setLocationName((String) updates.get("locationName"));
+        bulkStock.setAddress((String) updates.get("address"));
+        bulkStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+        bulkStock.setRemarks((String) updates.get("remarks"));
+        bulkStock.setDate(LocalDate.parse((String) updates.get("date")));
+        bulkStock.setUnitCost((List<Double>) updates.get("unitCost"));
+        bulkStock.setName((List<String>) updates.get("name"));
+        bulkStock.setQuantity((List<Integer>) updates.get("quantity"));
+        bulkStock.setItem((List<String>) updates.get("item"));
+        bulkStock.setBrandName((List<String>) updates.get("brandName"));
+        bulkStock.setPrice((List<Double>) updates.get("price"));
+        bulkStock.setUnitName((List<String>) updates.get("unitName"));
+        bulkStock.setStandardPrice((List<Double>) updates.get("standardPrice"));
+        bulkStock.setExtendedValue((List<Double>) updates.get("extendedValue"));
+        bulkStock.setSn((List<String>) updates.get("sn"));
+        bulkStock.setPn((List<String>) updates.get("pn"));
+        bulkStock.setEntityName((List<String>) updates.get("entityName"));
+        bulkStock.setStoreNo((List<String>) updates.get("storeNo"));
+        bulkStock.setImpaCode((List<String>) updates.get("impaCode"));
+        bulkStock.setDescription((List<String>) updates.get("description"));
+
+        // Update status based on action
+        if (action != null && !action.isEmpty()) {
+            if (action.equalsIgnoreCase("verify")) {
+                bulkStock.setStatus("verified");
+            } else if (action.equalsIgnoreCase("reject")) {
+                bulkStock.setStatus("rejected");
+            }
+        } else {
+            // If no action is provided, update the status from the updates map
+            bulkStock.setStatus((String) updates.get("status"));
+        }
+    }
+
+    private void updateIncomingStock(IncomingStock incomingStock, Map<String, Object> updates, String action) {
+        // Set all fields similar to updateStockStatus
+        incomingStock.setQuantity((Integer) updates.get("quantity"));
+        incomingStock.setUnitCost((Double) updates.get("unitCost"));
+        incomingStock.setExtendedValue((Double) updates.get("extendedValue"));
+        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
+        incomingStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+        incomingStock.setPn((String) updates.get("pn"));
+        incomingStock.setSn((String) updates.get("sn"));
+        incomingStock.setPrice((Double) updates.get("price"));
+        incomingStock.setRemarks((String) updates.get("remarks"));
+        incomingStock.setStandardPrice((Double) updates.get("standardPrice"));
+        incomingStock.setImpaCode((String) updates.get("impaCode"));
+        incomingStock.setStoreNo((String) updates.get("storeNo"));
+
+        // Update status based on action
+        if (action != null && !action.isEmpty()) {
+            if (action.equalsIgnoreCase("verify")) {
+                incomingStock.setStatus("verified");
+            } else if (action.equalsIgnoreCase("reject")) {
+                incomingStock.setStatus("rejected");
+            }
+        } else {
+            // If no action is provided, update the status from the updates map
+            incomingStock.setStatus((String) updates.get("status"));
+        }
+    }
+
+    @GetMapping("/created")
+    public ResponseEntity<List<Object>> getCreatedStocks() {
+        try {
+            List<Object> createdStocks = new ArrayList<>();
+
+            createdStocks.addAll(incomingStockRepo.findByStatus("created"));
+            createdStocks.addAll(bulkStockRepo.findByStatus("created"));
+
+            return ResponseEntity.ok(createdStocks);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    @GetMapping("/verified")
+    public ResponseEntity<List<Object>> getVerifiedStocks() {
+        try {
+            List<Object> stocks = new ArrayList<>();
+            stocks.addAll(incomingStockRepo.findByStatus("verified"));
+            stocks.addAll(bulkStockRepo.findByStatus("verified"));
+            return ResponseEntity.ok(stocks);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<Object>> getRejectedStocks() {
+        try {
+            List<Object> stocks = new ArrayList<>();
+            stocks.addAll(incomingStockRepo.findByStatus("rejected"));
+            stocks.addAll(bulkStockRepo.findByStatus("rejected"));
+            return ResponseEntity.ok(stocks);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 }

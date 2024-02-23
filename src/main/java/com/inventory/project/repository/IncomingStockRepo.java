@@ -77,4 +77,5 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     List<IncomingStock> findByLocation_LocationNameAndDateBetween(String locationName, LocalDate startDate, LocalDate endDate);
 
 
+    List<IncomingStock> findByStatusIgnoreCase(String created);
 }
