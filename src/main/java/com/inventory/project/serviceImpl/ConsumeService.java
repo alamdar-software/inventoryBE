@@ -2,6 +2,7 @@ package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.Cipl;
 import com.inventory.project.model.ConsumedItem;
+import com.inventory.project.model.InternalTransfer;
 import com.inventory.project.repository.ConsumedItemRepo;
 import com.inventory.project.repository.InventoryRepository;
 import io.micrometer.common.util.StringUtils;
@@ -11,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 //import org.apache.poi.ss.usermodel.*;
@@ -31,8 +29,12 @@ public class ConsumeService {
 
     @Autowired
     private ConsumedItemRepo consumedItemRepo;
-
-
+    public ConsumedItem updateConsumedItem(ConsumedItem consumedItem) {
+        return consumedItemRepo.save(consumedItem);
+    }
+        public Optional<ConsumedItem> getConsumedItemById(Long id) {
+        return consumedItemRepo.findById(id);
+    }
     public List<ConsumedItem> getCiplByItemAndLocation(String item, String locationName) {
         return consumedItemRepo.findByItemAndLocationName(item, locationName);
     }

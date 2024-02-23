@@ -104,7 +104,7 @@ private ConsumeService consumeService;
                     consumed.setItem(Collections.singletonList(itemName));
                     consumed.setSubLocations(Collections.singletonList(subLocation));
                     consumed.setQuantity(Collections.singletonList(quantity));
-
+                    consumed.setStatus("created");
                     consumedItems.add(consumed);
 
                 } else {
@@ -286,5 +286,84 @@ private ConsumeService consumeService;
             return ResponseEntity.ok(result);
         }
     }
+    @PutMapping("/status/{id}")
+    public ResponseEntity<?> updateConsumedItemStatus(
+            @PathVariable Long id,
+            @RequestBody ConsumedItem updatedConsumedItem,
+            @RequestParam(required = false) String action) {
+        Optional<ConsumedItem> existingConsumedItemOptional = consumeService.getConsumedItemById(id);
+        if (existingConsumedItemOptional.isPresent()) {
+            ConsumedItem existingConsumedItem = existingConsumedItemOptional.get();
 
+            // Update all fields of the existing ConsumedItem entity with the values from the updated ConsumedItem entity
+            existingConsumedItem.setLocationName(updatedConsumedItem.getLocationName());
+            existingConsumedItem.setTransferDate(updatedConsumedItem.getTransferDate());
+            existingConsumedItem.setSn(updatedConsumedItem.getSn());
+            existingConsumedItem.setPartNo(updatedConsumedItem.getPartNo());
+            existingConsumedItem.setRemarks(updatedConsumedItem.getRemarks());
+            existingConsumedItem.setDate(updatedConsumedItem.getDate());
+            existingConsumedItem.setItem(updatedConsumedItem.getItem());
+            existingConsumedItem.setSubLocations(updatedConsumedItem.getSubLocations());
+            existingConsumedItem.setQuantity(updatedConsumedItem.getQuantity());
+
+            // Check if action is provided (verify or reject)
+            if (action != null && !action.isEmpty()) {
+                if (action.equalsIgnoreCase("verify")) {
+                    existingConsumedItem.setStatus("verified");
+                } else if (action.equalsIgnoreCase("reject")) {
+                    existingConsumedItem.setStatus("rejected");
+                }
+            } else {
+                // If no action is provided, update the status from the updated InternalTransfer entity
+                existingConsumedItem.setStatus(updatedConsumedItem.getStatus());
+            }
+
+            // Save the updated ConsumedItem entity
+            ConsumedItem updatedConsumedItemEntity = consumeService.updateConsumedItem(existingConsumedItem);
+
+            // Return the updated ConsumedItem entity
+            return ResponseEntity.ok(updatedConsumedItemEntity);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/created")
+    public ResponseEntity<List<ConsumedItem>> getCreatedConsumedItems() {
+        try {
+            List<ConsumedItem> createdItems = consumedItemRepo.findByStatus("created");
+            if (createdItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(createdItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/verified")
+    public ResponseEntity<List<ConsumedItem>> getVerifiedConsumedItems() {
+        try {
+            List<ConsumedItem> verifiedItems = consumedItemRepo.findByStatus("verified");
+            if (verifiedItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(verifiedItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<ConsumedItem>> getRejectedConsumedItems() {
+        try {
+            List<ConsumedItem> rejectedItems = consumedItemRepo.findByStatus("rejected");
+            if (rejectedItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(rejectedItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

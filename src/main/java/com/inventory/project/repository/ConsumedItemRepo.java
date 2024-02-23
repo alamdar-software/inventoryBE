@@ -32,4 +32,6 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
     List<ConsumedItem> findByItemAndLocationNameAndTransferDateBetween(String item, String locationName, LocalDate startDate, LocalDate endDate);
 
     boolean existsByItemAndLocationName(String item, String locationName);
+
+    List<ConsumedItem> findByStatus(String created);
 }

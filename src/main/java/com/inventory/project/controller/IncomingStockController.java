@@ -175,6 +175,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 //    incomingStock.setStatus(incomingStockRequest.getStatus());
     incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
     incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+    incomingStock.setStatus("Created");
 
     Item item = new Item();
     item.setDescription(incomingStockRequest.getDescription());

@@ -35,6 +35,7 @@ public class BulkService {
     }
     @Transactional
     public BulkStock createBulk(BulkStock bulkStock) {
+        bulkStock.setStatus("Created");
         BulkStock savedBulkStock = bulkStockRepo.save(bulkStock);
         bulkStockRepo.flush();
         return savedBulkStock;

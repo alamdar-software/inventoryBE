@@ -101,6 +101,7 @@ public class IncomingStock {
     @JoinColumn(name = "entity_id")
     private Entity entity;
 
+
     public IncomingStock() {
     }
 
