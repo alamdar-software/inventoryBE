@@ -175,6 +175,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 //    incomingStock.setStatus(incomingStockRequest.getStatus());
     incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
     incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+    incomingStock.setStatus("Created");
 
     Item item = new Item();
     item.setDescription(incomingStockRequest.getDescription());
@@ -238,6 +239,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             responseDTO.setImpaCode(incomingStockRequest.getImpaCode());
             responseDTO.setStoreNo(incomingStockRequest.getStoreNo());
             responseDTO.setEntityName(incomingStockRequest.getEntityName());
+            responseDTO.setStatus("Created");
 
 
             // Return the DTO object within ResponseEntity.ok

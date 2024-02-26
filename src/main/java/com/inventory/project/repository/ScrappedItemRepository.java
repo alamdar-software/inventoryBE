@@ -31,4 +31,6 @@ public interface ScrappedItemRepository extends JpaRepository<ScrappedItem,Long>
     boolean existsByItemAndLocationName(String item, String locationName);
 
     List<ScrappedItem> findByItemAndLocationNameAndTransferDateBetween(String item, String locationName, LocalDate startDate, LocalDate endDate);
+
+    List<ScrappedItem> findByStatus(String created);
 }

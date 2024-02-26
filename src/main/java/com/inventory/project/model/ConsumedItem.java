@@ -44,7 +44,7 @@ private Inventory inventory;
 //    public ConsumedItem() {
 //        this.item = new ArrayList<>();
 //    }
-
+private String status;
     public Long getId() {
         return id;
     }
@@ -144,5 +144,11 @@ private Inventory inventory;
         this.inventory = inventory;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

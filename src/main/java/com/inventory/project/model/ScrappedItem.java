@@ -39,6 +39,8 @@ public class ScrappedItem {
     @ManyToOne
     private Inventory inventory;
 
+    private String status;
+
     public Long getId() {
         return id;
     }
@@ -125,5 +127,13 @@ public class ScrappedItem {
 
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

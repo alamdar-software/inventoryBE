@@ -75,6 +75,7 @@ public class BulkStock {
    @ElementCollection
    private List<String> description = new ArrayList<>();
 
+   private  String status;
 
     public BulkStock() {
 
@@ -246,5 +247,13 @@ public class BulkStock {
 
     public void setImpaCode(List<String> impaCode) {
         this.impaCode = impaCode;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

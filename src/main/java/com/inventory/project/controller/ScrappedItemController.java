@@ -98,7 +98,7 @@ public class ScrappedItemController {
                     consumed.setItem(Collections.singletonList(itemName));
                     consumed.setSubLocations(Collections.singletonList(subLocation));
                     consumed.setQuantity(Collections.singletonList(quantity));
-
+                    consumed.setStatus("created");
                     scrappedItems.add(consumed);
 
                 } else {
@@ -259,6 +259,83 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(result);
+        }
+    }
+    @PutMapping("/status/{id}")
+    public ResponseEntity<ScrappedItem> updateScrappedItemByIdStatus(@PathVariable("id") Long id, @RequestBody ScrappedItem request) {
+        Optional<ScrappedItem> existingScrappedItem = scrappedItemRepository.findById(id);
+        if (existingScrappedItem.isPresent()) {
+            ScrappedItem scrappedItemToUpdate = existingScrappedItem.get();
+            scrappedItemToUpdate.setLocationName(request.getLocationName());
+            scrappedItemToUpdate.setTransferDate(request.getTransferDate());
+            scrappedItemToUpdate.setSn(request.getSn());
+            scrappedItemToUpdate.setPartNo(request.getPartNo());
+            scrappedItemToUpdate.setRemarks(request.getRemarks());
+            scrappedItemToUpdate.setDate(request.getDate());
+            scrappedItemToUpdate.setItem(request.getItem());
+            scrappedItemToUpdate.setSubLocations(request.getSubLocations());
+            scrappedItemToUpdate.setQuantity(request.getQuantity());
+
+            // Update the status if provided
+            if (request.getStatus() != null) {
+                scrappedItemToUpdate.setStatus(request.getStatus());
+            }
+
+            ScrappedItem updatedItem = scrappedItemRepository.save(scrappedItemToUpdate);
+            return ResponseEntity.ok(updatedItem);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/created")
+    public ResponseEntity<List<ScrappedItem>> getCreatedScrappedItems() {
+        try {
+            List<ScrappedItem> createdItems = scrappedItemRepository.findByStatus("created");
+            if (createdItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(createdItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/verified")
+    public ResponseEntity<List<ScrappedItem>> getVerifiedScrappedItems() {
+        try {
+            List<ScrappedItem> verifiedItems = scrappedItemRepository.findByStatus("verified");
+            if (verifiedItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(verifiedItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<ScrappedItem>> getRejectedScrappedItems() {
+        try {
+            List<ScrappedItem> rejectedItems = scrappedItemRepository.findByStatus("rejected");
+            if (rejectedItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(rejectedItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<ScrappedItem>> getApprovedScrappedItems(){
+        try {
+            List<ScrappedItem> approvedItems =scrappedItemRepository.findByStatus("Approved");
+            if (approvedItems.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(approvedItems);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
