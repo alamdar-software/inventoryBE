@@ -363,4 +363,16 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approved")
+    public ResponseEntity<List<Mto>> getApprovedMto(){
+       try {
+           List<Mto> approvedMtos =mtoRepository.findByStatus("Approved");
+           if (approvedMtos.isEmpty()){
+               return ResponseEntity.noContent().build();
+           }
+           return ResponseEntity.ok(approvedMtos);
+       }catch (Exception e){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       }
+    }
 }

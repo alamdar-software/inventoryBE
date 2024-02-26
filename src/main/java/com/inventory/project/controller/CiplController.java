@@ -321,6 +321,9 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
                     existingCipl.setStatus("verified");
                 } else if (action.equalsIgnoreCase("reject")) {
                     existingCipl.setStatus("rejected");
+                } else if (action.equalsIgnoreCase("approve")) {
+                    existingCipl.setStatus("approved");
+
                 }
             } else {
                 // If no action is provided, update the status from the updated CIPL entity
@@ -374,4 +377,16 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
+    @GetMapping("/approved")
+    public ResponseEntity<List<Cipl>>getVerifiedCipl(){
+        try{
+            List<Cipl> verifiedCipl=ciplRepository.findByStatus("Approved");
+            if (verifiedCipl.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(verifiedCipl,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

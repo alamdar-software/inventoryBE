@@ -326,4 +326,16 @@ public class ScrappedItemController {
         }
     }
 
+    @GetMapping("/approved")
+    public ResponseEntity<List<ScrappedItem>> getApprovedScrappedItems(){
+        try {
+            List<ScrappedItem> approvedItems =scrappedItemRepository.findByStatus("Approved");
+            if (approvedItems.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(approvedItems);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

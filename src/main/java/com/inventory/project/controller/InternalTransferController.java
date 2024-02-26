@@ -237,4 +237,16 @@ public class InternalTransferController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approved")
+    public ResponseEntity<List<InternalTransfer>> getApprovedIt(){
+        try {
+            List<InternalTransfer> approvedIt=internalTransferRepo.findByStatus("Approved");
+            if (approvedIt.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(approvedIt);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

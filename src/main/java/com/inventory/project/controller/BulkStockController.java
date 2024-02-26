@@ -423,5 +423,16 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
         }
     }
 
+    @GetMapping("/approved")
+    public ResponseEntity<List<Object>> getApprovedStocks(){
+        try {
+            List<Object> stocks =new ArrayList<>();
+            stocks.addAll(incomingStockRepo.findByStatus("approved"));
+            stocks.addAll(bulkStockRepo.findByStatus("approved"));
+            return  ResponseEntity.ok(stocks);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

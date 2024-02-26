@@ -366,4 +366,16 @@ private ConsumeService consumeService;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approved")
+    public ResponseEntity<List<ConsumedItem>> getApprovedConsumeItems(){
+        try {
+            List<ConsumedItem>approvedItems =consumedItemRepo.findByStatus("Approved");
+            if (approvedItems.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return  ResponseEntity.ok(approvedItems);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
