@@ -112,12 +112,30 @@ IncomingStockRepo incomingStockRepo;
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     @PreAuthorize("hasRole('SUPERADMIN')")
-
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteBulkStock(@PathVariable Long id) {
-        bulkStockService.deleteBulkById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> deleteStock(@PathVariable Long id, @RequestParam(required = false) String type) {
+        try {
+            if ("bulk".equalsIgnoreCase(type)) {
+                // Delete bulk stock
+                bulkStockService.deleteBulkById(id);
+            } else {
+                // Delete single incoming stock
+                Optional<IncomingStock> optionalIncomingStock = incomingStockRepo.findById(id);
+
+                if (optionalIncomingStock.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("Incoming stock with ID " + id + " not found");
+                }
+
+                IncomingStock incomingStock = optionalIncomingStock.get();
+                incomingStockRepo.delete(incomingStock);
+            }
+            return ResponseEntity.ok("Stock deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete stock: " + e.getMessage());
+        }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @GetMapping("/view")
     public ResponseEntity<StockViewResponse> getStockView() {
