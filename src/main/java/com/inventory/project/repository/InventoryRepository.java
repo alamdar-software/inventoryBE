@@ -1,6 +1,8 @@
 package com.inventory.project.repository;
 
 import com.inventory.project.model.Inventory;
+import com.inventory.project.model.Item;
+import com.inventory.project.model.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,6 +35,8 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 //    List<Inventory> findByDescriptionAndItem_Category_Name(String description, String item);
 
     List<Inventory> findByItem_Category_Name(String categoryName);
+
+    Inventory findByLocationAndItem(Location location, Item item);
 
 
 //    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
