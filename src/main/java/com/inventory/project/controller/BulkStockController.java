@@ -113,7 +113,7 @@ IncomingStockRepo incomingStockRepo;
     }
     @PreAuthorize("hasRole('SUPERADMIN')")
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteBulkStock(@PathVariable Long id) {
         bulkStockService.deleteBulkById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
