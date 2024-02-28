@@ -172,7 +172,6 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     incomingStock.setPrice(incomingStockRequest.getPrice());
     incomingStock.setRemarks(incomingStockRequest.getRemarks());
     incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
-//    incomingStock.setStatus(incomingStockRequest.getStatus());
     incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
     incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
     incomingStock.setStatus("Created");
@@ -180,12 +179,11 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     Item item = new Item();
     item.setDescription(incomingStockRequest.getDescription());
     Address address = addressRepository.findFirstByAddressIgnoreCase(incomingStockRequest.getAddress());
-    Category category=categoryRepository.findByName((incomingStockRequest.getName()));
-    Brand  brand =brandRepository.findByBrandName(incomingStockRequest.getBrandName());
-    Unit unit=unitRepository.findByUnitName(incomingStockRequest.getUnitName());
-    Inventory inventory=inventoryRepo.findAllByQuantity(incomingStockRequest.getQuantity());
-    Entity entity=entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
-        Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
+    Category category = categoryRepository.findByName((incomingStockRequest.getName()));
+    Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
+    Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
+    Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
+    Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
 
     String requestedAddress = incomingStockRequest.getAddress();
 
@@ -201,20 +199,38 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         boolean addressFound = addresses.stream()
                 .anyMatch(addr -> Objects.equals(addr.getAddress(), requestedAddress));
 
-
         if (addressFound) {
+            // Find the Inventory item by description or locationName
+            Inventory inventoryItem = inventoryRepo.findByDescriptionOrLocationName(incomingStockRequest.getDescription(), incomingStockRequest.getLocationName());
+
+            if (inventoryItem != null) {
+                // Inventory item found, update its quantity
+                int newQuantity = inventoryItem.getQuantity() + incomingStockRequest.getQuantity();
+                inventoryItem.setQuantity(newQuantity);
+                inventoryRepo.save(inventoryItem);
+            } else {
+                // Inventory item not found, create a new one
+                Inventory newInventoryItem = new Inventory();
+                newInventoryItem.setDescription(incomingStockRequest.getDescription());
+                newInventoryItem.setLocationName(incomingStockRequest.getLocationName());
+                newInventoryItem.setQuantity(incomingStockRequest.getQuantity());
+                inventoryRepo.save(newInventoryItem);
+                inventoryItem = newInventoryItem; // Use the newly created inventory item
+            }
+
             // Set all fields for incomingStock
             incomingStock.setItemDescription(item.getDescription());
             incomingStock.setLocation(location);
             incomingStock.setAddress(address);
-        incomingStock.setCurrency(currency);
-        incomingStock.setCategory(category);
-        incomingStock.setBrand(brand);
-        incomingStock.setUnit(unit);
-        incomingStock.setInventory( inventory);
-        incomingStock.setEntity(entity);
+            incomingStock.setCurrency(currency);
+            incomingStock.setCategory(category);
+            incomingStock.setBrand(brand);
+            incomingStock.setUnit(unit);
+            incomingStock.setInventory(inventoryItem); // Use the found or created inventory item
+            incomingStock.setEntity(entity);
 
-        incomingStockRepo.save(incomingStock);
+            // Save incomingStock
+            incomingStockRepo.save(incomingStock);
 
             IncomingStockRequest responseDTO = new IncomingStockRequest();
             responseDTO.setLocationName(location.getLocationName());
@@ -235,12 +251,10 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             responseDTO.setBrandName(incomingStockRequest.getBrandName());
             responseDTO.setUnitName(incomingStockRequest.getUnitName());
             responseDTO.setStandardPrice(incomingStockRequest.getStandardPrice());
-//            responseDTO.setStatus(incomingStockRequest.getStatus());
             responseDTO.setImpaCode(incomingStockRequest.getImpaCode());
             responseDTO.setStoreNo(incomingStockRequest.getStoreNo());
             responseDTO.setEntityName(incomingStockRequest.getEntityName());
             responseDTO.setStatus("Created");
-
 
             // Return the DTO object within ResponseEntity.ok
             return ResponseEntity.ok().body(responseDTO);
@@ -252,8 +266,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         // Location not found
         return ResponseEntity.badRequest().body("Location not found.");
     }
-
 }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")

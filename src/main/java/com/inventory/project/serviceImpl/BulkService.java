@@ -3,6 +3,7 @@ package com.inventory.project.serviceImpl;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.BulkStockRepo;
 import com.inventory.project.repository.CiplRepository;
+import com.inventory.project.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ import java.util.Optional;
 @Service
 public class BulkService {
     private final BulkStockRepo bulkStockRepo;
-
+    @Autowired
+    private InventoryRepository inventoryRepository;
     @Autowired
     public BulkService(BulkStockRepo bulkStockRepo) {
         this.bulkStockRepo = bulkStockRepo;
@@ -36,6 +38,31 @@ public class BulkService {
     @Transactional
     public BulkStock createBulk(BulkStock bulkStock) {
         bulkStock.setStatus("Created");
+
+        // Iterate over each item in the bulk stock
+        for (int i = 0; i < bulkStock.getDescription().size(); i++) {
+            String description = bulkStock.getDescription().get(i);
+            String locationName = bulkStock.getLocationName();
+            int quantity = bulkStock.getQuantity().get(i);
+
+            // Find or create the Inventory item
+            Inventory inventoryItem = inventoryRepository.findByDescriptionOrLocationName(description, locationName);
+
+            if (inventoryItem != null) {
+                // Inventory item found, update its quantity
+                int newQuantity = inventoryItem.getQuantity() + quantity;
+                inventoryItem.setQuantity(newQuantity);
+                inventoryRepository.save(inventoryItem);
+            } else {
+                // Inventory item not found, create a new one
+                Inventory newInventoryItem = new Inventory();
+                newInventoryItem.setDescription(description);
+                newInventoryItem.setLocationName(locationName);
+                newInventoryItem.setQuantity(quantity);
+                inventoryRepository.save(newInventoryItem);
+            }
+        }
+
         BulkStock savedBulkStock = bulkStockRepo.save(bulkStock);
         bulkStockRepo.flush();
         return savedBulkStock;

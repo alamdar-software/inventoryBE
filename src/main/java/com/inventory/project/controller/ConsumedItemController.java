@@ -312,6 +312,9 @@ private ConsumeService consumeService;
                     existingConsumedItem.setStatus("verified");
                 } else if (action.equalsIgnoreCase("reject")) {
                     existingConsumedItem.setStatus("rejected");
+                }else if (action.equalsIgnoreCase("approve")) {
+                    existingConsumedItem.setStatus("approved");
+
                 }
             } else {
                 // If no action is provided, update the status from the updated InternalTransfer entity
