@@ -545,18 +545,94 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
     }
 
     @GetMapping("/getBoth/{id}")
-    public ResponseEntity<?> getBothStockById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        Optional<IncomingStock> incomingStockOptional = incomingStockRepo.findById(id);
         Optional<BulkStock> bulkStockOptional = bulkStockService.getBulkById(id);
-        if (bulkStockOptional.isPresent()) {
-            return ResponseEntity.ok(bulkStockOptional.get());
-        }
 
-        Optional<IncomingStock> incomingStockOptional = incomingStockService.getById(id);
         if (incomingStockOptional.isPresent()) {
-            return ResponseEntity.ok(incomingStockOptional.get());
+            IncomingStock incomingStock = incomingStockOptional.get();
+            StockViewDto responseDto = mapIncomingStockToResponseDto(incomingStock);
+            return ResponseEntity.ok(responseDto);
+        } else if (bulkStockOptional.isPresent()) {
+            BulkStock bulkStock = bulkStockOptional.get();
+            StockViewDto responseDto = mapBulkStockToResponseDto(bulkStock);
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Stock with ID " + id + " not found");
         }
-
-        return ResponseEntity.notFound().build();
     }
+
+    private StockViewDto mapIncomingStockToResponseDto(IncomingStock incomingStock) {
+        StockViewDto responseDto = new StockViewDto();
+        responseDto.setId(incomingStock.getId());
+        if (incomingStock.getLocation() != null) {
+            responseDto.setLocationName(incomingStock.getLocation().getLocationName());
+        } else {
+            responseDto.setLocationName("Location not available");
+        }
+        if (incomingStock.getAddress() != null) {
+            responseDto.setAddress(incomingStock.getAddress().getAddress());
+            // Map other fields...
+        } else {
+            responseDto.setAddress("Address not available");
+        }
+        if (incomingStock.getCategory() != null) {
+            responseDto.setName(Collections.singletonList(incomingStock.getCategory().getName()));
+        } else {
+            responseDto.setName(Collections.singletonList("Category not available"));
+        }
+        if (incomingStock.getBrand() != null) {
+            responseDto.setBrandName(Collections.singletonList(incomingStock.getBrand().getBrandName()));
+        } else {
+            responseDto.setBrandName(Collections.singletonList("Brand not available"));
+        }
+        responseDto.setUnitName(Collections.singletonList(incomingStock.getUnit().getUnitName()));
+        responseDto.setEntityName(Collections.singletonList(incomingStock.getEntity().getEntityName()));
+
+        responseDto.setQuantity(Collections.singletonList(incomingStock.getQuantity()));
+        responseDto.setUnitCost(Collections.singletonList(incomingStock.getUnitCost()));
+        responseDto.setExtendedValue(Collections.singletonList(incomingStock.getExtendedValue()));
+        responseDto.setDate(incomingStock.getDate());
+        responseDto.setPurchaseOrder(incomingStock.getPurchaseOrder());
+        responseDto.setPn(Collections.singletonList(incomingStock.getPn()));
+        responseDto.setSn(Collections.singletonList(incomingStock.getSn()));
+        responseDto.setPrice(Collections.singletonList(incomingStock.getPrice()));
+        responseDto.setStandardPrice(Collections.singletonList(incomingStock.getStandardPrice()));
+        responseDto.setStatus(incomingStock.getStatus());
+        responseDto.setImpaCode(Collections.singletonList(incomingStock.getImpaCode()));
+        responseDto.setStoreNo(Collections.singletonList(incomingStock.getStoreNo()));
+        responseDto.setDescription(Collections.singletonList(incomingStock.getItemDescription()));
+        responseDto.setRemarks(incomingStock.getRemarks());
+        return responseDto;
+    }
+
+    private StockViewDto mapBulkStockToResponseDto(BulkStock bulkStock) {
+        StockViewDto responseDto = new StockViewDto();
+        responseDto.setId(bulkStock.getId());
+        responseDto.setLocationName(bulkStock.getLocationName());
+        responseDto.setAddress(bulkStock.getAddress());
+        responseDto.setPurchaseOrder(bulkStock.getPurchaseOrder());
+        responseDto.setRemarks(bulkStock.getRemarks());
+        responseDto.setDate(bulkStock.getDate());
+        responseDto.setUnitCost(bulkStock.getUnitCost());
+        responseDto.setName(bulkStock.getName());
+        responseDto.setQuantity(bulkStock.getQuantity());
+        responseDto.setItem(bulkStock.getItem());
+        responseDto.setBrandName(bulkStock.getBrandName());
+        responseDto.setPrice(bulkStock.getPrice());
+        responseDto.setUnitName(bulkStock.getUnitName());
+        responseDto.setStandardPrice(bulkStock.getStandardPrice());
+        responseDto.setExtendedValue(bulkStock.getExtendedValue());
+        responseDto.setSn(bulkStock.getSn());
+        responseDto.setPn(bulkStock.getPn());
+        responseDto.setEntityName(bulkStock.getEntityName());
+        responseDto.setStoreNo(bulkStock.getStoreNo());
+        responseDto.setImpaCode(bulkStock.getImpaCode());
+        responseDto.setDescription(bulkStock.getDescription());
+        responseDto.setStatus(bulkStock.getStatus());
+
+        return responseDto;
+    }
+
 
 }
