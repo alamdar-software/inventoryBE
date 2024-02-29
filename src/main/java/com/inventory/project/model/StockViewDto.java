@@ -27,6 +27,7 @@ public class StockViewDto {
     private List<String> impaCode = new ArrayList<>();
     private List<String> description = new ArrayList<>();
     private String dataType;
+    private String status; // Add status field
 
     public StockViewDto() {
     }
@@ -206,6 +207,14 @@ public class StockViewDto {
 
     public void setDataType(String dataType) {
         this.dataType = dataType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 

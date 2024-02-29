@@ -402,19 +402,110 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
     }
 
     @GetMapping("/created")
-    public ResponseEntity<List<Object>> getCreatedStocks() {
-        try {
-            List<Object> createdStocks = new ArrayList<>();
+    public ResponseEntity<StockViewResponse> getCreatedStockView() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("created");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("created");
 
-            createdStocks.addAll(incomingStockRepo.findByStatus("created"));
-            createdStocks.addAll(bulkStockRepo.findByStatus("created"));
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
 
-            return ResponseEntity.ok(createdStocks);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
         }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
     }
 
+    private StockViewDto mapStatusIncomingStockToDTO(IncomingStock incomingStockRequest) {
+        StockViewDto stockView = new StockViewDto();
+        stockView.setId(incomingStockRequest.getId());
+        stockView.setDataType("Incoming Stock"); // Set data type
+
+        if (incomingStockRequest.getLocation() != null) {
+            stockView.setLocationName(incomingStockRequest.getLocation().getLocationName());
+        } else {
+            stockView.setLocationName("Location not available");
+        }
+        if (incomingStockRequest.getAddress() != null) {
+            stockView.setAddress(incomingStockRequest.getAddress().getAddress());
+            // Map other fields...
+        } else {
+            stockView.setAddress("Address not available");
+        }
+        stockView.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        stockView.setRemarks(incomingStockRequest.getRemarks());
+        stockView.setDate(incomingStockRequest.getDate());
+        stockView.setUnitCost(Collections.singletonList(incomingStockRequest.getUnitCost()));
+        if (incomingStockRequest.getCategory() != null) {
+            stockView.setName(Collections.singletonList(incomingStockRequest.getCategory().getName()));
+        } else {
+            stockView.setName(Collections.singletonList("Category not available"));
+        }
+        stockView.setQuantity(Collections.singletonList(incomingStockRequest.getQuantity()));
+        if (incomingStockRequest.getBrand() != null) {
+            stockView.setBrandName(Collections.singletonList(incomingStockRequest.getBrand().getBrandName()));
+        } else {
+            stockView.setBrandName(Collections.singletonList("Brand not available"));
+        }
+        stockView.setPrice(Collections.singletonList(incomingStockRequest.getPrice()));
+        stockView.setUnitName(Collections.singletonList(incomingStockRequest.getUnit().getUnitName()));
+        stockView.setStandardPrice(Collections.singletonList(incomingStockRequest.getStandardPrice()));
+        stockView.setExtendedValue(Collections.singletonList(incomingStockRequest.getExtendedValue()));
+        stockView.setSn(Collections.singletonList(incomingStockRequest.getSn()));
+        stockView.setPn(Collections.singletonList(incomingStockRequest.getPn()));
+        stockView.setEntityName(Collections.singletonList(incomingStockRequest.getEntity().getEntityName()));
+        stockView.setStoreNo(Collections.singletonList(incomingStockRequest.getStoreNo()));
+        stockView.setImpaCode(Collections.singletonList(incomingStockRequest.getImpaCode()));
+        stockView.setDescription(Collections.singletonList(incomingStockRequest.getItemDescription()));
+        stockView.setStatus(incomingStockRequest.getStatus()); // Set status
+
+        return stockView;
+    }
+
+    private StockViewDto mapStatusBulkStockToDTO(BulkStock bulkStock) {
+        StockViewDto stockView = new StockViewDto();
+        stockView.setDataType("Bulk Stock"); // Set data type
+
+        stockView.setId(bulkStock.getId());
+        stockView.setLocationName(bulkStock.getLocationName());
+        stockView.setAddress(bulkStock.getAddress());
+        stockView.setPurchaseOrder(bulkStock.getPurchaseOrder());
+        stockView.setRemarks(bulkStock.getRemarks());
+        stockView.setDate(bulkStock.getDate());
+        stockView.setUnitCost(bulkStock.getUnitCost());
+        stockView.setName(bulkStock.getName());
+        stockView.setQuantity(bulkStock.getQuantity());
+        stockView.setItem(bulkStock.getItem());
+        stockView.setBrandName(bulkStock.getBrandName());
+        stockView.setPrice(bulkStock.getPrice());
+        stockView.setUnitName(bulkStock.getUnitName());
+        stockView.setStandardPrice(bulkStock.getStandardPrice());
+        stockView.setExtendedValue(bulkStock.getExtendedValue());
+        stockView.setSn(bulkStock.getSn());
+        stockView.setPn(bulkStock.getPn());
+        stockView.setEntityName(bulkStock.getEntityName());
+        stockView.setStoreNo(bulkStock.getStoreNo());
+        stockView.setImpaCode(bulkStock.getImpaCode());
+        stockView.setDescription(bulkStock.getDescription());
+        stockView.setStatus(bulkStock.getStatus()); // Set status
+
+        return stockView;
+    }
 
 
     @GetMapping("/verified")
