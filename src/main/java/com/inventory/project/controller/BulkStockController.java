@@ -544,4 +544,19 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
         }
     }
 
+    @GetMapping("/getBoth/{id}")
+    public ResponseEntity<?> getBothStockById(@PathVariable Long id) {
+        Optional<BulkStock> bulkStockOptional = bulkStockService.getBulkById(id);
+        if (bulkStockOptional.isPresent()) {
+            return ResponseEntity.ok(bulkStockOptional.get());
+        }
+
+        Optional<IncomingStock> incomingStockOptional = incomingStockService.getById(id);
+        if (incomingStockOptional.isPresent()) {
+            return ResponseEntity.ok(incomingStockOptional.get());
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
 }
