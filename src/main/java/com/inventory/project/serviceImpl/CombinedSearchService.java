@@ -91,9 +91,9 @@ public class CombinedSearchService {
             // Search all InternalTransfer and Mto within the specified date range
             List<InternalTransfer> internalTransferResults = searchInternalTransfer(searchCriteria);
             List<Mto> mtoResults = searchMto(searchCriteria);
-
+            List<Cipl>ciplResults=searchCipl(searchCriteria);
             // Combine and return the results
-            List<Object> combinedResults = combineResults(internalTransferResults, mtoResults);
+            List<Object> combinedResults = combineResults(internalTransferResults, mtoResults,ciplResults);
             return combinedResults;
         } else {
             // Handle other cases or return an empty list as needed
@@ -115,7 +115,7 @@ public class CombinedSearchService {
         return combinedResults;
     }
 
-    private List<Object> combineResults(List<InternalTransfer> internalTransferResults, List<Mto> mtoResults) {
+    private List<Object> combineResults(List<InternalTransfer> internalTransferResults, List<Mto> mtoResults,List<Cipl>ciplResults) {
         List<Object> combinedResults = new ArrayList<>();
 
         for (InternalTransfer internalTransfer : internalTransferResults) {
@@ -127,6 +127,11 @@ public class CombinedSearchService {
         for (Mto mto : mtoResults) {
             Map<String, Object> result = mapMtoToMap(mto);
             result.put("dataType", "Mto");
+            combinedResults.add(result);
+        }
+        for (Cipl cipl : ciplResults) {
+            Map<String, Object> result = mapCiplToMap(cipl);
+            result.put("dataType", "Cipl");
             combinedResults.add(result);
         }
 
