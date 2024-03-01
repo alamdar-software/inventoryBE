@@ -118,8 +118,8 @@ IncomingStockRepo incomingStockRepo;
             if ("bulk".equalsIgnoreCase(type)) {
                 // Delete bulk stock
                 bulkStockService.deleteBulkById(id);
-            } else {
-                // Delete single incoming stock
+            } else if ("incoming".equalsIgnoreCase(type)) {
+                // Delete incoming stock
                 Optional<IncomingStock> optionalIncomingStock = incomingStockRepo.findById(id);
 
                 if (optionalIncomingStock.isEmpty()) {
@@ -129,12 +129,18 @@ IncomingStockRepo incomingStockRepo;
 
                 IncomingStock incomingStock = optionalIncomingStock.get();
                 incomingStockRepo.delete(incomingStock);
+            } else {
+                // Delete both bulk and incoming stock if no type specified
+                bulkStockService.deleteBulkById(id);
+                incomingStockRepo.deleteById(id);
             }
             return ResponseEntity.ok("Stock deleted successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete stock: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete stock: " + e.getMessage());
         }
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @GetMapping("/view")
@@ -434,7 +440,7 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
     private StockViewDto mapStatusIncomingStockToDTO(IncomingStock incomingStockRequest) {
         StockViewDto stockView = new StockViewDto();
         stockView.setId(incomingStockRequest.getId());
-        stockView.setDataType("Incoming Stock"); // Set data type
+        stockView.setDataType("Incoming Stock");
 
         if (incomingStockRequest.getLocation() != null) {
             stockView.setLocationName(incomingStockRequest.getLocation().getLocationName());
