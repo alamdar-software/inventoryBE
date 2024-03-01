@@ -341,7 +341,8 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
     } else {
         return ResponseEntity.notFound().build();
     }
-}    
+}
+
 private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
     // Set all fields similar to updateStockStatus
     bulkStock.setLocationName((String) updates.get("locationName"));
