@@ -341,58 +341,148 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
     } else {
         return ResponseEntity.notFound().build();
     }
-}
+}    
+private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
+    // Set all fields similar to updateStockStatus
+    bulkStock.setLocationName((String) updates.get("locationName"));
+    bulkStock.setAddress((String) updates.get("address"));
+    bulkStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+    bulkStock.setRemarks((String) updates.get("remarks"));
+    bulkStock.setDate(LocalDate.parse((String) updates.get("date")));
+    bulkStock.setName((List<String>) updates.get("name"));
+    bulkStock.setItem((List<String>) updates.get("item"));
+    bulkStock.setBrandName((List<String>) updates.get("brandName"));
+    bulkStock.setUnitName((List<String>) updates.get("unitName"));
+    bulkStock.setEntityName((List<String>) updates.get("entityName"));
+    bulkStock.setStoreNo((List<String>) updates.get("storeNo"));
+    bulkStock.setImpaCode((List<String>) updates.get("impaCode"));
+    bulkStock.setDescription((List<String>) updates.get("description"));
 
-    private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
-        // Set all fields similar to updateStockStatus
-        bulkStock.setLocationName((String) updates.get("locationName"));
-        bulkStock.setAddress((String) updates.get("address"));
-        bulkStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
-        bulkStock.setRemarks((String) updates.get("remarks"));
-        bulkStock.setDate(LocalDate.parse((String) updates.get("date")));
-        bulkStock.setUnitCost((List<Double>) updates.get("unitCost"));
-        bulkStock.setName((List<String>) updates.get("name"));
-        bulkStock.setQuantity((List<Integer>) updates.get("quantity"));
-        bulkStock.setItem((List<String>) updates.get("item"));
-        bulkStock.setBrandName((List<String>) updates.get("brandName"));
-        bulkStock.setPrice((List<Double>) updates.get("price"));
-        bulkStock.setUnitName((List<String>) updates.get("unitName"));
-        bulkStock.setStandardPrice((List<Double>) updates.get("standardPrice"));
-        bulkStock.setExtendedValue((List<Double>) updates.get("extendedValue"));
-        bulkStock.setSn((List<String>) updates.get("sn"));
-        bulkStock.setPn((List<String>) updates.get("pn"));
-        bulkStock.setEntityName((List<String>) updates.get("entityName"));
-        bulkStock.setStoreNo((List<String>) updates.get("storeNo"));
-        bulkStock.setImpaCode((List<String>) updates.get("impaCode"));
-        bulkStock.setDescription((List<String>) updates.get("description"));
-
-        // Update status based on action
-        if (action != null && !action.isEmpty()) {
-            if (action.equalsIgnoreCase("verify")) {
-                bulkStock.setStatus("verified");
-            } else if (action.equalsIgnoreCase("reject")) {
-                bulkStock.setStatus("rejected");
-            }
+    // Handle Unit Cost
+    List<Object> unitCostList = (List<Object>) updates.get("unitCost");
+    List<Double> unitCosts = new ArrayList<>();
+    for (Object cost : unitCostList) {
+        if (cost instanceof Double) {
+            unitCosts.add((Double) cost);
+        } else if (cost instanceof Integer) {
+            unitCosts.add(((Integer) cost).doubleValue());
         } else {
-            // If no action is provided, update the status from the updates map
-            bulkStock.setStatus((String) updates.get("status"));
+            throw new IllegalArgumentException("Unsupported data type for unitCost: " + cost.getClass().getName());
         }
     }
+    bulkStock.setUnitCost(unitCosts);
+
+    // Handle Quantity
+    List<Object> quantityList = (List<Object>) updates.get("quantity");
+    List<Integer> quantities = new ArrayList<>();
+    for (Object quantity : quantityList) {
+        if (quantity instanceof Integer) {
+            quantities.add((Integer) quantity);
+        } else if (quantity instanceof Double) {
+            quantities.add(((Double) quantity).intValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for quantity: " + quantity.getClass().getName());
+        }
+    }
+    bulkStock.setQuantity(quantities);
+
+    // Handle Price
+    List<Object> priceList = (List<Object>) updates.get("price");
+    List<Double> prices = new ArrayList<>();
+    for (Object price : priceList) {
+        if (price instanceof Double) {
+            prices.add((Double) price);
+        } else if (price instanceof Integer) {
+            prices.add(((Integer) price).doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for price: " + price.getClass().getName());
+        }
+    }
+    bulkStock.setPrice(prices);
+
+    // Handle Standard Price
+    List<Object> standardPriceList = (List<Object>) updates.get("standardPrice");
+    List<Double> standardPrices = new ArrayList<>();
+    for (Object standardPrice : standardPriceList) {
+        if (standardPrice instanceof Double) {
+            standardPrices.add((Double) standardPrice);
+        } else if (standardPrice instanceof Integer) {
+            standardPrices.add(((Integer) standardPrice).doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for standardPrice: " + standardPrice.getClass().getName());
+        }
+    }
+    bulkStock.setStandardPrice(standardPrices);
+
+    // Handle Extended Value
+    List<Object> extendedValueList = (List<Object>) updates.get("extendedValue");
+    List<Double> extendedValues = new ArrayList<>();
+    for (Object extendedValue : extendedValueList) {
+        if (extendedValue instanceof Double) {
+            extendedValues.add((Double) extendedValue);
+        } else if (extendedValue instanceof Integer) {
+            extendedValues.add(((Integer) extendedValue).doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for extendedValue: " + extendedValue.getClass().getName());
+        }
+    }
+    bulkStock.setExtendedValue(extendedValues);
+
+    // Update status based on action
+    if (action != null && !action.isEmpty()) {
+        if (action.equalsIgnoreCase("verify")) {
+            bulkStock.setStatus("verified");
+        } else if (action.equalsIgnoreCase("reject")) {
+            bulkStock.setStatus("rejected");
+        }
+    } else {
+        // If no action is provided, update the status from the updates map
+        bulkStock.setStatus((String) updates.get("status"));
+    }
+}
 
     private void updateIncomingStock(IncomingStock incomingStock, Map<String, Object> updates, String action) {
         // Set all fields similar to updateStockStatus
-        incomingStock.setQuantity((Integer) updates.get("quantity"));
-        incomingStock.setUnitCost((Double) updates.get("unitCost"));
-        incomingStock.setExtendedValue((Double) updates.get("extendedValue"));
-        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
         incomingStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
         incomingStock.setPn((String) updates.get("pn"));
         incomingStock.setSn((String) updates.get("sn"));
-        incomingStock.setPrice((Double) updates.get("price"));
         incomingStock.setRemarks((String) updates.get("remarks"));
-        incomingStock.setStandardPrice((Double) updates.get("standardPrice"));
         incomingStock.setImpaCode((String) updates.get("impaCode"));
         incomingStock.setStoreNo((String) updates.get("storeNo"));
+        incomingStock.setItemDescription((String) updates.get("description"));
+
+        // Handle Quantity
+        Object quantity = updates.get("quantity");
+        if (quantity instanceof Integer) {
+            incomingStock.setQuantity((Integer) quantity);
+        } else if (quantity instanceof Double) {
+            incomingStock.setQuantity(((Double) quantity).intValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for quantity: " + quantity.getClass().getName());
+        }
+
+        // Handle Unit Cost
+        Object unitCost = updates.get("unitCost");
+        if (unitCost instanceof Double) {
+            incomingStock.setUnitCost((Double) unitCost);
+        } else if (unitCost instanceof Integer) {
+            incomingStock.setUnitCost(((Integer) unitCost).doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for unitCost: " + unitCost.getClass().getName());
+        }
+
+        // Handle Extended Value
+        Object extendedValue = updates.get("extendedValue");
+        if (extendedValue instanceof Double) {
+            incomingStock.setExtendedValue((Double) extendedValue);
+        } else if (extendedValue instanceof Integer) {
+            incomingStock.setExtendedValue(((Integer) extendedValue).doubleValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for extendedValue: " + extendedValue.getClass().getName());
+        }
+
+        // Set Date
+        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
 
         // Update status based on action
         if (action != null && !action.isEmpty()) {
@@ -406,6 +496,90 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
             incomingStock.setStatus((String) updates.get("status"));
         }
     }
+
+//@PutMapping("/status/{id}")
+//public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates, @RequestParam(required = false) String action) {
+//    Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
+//    Optional<IncomingStock> existingIncomingStock = incomingStockService.getById(id);
+//
+//    if (existingBulkStock.isPresent()) {
+//        BulkStock existingBulk = existingBulkStock.get();
+//        updateBulkStock(existingBulk, stockUpdates, action); // Pass action parameter
+//        BulkStock updatedBulkStock = bulkStockService.save(existingBulk);
+//        return ResponseEntity.ok(updatedBulkStock);
+//    } else if (existingIncomingStock.isPresent()) {
+//        IncomingStock existingIncoming = existingIncomingStock.get();
+//        updateIncomingStock(existingIncoming, stockUpdates, action); // Pass action parameter
+//        IncomingStock updatedIncomingStock = incomingStockService.save(existingIncoming);
+//        return ResponseEntity.ok(updatedIncomingStock);
+//    } else {
+//        return ResponseEntity.notFound().build();
+//    }
+//}
+//
+//    private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
+//        // Set all fields similar to updateStockStatus
+//        bulkStock.setLocationName((String) updates.get("locationName"));
+//        bulkStock.setAddress((String) updates.get("address"));
+//        bulkStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+//        bulkStock.setRemarks((String) updates.get("remarks"));
+//        bulkStock.setDate(LocalDate.parse((String) updates.get("date")));
+//        bulkStock.setUnitCost((List<Double>) updates.get("unitCost"));
+//        bulkStock.setName((List<String>) updates.get("name"));
+//        bulkStock.setQuantity((List<Integer>) updates.get("quantity"));
+//        bulkStock.setItem((List<String>) updates.get("item"));
+//        bulkStock.setBrandName((List<String>) updates.get("brandName"));
+//        bulkStock.setPrice((List<Double>) updates.get("price"));
+//        bulkStock.setUnitName((List<String>) updates.get("unitName"));
+//        bulkStock.setStandardPrice((List<Double>) updates.get("standardPrice"));
+//        bulkStock.setExtendedValue((List<Double>) updates.get("extendedValue"));
+//        bulkStock.setSn((List<String>) updates.get("sn"));
+//        bulkStock.setPn((List<String>) updates.get("pn"));
+//        bulkStock.setEntityName((List<String>) updates.get("entityName"));
+//        bulkStock.setStoreNo((List<String>) updates.get("storeNo"));
+//        bulkStock.setImpaCode((List<String>) updates.get("impaCode"));
+//        bulkStock.setDescription((List<String>) updates.get("description"));
+//
+//        // Update status based on action
+//        if (action != null && !action.isEmpty()) {
+//            if (action.equalsIgnoreCase("verify")) {
+//                bulkStock.setStatus("verified");
+//            } else if (action.equalsIgnoreCase("reject")) {
+//                bulkStock.setStatus("rejected");
+//            }
+//        } else {
+//            // If no action is provided, update the status from the updates map
+//            bulkStock.setStatus((String) updates.get("status"));
+//        }
+//    }
+//
+//    private void updateIncomingStock(IncomingStock incomingStock, Map<String, Object> updates, String action) {
+//        // Set all fields similar to updateStockStatus
+//        incomingStock.setQuantity((Integer) updates.get("quantity"));
+//        incomingStock.setUnitCost((Double) updates.get("unitCost"));
+//        incomingStock.setExtendedValue((Double) updates.get("extendedValue"));
+//        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
+//        incomingStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
+//        incomingStock.setPn((String) updates.get("pn"));
+//        incomingStock.setSn((String) updates.get("sn"));
+//        incomingStock.setPrice((Double) updates.get("price"));
+//        incomingStock.setRemarks((String) updates.get("remarks"));
+//        incomingStock.setStandardPrice((Double) updates.get("standardPrice"));
+//        incomingStock.setImpaCode((String) updates.get("impaCode"));
+//        incomingStock.setStoreNo((String) updates.get("storeNo"));
+//
+//        // Update status based on action
+//        if (action != null && !action.isEmpty()) {
+//            if (action.equalsIgnoreCase("verify")) {
+//                incomingStock.setStatus("verified");
+//            } else if (action.equalsIgnoreCase("reject")) {
+//                incomingStock.setStatus("rejected");
+//            }
+//        } else {
+//            // If no action is provided, update the status from the updates map
+//            incomingStock.setStatus((String) updates.get("status"));
+//        }
+//    }
 
     @GetMapping("/created")
     public ResponseEntity<StockViewResponse> getCreatedStockView() {
