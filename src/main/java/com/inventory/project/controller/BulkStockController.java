@@ -335,13 +335,13 @@ public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestB
         return ResponseEntity.ok(updatedBulkStock);
     } else if (existingIncomingStock.isPresent()) {
         IncomingStock existingIncoming = existingIncomingStock.get();
-        mapIncomingStockToResponseDto(existingIncoming); // Pass action parameter
-        IncomingStock updatedIncomingStock = incomingStockService.save(existingIncoming);
-        return ResponseEntity.ok(updatedIncomingStock);
+        StockViewDto updatedStockView = mapStatusIncomingStockToDTOS(existingIncoming, stockUpdates, action); // Pass action parameter
+        return ResponseEntity.ok(updatedStockView);
     } else {
         return ResponseEntity.notFound().build();
     }
 }
+
 
 private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, String action) {
     // Set all fields similar to updateStockStatus
@@ -442,62 +442,61 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
     }
 }
 
-    private void updateIncomingStock(IncomingStock incomingStock, Map<String, Object> updates, String action) {
-        // Set all fields similar to updateStockStatus
-        incomingStock.setPurchaseOrder((String) updates.get("purchaseOrder"));
-        incomingStock.setPn((String) updates.get("pn"));
-        incomingStock.setSn((String) updates.get("sn"));
-        incomingStock.setRemarks((String) updates.get("remarks"));
-        incomingStock.setImpaCode((String) updates.get("impaCode"));
-        incomingStock.setStoreNo((String) updates.get("storeNo"));
-        incomingStock.setItemDescription((String) updates.get("description"));
+    private StockViewDto mapStatusIncomingStockToDTOS(IncomingStock incomingStockRequest, Map<String, Object> updates, String action) {
+        StockViewDto stockView = new StockViewDto();
+        stockView.setId(incomingStockRequest.getId());
+        stockView.setDataType("Incoming Stock");
 
-        // Handle Quantity
-        Object quantity = updates.get("quantity");
-        if (quantity instanceof Integer) {
-            incomingStock.setQuantity((Integer) quantity);
-        } else if (quantity instanceof Double) {
-            incomingStock.setQuantity(((Double) quantity).intValue());
+        if (incomingStockRequest.getLocation() != null) {
+            stockView.setLocationName(incomingStockRequest.getLocation().getLocationName());
         } else {
-            throw new IllegalArgumentException("Unsupported data type for quantity: " + quantity.getClass().getName());
+            stockView.setLocationName("Location not available");
         }
-
-        // Handle Unit Cost
-        Object unitCost = updates.get("unitCost");
-        if (unitCost instanceof Double) {
-            incomingStock.setUnitCost((Double) unitCost);
-        } else if (unitCost instanceof Integer) {
-            incomingStock.setUnitCost(((Integer) unitCost).doubleValue());
+        if (incomingStockRequest.getAddress() != null) {
+            stockView.setAddress(incomingStockRequest.getAddress().getAddress());
+            // Map other fields...
         } else {
-            throw new IllegalArgumentException("Unsupported data type for unitCost: " + unitCost.getClass().getName());
+            stockView.setAddress("Address not available");
         }
-
-        // Handle Extended Value
-        Object extendedValue = updates.get("extendedValue");
-        if (extendedValue instanceof Double) {
-            incomingStock.setExtendedValue((Double) extendedValue);
-        } else if (extendedValue instanceof Integer) {
-            incomingStock.setExtendedValue(((Integer) extendedValue).doubleValue());
+        stockView.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        stockView.setRemarks(incomingStockRequest.getRemarks());
+        stockView.setDate(incomingStockRequest.getDate());
+        stockView.setUnitCost(Collections.singletonList(incomingStockRequest.getUnitCost()));
+        if (incomingStockRequest.getCategory() != null) {
+            stockView.setName(Collections.singletonList(incomingStockRequest.getCategory().getName()));
         } else {
-            throw new IllegalArgumentException("Unsupported data type for extendedValue: " + extendedValue.getClass().getName());
+            stockView.setName(Collections.singletonList("Category not available"));
         }
-
-        // Set Date
-        incomingStock.setDate(LocalDate.parse((String) updates.get("date")));
+        stockView.setQuantity(Collections.singletonList(incomingStockRequest.getQuantity()));
+        if (incomingStockRequest.getBrand() != null) {
+            stockView.setBrandName(Collections.singletonList(incomingStockRequest.getBrand().getBrandName()));
+        } else {
+            stockView.setBrandName(Collections.singletonList("Brand not available"));
+        }
+        stockView.setPrice(Collections.singletonList(incomingStockRequest.getPrice()));
+        stockView.setUnitName(Collections.singletonList(incomingStockRequest.getUnit().getUnitName()));
+        stockView.setStandardPrice(Collections.singletonList(incomingStockRequest.getStandardPrice()));
+        stockView.setExtendedValue(Collections.singletonList(incomingStockRequest.getExtendedValue()));
+        stockView.setSn(Collections.singletonList(incomingStockRequest.getSn()));
+        stockView.setPn(Collections.singletonList(incomingStockRequest.getPn()));
+        stockView.setEntityName(Collections.singletonList(incomingStockRequest.getEntity().getEntityName()));
+        stockView.setStoreNo(Collections.singletonList(incomingStockRequest.getStoreNo()));
+        stockView.setImpaCode(Collections.singletonList(incomingStockRequest.getImpaCode()));
+        stockView.setDescription(Collections.singletonList(incomingStockRequest.getItemDescription()));
 
         // Update status based on action
         if (action != null && !action.isEmpty()) {
             if (action.equalsIgnoreCase("verify")) {
-                incomingStock.setStatus("verified");
+                stockView.setStatus("verified");
             } else if (action.equalsIgnoreCase("reject")) {
-                incomingStock.setStatus("rejected");
+                stockView.setStatus("rejected");
             }
-        } else {
+        }  else {
             // If no action is provided, update the status from the updates map
-            incomingStock.setStatus((String) updates.get("status"));
+            stockView.setStatus((String) updates.get("status"));
         }
+        return stockView;
     }
-
 
 
     @GetMapping("/created")
