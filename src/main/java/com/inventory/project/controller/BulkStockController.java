@@ -50,8 +50,9 @@ IncomingStockRepo incomingStockRepo;
     private final BulkService bulkStockService;
 
     @Autowired
-    public BulkStockController(BulkService bulkStockService) {
+    public BulkStockController(BulkService bulkStockService, IncomingStockService incomingStockService ) {
         this.bulkStockService = bulkStockService;
+        this.incomingStockService=incomingStockService;
     }
 
 //    @GetMapping("/view")
@@ -325,19 +326,21 @@ IncomingStockRepo incomingStockRepo;
 //    }
 @PutMapping("/status/{id}")
 public ResponseEntity<Object> updateStockStatus(@PathVariable Long id, @RequestBody Map<String, Object> stockUpdates, @RequestParam(required = false) String action) {
-    Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
     Optional<IncomingStock> existingIncomingStock = incomingStockService.getById(id);
+    Optional<BulkStock> existingBulkStock = bulkStockService.getBulkById(id);
 
     if (existingBulkStock.isPresent()) {
         BulkStock existingBulk = existingBulkStock.get();
         updateBulkStock(existingBulk, stockUpdates, action); // Pass action parameter
         BulkStock updatedBulkStock = bulkStockService.save(existingBulk);
         return ResponseEntity.ok(updatedBulkStock);
-    } else if (existingIncomingStock.isPresent()) {
+    }    else if (existingIncomingStock.isPresent()) {
         IncomingStock existingIncoming = existingIncomingStock.get();
-        StockViewDto updatedStockView = mapStatusIncomingStockToDTOS(existingIncoming, stockUpdates, action); // Pass action parameter
+        StockViewDto updatedStockView = mapStatusIncomingStockToDTOS(existingIncoming, stockUpdates, action);
+        incomingStockService.save(existingIncoming); // Save the updated IncomingStock entity
         return ResponseEntity.ok(updatedStockView);
-    } else {
+    }
+    else {
         return ResponseEntity.notFound().build();
     }
 }
@@ -473,6 +476,7 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         } else {
             stockView.setBrandName(Collections.singletonList("Brand not available"));
         }
+
         stockView.setPrice(Collections.singletonList(incomingStockRequest.getPrice()));
         stockView.setUnitName(Collections.singletonList(incomingStockRequest.getUnit().getUnitName()));
         stockView.setStandardPrice(Collections.singletonList(incomingStockRequest.getStandardPrice()));
@@ -487,17 +491,26 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         // Update status based on action
         if (action != null && !action.isEmpty()) {
             if (action.equalsIgnoreCase("verify")) {
-                stockView.setStatus("verified");
+                incomingStockRequest.setStatus("verified");  // Update status in the entity
+                stockView.setStatus("verified");  // Update status in the DTO
             } else if (action.equalsIgnoreCase("reject")) {
-                stockView.setStatus("rejected");
+                incomingStockRequest.setStatus("rejected");  // Update status in the entity
+                stockView.setStatus("rejected");  // Update status in the DTO
             }
-        }  else {
+        } else {
             // If no action is provided, update the status from the updates map
-            stockView.setStatus((String) updates.get("status"));
+            String updatedStatus = (String) updates.get("status");
+            if (updatedStatus != null) {
+                incomingStockRequest.setStatus(updatedStatus);  // Update status in the entity
+                stockView.setStatus(updatedStatus);  // Update status in the DTO
+            }
         }
+
+        // Save the updated entity
+        incomingStockService.save(incomingStockRequest);
+
         return stockView;
     }
-
 
     @GetMapping("/created")
     public ResponseEntity<StockViewResponse> getCreatedStockView() {

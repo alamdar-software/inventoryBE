@@ -2,6 +2,7 @@ package com.inventory.project.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class StockViewDto {
@@ -29,6 +30,7 @@ public class StockViewDto {
     private String dataType;
     private String status; // Add status field
 
+    private String CurrencyName;
     public StockViewDto() {
     }
 
@@ -39,6 +41,14 @@ public class StockViewDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCurrencyName() {
+        return CurrencyName;
+    }
+
+    public void setCurrencyName(String currencyName) {
+        CurrencyName = currencyName;
     }
 
     public String getLocationName() {

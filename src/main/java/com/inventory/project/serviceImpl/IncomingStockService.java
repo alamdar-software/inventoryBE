@@ -6,6 +6,7 @@ import com.inventory.project.repository.*;
 //import jakarta.persistence.EntityNotFoundException;
 
 import io.micrometer.common.util.StringUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,7 @@ public class IncomingStockService {
         return incomingStockRepo.findById(id);
     }
 
+    @Transactional
     public IncomingStock save(IncomingStock existingIncoming) {
         return incomingStockRepo.save(existingIncoming);
 
