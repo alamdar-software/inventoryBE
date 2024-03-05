@@ -491,11 +491,11 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         // Update status based on action
         if (action != null && !action.isEmpty()) {
             if (action.equalsIgnoreCase("verify")) {
-                incomingStockRequest.setStatus("verified");  // Update status in the entity
-                stockView.setStatus("verified");  // Update status in the DTO
+                incomingStockRequest.setStatus("verified");
+                stockView.setStatus("verified");
             } else if (action.equalsIgnoreCase("reject")) {
-                incomingStockRequest.setStatus("rejected");  // Update status in the entity
-                stockView.setStatus("rejected");  // Update status in the DTO
+                incomingStockRequest.setStatus("rejected");
+                stockView.setStatus("rejected");
             }
         } else {
             // If no action is provided, update the status from the updates map
@@ -505,8 +505,6 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
                 stockView.setStatus(updatedStatus);  // Update status in the DTO
             }
         }
-
-        // Save the updated entity
         incomingStockService.save(incomingStockRequest);
 
         return stockView;
