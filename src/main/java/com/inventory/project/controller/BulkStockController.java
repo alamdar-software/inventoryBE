@@ -496,6 +496,9 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
             } else if (action.equalsIgnoreCase("reject")) {
                 incomingStockRequest.setStatus("rejected");  // Update status in the entity
                 stockView.setStatus("rejected");  // Update status in the DTO
+            } else if (action.equalsIgnoreCase("approve")) {
+                incomingStockRequest.setStatus("approved");  // Update status in the entity
+                stockView.setStatus("rejected");  // Update status in the DTO
             }
         } else {
             // If no action is provided, update the status from the updates map
