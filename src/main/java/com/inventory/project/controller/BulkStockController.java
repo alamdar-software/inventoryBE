@@ -461,7 +461,7 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         } else {
             stockView.setAddress("Address not available");
         }
-        stockView.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+        stockView.setPurchaseOrder((String) updates.get("purchaseOrder"));
         stockView.setRemarks(incomingStockRequest.getRemarks());
         stockView.setDate(incomingStockRequest.getDate());
         stockView.setUnitCost(Collections.singletonList(incomingStockRequest.getUnitCost()));
