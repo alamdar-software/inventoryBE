@@ -620,39 +620,93 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
 
 
     @GetMapping("/verified")
-    public ResponseEntity<List<Object>> getVerifiedStocks() {
-        try {
-            List<Object> stocks = new ArrayList<>();
-            stocks.addAll(incomingStockRepo.findByStatus("verified"));
-            stocks.addAll(bulkStockRepo.findByStatus("verified"));
-            return ResponseEntity.ok(stocks);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public ResponseEntity<StockViewResponse> getVerifiedStockView() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("verified");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("verified");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
         }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/rejected")
-    public ResponseEntity<List<Object>> getRejectedStocks() {
-        try {
-            List<Object> stocks = new ArrayList<>();
-            stocks.addAll(incomingStockRepo.findByStatus("rejected"));
-            stocks.addAll(bulkStockRepo.findByStatus("rejected"));
-            return ResponseEntity.ok(stocks);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public ResponseEntity<StockViewResponse> getRejectedStockView() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("rejected");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("rejected");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
         }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/approved")
-    public ResponseEntity<List<Object>> getApprovedStocks(){
-        try {
-            List<Object> stocks =new ArrayList<>();
-            stocks.addAll(incomingStockRepo.findByStatus("approved"));
-            stocks.addAll(bulkStockRepo.findByStatus("approved"));
-            return  ResponseEntity.ok(stocks);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public ResponseEntity<StockViewResponse> getApprovedStockView() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("approved");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("approved");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
         }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getBoth/{id}")
