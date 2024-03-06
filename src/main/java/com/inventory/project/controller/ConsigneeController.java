@@ -79,6 +79,12 @@ public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee c
 
             existingConsignee.setLocationName(consignee.getLocationName()); // Update locationName directly in Consignee entity
             existingConsignee.setConsigneeName(consignee.getConsigneeName()); // Update other fields as needed
+            existingConsignee.setAddress(consignee.getAddress());
+            existingConsignee.setEmail(consignee.getEmail());
+            existingConsignee.setPincode(consignee.getPincode());
+            existingConsignee.setPhoneNumber(consignee.getPhoneNumber());
+            existingConsignee.setNotifyParty(consignee.getNotifyParty());
+            existingConsignee.setDeliveryAddress(consignee.getDeliveryAddress());
 
             Consignee updatedConsignee = consigneeRepo.save(existingConsignee);
 
