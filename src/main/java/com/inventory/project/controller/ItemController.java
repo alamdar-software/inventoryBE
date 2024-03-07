@@ -218,24 +218,14 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
                 if (itemDetails.getDescription() != null) {
                     item.setDescription(itemDetails.getDescription());
                 }
-                if (itemDetails.getUnit() != null) {
-                    // Retain the existing unit mapping without updating its name
-                    item.setUnit(item.getUnit());
+                if (itemDetails.getName() != null) {
+                    item.setName(itemDetails.getName());
                 }
-                if (itemDetails.getCategory() != null) {
-                    Category category = categoryRepository.findByName(itemDetails.getCategory().getName());
-                    if (category != null) {
-                        // If the category exists, update the item's category
-                        item.setCategory(category);
-                        // Update the name of the category if necessary
-                        if (!category.getName().equals(item.getName())) {
-                            item.setName(category.getName());
-                        }
-                    } else {
-                        // Handle category not found error
-                    }
+                if (itemDetails.getUnitName() != null) {
+                    item.setUnitName(itemDetails.getUnitName());
                 }
 
+                // Save the updated item
                 Item updatedItem = itemRepository.save(item);
                 if (updatedItem != null) {
                     return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
