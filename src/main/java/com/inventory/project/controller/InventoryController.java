@@ -382,8 +382,31 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
 }
 
 
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> getCountsInventories() {
+        List<Inventory> inventories = inventoryRepo.findAll();
+        List<Map<String, Object>> inventoryList = new ArrayList<>();
 
+        for (Inventory inventory : inventories) {
+            Map<String, Object> inventoryDetails = new HashMap<>();
+            inventoryDetails.put("id", inventory.getId()); // Include the ID
+            inventoryDetails.put("description", inventory.getDescription() + " (" + inventory.getQuantity() + ")");
+            // Include other fields if needed
+            inventoryDetails.put("locationName", inventory.getLocationName());
+            inventoryDetails.put("address", inventory.getAddress());
+            inventoryDetails.put("quantity", inventory.getQuantity());
+            inventoryDetails.put("consumedItem", inventory.getConsumedItem());
+            inventoryDetails.put("scrappedItem", inventory.getScrappedItem());
+            inventoryList.add(inventoryDetails);
+        }
 
+        // Create the response map including the inventory list and total count
+        Map<String, Object> response = new HashMap<>();
+        response.put("inventoryList", inventoryList);
+        response.put("totalCount", inventories.size());
+
+        return ResponseEntity.ok(response);
+    }
 
 }
 
