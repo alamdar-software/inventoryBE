@@ -381,5 +381,17 @@ private ConsumeService consumeService;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> getAllConsumedItemsWithCount() {
+        List<ConsumedItem> consumedItems = consumedItemRepo.findAll();
+        int totalCount = consumedItems.size();
+
+        // Create the response map including the list of consumed items and total count
+        Map<String, Object> response = new HashMap<>();
+        response.put("consumedItems", consumedItems);
+        response.put("totalCount", totalCount);
+
+        return ResponseEntity.ok(response);
+    }
 
 }

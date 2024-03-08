@@ -15,10 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/scrappeditem")
@@ -338,4 +335,17 @@ public class ScrappedItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> getAllScrappedItemsWithCount() {
+        List<ScrappedItem> scrappedItems = scrappedItemRepository.findAll();
+        int totalCount = scrappedItems.size();
+
+        // Create the response map including the list of scrapped items and total count
+        Map<String, Object> response = new HashMap<>();
+        response.put("scrappedItems", scrappedItems);
+        response.put("totalCount", totalCount);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
