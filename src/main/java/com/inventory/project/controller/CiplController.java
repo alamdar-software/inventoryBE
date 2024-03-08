@@ -413,6 +413,18 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
 
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/viewCount")
+    public ResponseEntity<Map<String, Object>> getAllCiplWithCount() {
+        List<Cipl> ciplList = ciplRepository.findAll();
+        int totalCount = ciplList.size();
+
+        // Create the response map including the list of Cipl items and total count
+        Map<String, Object> response = new HashMap<>();
+        response.put("ciplList", ciplList);
+        response.put("totalCount", totalCount);
+
+        return ResponseEntity.ok(response);
+    }
 
 
 }
