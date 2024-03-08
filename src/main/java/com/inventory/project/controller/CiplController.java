@@ -401,21 +401,18 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         List<InternalTransfer> itList = internalTransferService.getAllInternalTransfers();
         List<Mto> mtoList = mtoService.getAllMto();
 
-        // Calculate total counts
-        int totalCiplCount = ciplList.size();
-        int totalItCount = itList.size();
-        int totalMtoCount = mtoList.size();
+        // Calculate total count for all three entities combined
+        int totalCount = ciplList.size() + itList.size() + mtoList.size();
 
-        // Create the response map including data and total counts
+        // Create the response map including data and total count
         Map<String, Object> response = new HashMap<>();
-        response.put("totalCiplCount", totalCiplCount);
         response.put("ciplList", ciplList);
-        response.put("totalItCount", totalItCount);
         response.put("itList", itList);
-        response.put("totalMtoCount", totalMtoCount);
         response.put("mtoList", mtoList);
+        response.put("totalCount", totalCount);
 
         return ResponseEntity.ok(response);
     }
+
 
 }
