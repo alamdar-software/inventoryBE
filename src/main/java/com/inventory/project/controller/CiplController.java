@@ -4,6 +4,8 @@ import com.inventory.project.model.*;
 import com.inventory.project.model.Currency;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.CiplService;
+import com.inventory.project.serviceImpl.InternalTransferService;
+import com.inventory.project.serviceImpl.MtoService;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,10 +38,13 @@ public class CiplController {
     private  PickupRepository pickupRepository;
 
     private final CiplService ciplService;
-
+    private MtoService mtoService;
+    private InternalTransferService internalTransferService;
     @Autowired
-    public CiplController(CiplService ciplService) {
+    public CiplController(CiplService ciplService,InternalTransferService internalTransferService,MtoService mtoService) {
         this.ciplService = ciplService;
+        this.internalTransferService=internalTransferService;
+        this.mtoService=mtoService;
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
@@ -388,6 +393,29 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }catch (Exception e){
             return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> getAllDataWithCounts() {
+        // Get data from the existing endpoints
+        List<Cipl> ciplList = ciplRepository.findAll();
+        List<InternalTransfer> itList = internalTransferService.getAllInternalTransfers();
+        List<Mto> mtoList = mtoService.getAllMto();
+
+        // Calculate total counts
+        int totalCiplCount = ciplList.size();
+        int totalItCount = itList.size();
+        int totalMtoCount = mtoList.size();
+
+        // Create the response map including data and total counts
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCiplCount", totalCiplCount);
+        response.put("ciplList", ciplList);
+        response.put("totalItCount", totalItCount);
+        response.put("itList", itList);
+        response.put("totalMtoCount", totalMtoCount);
+        response.put("mtoList", mtoList);
+
+        return ResponseEntity.ok(response);
     }
 
 }

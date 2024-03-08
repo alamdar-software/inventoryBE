@@ -251,6 +251,25 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
         }
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> viewAllItemsCounts(HttpSession session) {
+        try {
+            List<Item> items = itemRepository.findAll();
+
+            // Create the response map including the list of items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("items", items);
+            response.put("totalCount", items.size());
+
+            if (!items.isEmpty()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 
 }
