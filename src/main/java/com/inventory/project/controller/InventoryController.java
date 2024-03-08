@@ -381,6 +381,7 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
     }
 }
 
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getCountsInventories() {

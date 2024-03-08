@@ -218,52 +218,21 @@ public class LocationController {
     }
 
 
-//    @PostMapping("/downloadExcel")
-//    public ResponseEntity<?> downloadExcel(@RequestBody(required = false) SearchCriteria criteria) {
-//        // Your existing search logic
-//
-//        // Generate Excel if needed
-//        if (criteria != null && criteria.isGenerateExcel()) {
-//            try {
-//                List<Location> locationList;
-//
-//                if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-//                    locationList = locationService.getLocationByLocationName(criteria.getLocationName());
-//
-//                    // Check if the locationList is not empty before generating Excel
-//                    if (!locationList.isEmpty()) {
-//                        byte[] excelBytes = ExcelGenerator.generateExcel(locationList);
-//
-//                        HttpHeaders headers = new HttpHeaders();
-//                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-//                        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=locations.xlsx");
-//
-//                        return ResponseEntity.ok()
-//                                .headers(headers)
-//                                .body(excelBytes);
-//                    } else {
-//                        return ResponseEntity.notFound().build();
-//                    }
-//                } else {
-//                    return ResponseEntity.badRequest().build(); // You may customize this response according to your needs
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace(); // Handle exception appropriately
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating Excel");
-//            }
-//        }
-//
-//        // Continue with your existing logic
-//        // ...
-//
-//        // Replace the comment with the actual result you want to return
-//        List<Location> locationList = locationService.getLocationByLocationName(String.valueOf(criteria));
-//        if (locationList.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        return ResponseEntity.ok(locationList);
-//    }
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Object>> getAllCounts() {
+        List<Location> locations = locationRepo.findAll();
+        if (locations.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Create the response map including the list of locations and total count
+        Map<String, Object> response = new HashMap<>();
+        response.put("locations", locations);
+        response.put("totalCount", locations.size());
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }
