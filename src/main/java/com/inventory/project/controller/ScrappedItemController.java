@@ -337,7 +337,8 @@ public class ScrappedItemController {
     }
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllScrappedItemsWithCount() {
-        List<ScrappedItem> scrappedItems = scrappedItemRepository.findAll();
+        List<ScrappedItem> scrappedItems = scrappedItemRepository.findByStatus("approved"); // Assuming status field is named "status"
+
         int totalCount = scrappedItems.size();
 
         // Create the response map including the list of scrapped items and total count
@@ -347,5 +348,6 @@ public class ScrappedItemController {
 
         return ResponseEntity.ok(response);
     }
+
 
 }

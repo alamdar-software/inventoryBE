@@ -396,10 +396,10 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
     }
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllDataWithCounts() {
-        // Get data from the existing endpoints
-        List<Cipl> ciplList = ciplRepository.findAll();
-        List<InternalTransfer> itList = internalTransferService.getAllInternalTransfers();
-        List<Mto> mtoList = mtoService.getAllMto();
+        // Get data from the existing endpoints with approved status
+        List<Cipl> ciplList = ciplRepository.findByStatus("approved");
+        List<InternalTransfer> itList = internalTransferService.findApprovedInternalTransfers();
+        List<Mto> mtoList = mtoService.findApprovedMto();
 
         // Calculate total count for all three entities combined
         int totalCount = ciplList.size() + itList.size() + mtoList.size();
@@ -413,18 +413,17 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
 
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/viewCount")
     public ResponseEntity<Map<String, Object>> getAllCiplWithCount() {
         List<Cipl> ciplList = ciplRepository.findAll();
         int totalCount = ciplList.size();
 
-        // Create the response map including the list of Cipl items and total count
         Map<String, Object> response = new HashMap<>();
         response.put("ciplList", ciplList);
         response.put("totalCount", totalCount);
 
         return ResponseEntity.ok(response);
     }
-
 
 }

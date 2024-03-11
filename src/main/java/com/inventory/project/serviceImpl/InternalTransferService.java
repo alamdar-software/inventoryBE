@@ -23,7 +23,9 @@ public class InternalTransferService {
     public InternalTransferService(InternalTransferRepo internalTransferRepository) {
         this.internalTransferRepository = internalTransferRepository;initializeLocationReferenceMap();
     }
-
+    public List<InternalTransfer> findApprovedInternalTransfers() {
+        return internalTransferRepository.findByStatus("approved"); // Assuming status field is named "status"
+    }
     public List<InternalTransfer> getAllInternalTransfers() {
         return internalTransferRepository.findAll();
     }

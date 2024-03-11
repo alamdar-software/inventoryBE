@@ -383,7 +383,8 @@ private ConsumeService consumeService;
     }
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllConsumedItemsWithCount() {
-        List<ConsumedItem> consumedItems = consumedItemRepo.findAll();
+        List<ConsumedItem> consumedItems = consumedItemRepo.findByStatus("approved"); // Assuming status field is named "status"
+
         int totalCount = consumedItems.size();
 
         // Create the response map including the list of consumed items and total count
@@ -393,5 +394,6 @@ private ConsumeService consumeService;
 
         return ResponseEntity.ok(response);
     }
+
 
 }

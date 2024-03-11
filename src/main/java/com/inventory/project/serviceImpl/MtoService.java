@@ -22,7 +22,9 @@ public class MtoService {
     public MtoService(MtoRepository mtoRepository) {
         this.mtoRepository = mtoRepository;initializeLocationReferenceMap();
     }
-
+    public List<Mto> findApprovedMto() {
+        return mtoRepository.findByStatus("approved"); // Assuming status field is named "status"
+    }
     public List<Mto> getAllMto() {
         return mtoRepository.findAll();
     }
