@@ -427,4 +427,26 @@ public class ScrappedItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approverrejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedScrappedItemsWithCount() {
+        try {
+            List<ScrappedItem> rejectedItems = scrappedItemRepository.findByStatus("Rejected");
+            int totalCount = rejectedItems.size();
+
+            // Create the response map including the list of rejected Scrapped Item items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedScrappedItems", rejectedItems);
+            response.put("totalCount", totalCount);
+
+            // If no rejected items found, return a response with total count 0
+            if (totalCount == 0) {
+                return ResponseEntity.ok(Collections.singletonMap("totalCount", 0));
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

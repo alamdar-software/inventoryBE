@@ -448,5 +448,27 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approverrejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedMtosWithCount() {
+        try {
+            List<Mto> rejectedMtos = mtoRepository.findByStatus("Rejected");
+            int totalCount = rejectedMtos.size();
+
+            // Create the response map including the list of rejected MTO items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedMtos", rejectedMtos);
+            response.put("totalCount", totalCount);
+
+            // If no rejected items found, return a response with total count 0
+            if (totalCount == 0) {
+                return ResponseEntity.ok(Collections.singletonMap("totalCount", 0));
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 }

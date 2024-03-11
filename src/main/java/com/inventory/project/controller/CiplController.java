@@ -504,6 +504,27 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @GetMapping("/approverrejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedCiplItemsWithCount() {
+        try {
+            List<Cipl> rejectedItems = ciplRepository.findByStatus("Rejected");
+            int totalCount = rejectedItems.size();
+
+            // Create the response map including the list of rejected CIPL items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedCiplItems", rejectedItems);
+            response.put("totalCount", totalCount);
+
+            // If no rejected items found, return a response with total count 0
+            if (totalCount == 0) {
+                return ResponseEntity.ok(Collections.singletonMap("totalCount", 0));
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 }

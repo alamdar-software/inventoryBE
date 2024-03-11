@@ -317,6 +317,27 @@ public class InternalTransferController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approverrejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedInternalTransfersWithCount() {
+        try {
+            List<InternalTransfer> rejectedTransfers = internalTransferRepo.findByStatus("Rejected");
+            int totalCount = rejectedTransfers.size();
+
+            // Create the response map including the list of rejected Internal Transfer items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedInternalTransfers", rejectedTransfers);
+            response.put("totalCount", totalCount);
+
+            // If no rejected items found, return a response with total count 0
+            if (totalCount == 0) {
+                return ResponseEntity.ok(Collections.singletonMap("totalCount", 0));
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 }
