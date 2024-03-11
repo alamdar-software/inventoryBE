@@ -426,4 +426,64 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/createdCount")
+    public ResponseEntity<Map<String, Object>> getCreatedCiplItem() {
+        try {
+            List<Cipl> createdCiplItems = ciplRepository.findByStatus("Created");
+            int totalCount = createdCiplItems.size();
+
+            // Create the response map including the list of created CIPL items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("createdCiplItems", createdCiplItems);
+            response.put("totalCount", totalCount);
+
+            if (createdCiplItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/verifiedCount")
+    public ResponseEntity<Map<String, Object>> getVerifiedCountCiplItems() {
+        try {
+            List<Cipl> verifiedCiplItems = ciplRepository.findByStatus("Verified");
+            int totalCount = verifiedCiplItems.size();
+
+            // Create the response map including the list of verified CIPL items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("verifiedCiplItems", verifiedCiplItems);
+            response.put("totalCount", totalCount);
+
+            if (verifiedCiplItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/rejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedCountCiplItems() {
+        try {
+            List<Cipl> rejectedCiplItems = ciplRepository.findByStatus("Rejected");
+            int totalCount = rejectedCiplItems.size();
+
+            // Create the response map including the list of rejected CIPL items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedCiplItems", rejectedCiplItems);
+            response.put("totalCount", totalCount);
+
+            if (rejectedCiplItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }

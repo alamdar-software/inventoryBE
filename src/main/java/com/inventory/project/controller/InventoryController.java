@@ -401,7 +401,6 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
             inventoryList.add(inventoryDetails);
         }
 
-        // Create the response map including the inventory list and total count
         Map<String, Object> response = new HashMap<>();
         response.put("inventoryList", inventoryList);
         response.put("totalCount", inventories.size());
