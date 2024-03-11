@@ -427,5 +427,26 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
         }
     }
 
+    @GetMapping("/approvedCount")
+    public ResponseEntity<Map<String, Object>> getApprovedMtoCount() {
+        try {
+            List<Mto> approvedMtos = mtoRepository.findByStatus("Approved");
+            int totalCount = approvedMtos.size();
+
+            // Create the response map including the list of approved MTOs and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("approvedMtos", approvedMtos);
+            response.put("totalCount", totalCount);
+
+            if (approvedMtos.isEmpty()) {
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

@@ -488,5 +488,22 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @GetMapping("/approvedCount")
+    public ResponseEntity<Map<String, Object>> getVerifiedCiplCount() {
+        try {
+            List<Cipl> verifiedCipl = ciplRepository.findByStatus("Approved");
+            int totalCount = verifiedCipl.size();
+
+            // Create the response map including the list of verified CIPL items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("verifiedCiplItems", verifiedCipl);
+            response.put("totalCount", totalCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
 }

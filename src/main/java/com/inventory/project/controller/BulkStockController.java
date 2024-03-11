@@ -885,5 +885,42 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
 
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/approvedCount")
+    public ResponseEntity<StockViewResponse> getApprovedStockViewCount() {
+        try {
+            List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("approved");
+            List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("approved");
+
+            int incomingStockCount = incomingStocks.size();
+            int bulkStockCount = bulkStocks.size();
+            int totalCount = incomingStockCount + bulkStockCount;
+
+            // Create a response with total count and other details
+            StockViewResponse response = new StockViewResponse();
+            response.setTotalCount(totalCount);
+            response.setIncomingStockCount(incomingStockCount);
+            response.setBulkStockCount(bulkStockCount);
+
+            if (totalCount == 0) {
+                return ResponseEntity.ok(response); // Return response with total count 0
+            }
+
+            // If there is data, create StockViewDto list and populate it
+            List<StockViewDto> stockViewList = new ArrayList<>();
+            for (IncomingStock incomingStock : incomingStocks) {
+                StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+                stockViewList.add(stockView);
+            }
+            for (BulkStock bulkStock : bulkStocks) {
+                StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+                stockViewList.add(stockView);
+            }
+            response.setStockViewList(stockViewList);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

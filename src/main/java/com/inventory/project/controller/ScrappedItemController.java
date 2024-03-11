@@ -29,6 +29,7 @@ public class ScrappedItemController {
 
     @Autowired
     private ScrappedItemService scrappedItemService;
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
@@ -109,6 +110,7 @@ public class ScrappedItemController {
         scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
@@ -123,6 +125,7 @@ public class ScrappedItemController {
         Optional<ScrappedItem> scrappedItem = scrappedItemRepository.findById(id);
         return scrappedItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
@@ -134,6 +137,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
@@ -157,6 +161,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
@@ -207,9 +212,7 @@ public class ScrappedItemController {
     }
 
 
-
-
-//    @PostMapping("/searchReport")
+    //    @PostMapping("/searchReport")
 //    public ResponseEntity<List<ScrappedItem>> searchConsumeByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
 //        if (criteria == null) {
 //            List<ScrappedItem> allCipl = scrappedItemService.getAll();
@@ -230,7 +233,7 @@ public class ScrappedItemController {
 //
 //        return ResponseEntity.ok(ciplList);
 //    }
-@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/searchReport")
     public ResponseEntity<List<ScrappedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
@@ -258,6 +261,7 @@ public class ScrappedItemController {
             return ResponseEntity.ok(result);
         }
     }
+
     @PutMapping("/status/{id}")
     public ResponseEntity<ScrappedItem> updateScrappedItemByIdStatus(@PathVariable("id") Long id, @RequestBody ScrappedItem request) {
         Optional<ScrappedItem> existingScrappedItem = scrappedItemRepository.findById(id);
@@ -284,6 +288,7 @@ public class ScrappedItemController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/created")
     public ResponseEntity<List<ScrappedItem>> getCreatedScrappedItems() {
         try {
@@ -324,17 +329,18 @@ public class ScrappedItemController {
     }
 
     @GetMapping("/approved")
-    public ResponseEntity<List<ScrappedItem>> getApprovedScrappedItems(){
+    public ResponseEntity<List<ScrappedItem>> getApprovedScrappedItems() {
         try {
-            List<ScrappedItem> approvedItems =scrappedItemRepository.findByStatus("Approved");
-            if (approvedItems.isEmpty()){
+            List<ScrappedItem> approvedItems = scrappedItemRepository.findByStatus("Approved");
+            if (approvedItems.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(approvedItems);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllScrappedItemsWithCount() {
         List<ScrappedItem> scrappedItems = scrappedItemRepository.findByStatus("approved"); // Assuming status field is named "status"
@@ -400,6 +406,25 @@ public class ScrappedItemController {
         }
     }
 
+    @GetMapping("/approvedCount")
+    public ResponseEntity<Map<String, Object>> getApprovedScrappedItemsCount() {
+        try {
+            List<ScrappedItem> approvedItems = scrappedItemRepository.findByStatus("Approved");
+            int totalCount = approvedItems.size();
 
+            // Create the response map including the list of approved items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("approvedItems", approvedItems);
+            response.put("totalCount", totalCount);
 
+            if (approvedItems.isEmpty()) {
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

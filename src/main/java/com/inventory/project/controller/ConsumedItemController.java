@@ -445,5 +445,25 @@ private ConsumeService consumeService;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approvedCount")
+    public ResponseEntity<Map<String, Object>> getApprovedConsumeItemsCount() {
+        try {
+            List<ConsumedItem> approvedItems = consumedItemRepo.findByStatus("Approved");
+            int totalCount = approvedItems.size();
 
+            // Create the response map including the list of approved items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("approvedItems", approvedItems);
+            response.put("totalCount", totalCount);
+
+            if (approvedItems.isEmpty()) {
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

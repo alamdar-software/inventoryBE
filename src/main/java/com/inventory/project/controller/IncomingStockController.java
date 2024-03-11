@@ -490,6 +490,42 @@ public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody Searc
         }
     }
 
+    @GetMapping("/approvedTotalCount")
+    public ResponseEntity<Map<String, Integer>> getTotalVerifierCounts() {
+        try {
+            // Initialize total counts
+            int totalCiplItemCount = ciplRepository.findByStatus("Verified").size();
+            int totalInternalTransferCount = internalTransferRepo.findByStatus("Verified").size();
+            int totalConsumedItemCount = consumedItemRepo.findByStatus("Verified").size();
+            int totalScrappedItemCount = scrappedItemRepository.findByStatus("Verified").size();
+            int totalMtoCount = mtoRepository.findByStatus("Verified").size();
+            int totalIncomingStockCount = incomingStockRepo.findByStatus("Verified").size();
+            int totalBulkStockCount = bulkStockRepo.findByStatus("Verified").size();
+
+            // Calculate total count including all entity counts
+            int totalCount = totalCiplItemCount + totalInternalTransferCount + totalConsumedItemCount
+                    + totalScrappedItemCount + totalMtoCount + totalIncomingStockCount + totalBulkStockCount;
+
+            // If totalCount is zero, return immediately with zero count
+            if (totalCount == 0) {
+                return ResponseEntity.ok(Collections.singletonMap("totalCount", 0));
+            }
+
+            // Create the response map including only the total count
+            Map<String, Integer> response = new HashMap<>();
+            response.put("totalCount", totalCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Create a response with an error message
+            Map<String, Integer> errorResponse = new HashMap<>();
+            errorResponse.put("error", -1); // Indicate an error with a negative count value
+            errorResponse.put("message", Integer.valueOf(e.getMessage())); // Include the exception message
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
 
 
 }
