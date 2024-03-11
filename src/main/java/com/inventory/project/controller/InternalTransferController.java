@@ -249,4 +249,65 @@ public class InternalTransferController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/createdCount")
+    public ResponseEntity<Map<String, Object>> getCreatedInternalTransfersCount() {
+        try {
+            List<InternalTransfer> createdTransfers = internalTransferRepo.findByStatus("Created");
+            int totalCount = createdTransfers.size();
+
+            // Create the response map including the list of created InternalTransfer items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("createdTransfers", createdTransfers);
+            response.put("totalCount", totalCount);
+
+            if (createdTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/verifiedCount")
+    public ResponseEntity<Map<String, Object>> getVerifiedInternalTransfersCount() {
+        try {
+            List<InternalTransfer> verifiedTransfers = internalTransferRepo.findByStatus("Verified");
+            int totalCount = verifiedTransfers.size();
+
+            // Create the response map including the list of verified InternalTransfer items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("verifiedTransfers", verifiedTransfers);
+            response.put("totalCount", totalCount);
+
+            if (verifiedTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedInternalTransfersCount() {
+        try {
+            List<InternalTransfer> rejectedTransfers = internalTransferRepo.findByStatus("Rejected");
+            int totalCount = rejectedTransfers.size();
+
+            // Create the response map including the list of rejected InternalTransfer items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedTransfers", rejectedTransfers);
+            response.put("totalCount", totalCount);
+
+            if (rejectedTransfers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

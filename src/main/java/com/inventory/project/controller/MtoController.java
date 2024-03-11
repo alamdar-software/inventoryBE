@@ -375,4 +375,65 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
        }
     }
+
+    @GetMapping("/createdCount")
+    public ResponseEntity<Map<String, Object>> getCreatedMtosCount() {
+        try {
+            List<Mto> createdMtos = mtoRepository.findByStatus("Created");
+            int totalCount = createdMtos.size();
+
+            // Create the response map including the list of created MTO items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("createdMtos", createdMtos);
+            response.put("totalCount", totalCount);
+
+            if (createdMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/verifiedCount")
+    public ResponseEntity<Map<String, Object>> getVerifiedMtosCount() {
+        try {
+            List<Mto> verifiedMtos = mtoRepository.findByStatus("Verified");
+            int totalCount = verifiedMtos.size();
+
+            // Create the response map including the list of verified MTO items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("verifiedMtos", verifiedMtos);
+            response.put("totalCount", totalCount);
+
+            if (verifiedMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedMtosCount() {
+        try {
+            List<Mto> rejectedMtos = mtoRepository.findByStatus("Rejected");
+            int totalCount = rejectedMtos.size();
+
+            // Create the response map including the list of rejected MTO items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedMtos", rejectedMtos);
+            response.put("totalCount", totalCount);
+
+            if (rejectedMtos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
