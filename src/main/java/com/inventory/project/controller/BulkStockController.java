@@ -922,5 +922,31 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/approverrejectedCount")
+    public ResponseEntity<StockViewResponse> getRejectedStockViewCountcount() {
+        try {
+            List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("rejected");
+            List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("rejected");
 
+            int incomingStockCount = incomingStocks.size();
+            int bulkStockCount = bulkStocks.size();
+            int totalCount = incomingStockCount + bulkStockCount;
+
+            // Create an empty list for StockViewDto
+            List<StockViewDto> stockViewList = new ArrayList<>();
+
+            // No need to iterate over items to create DTOs as we are not returning the actual items
+
+            // Create the StockViewResponse with counts and empty StockViewDto list
+            StockViewResponse response = new StockViewResponse();
+            response.setTotalCount(totalCount);
+            response.setIncomingStockCount(incomingStockCount);
+            response.setBulkStockCount(bulkStockCount);
+            response.setStockViewList(stockViewList);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
