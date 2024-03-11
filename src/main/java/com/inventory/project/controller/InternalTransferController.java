@@ -261,9 +261,6 @@ public class InternalTransferController {
             response.put("createdTransfers", createdTransfers);
             response.put("totalCount", totalCount);
 
-            if (createdTransfers.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -281,9 +278,6 @@ public class InternalTransferController {
             response.put("verifiedTransfers", verifiedTransfers);
             response.put("totalCount", totalCount);
 
-            if (verifiedTransfers.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -301,9 +295,6 @@ public class InternalTransferController {
             response.put("rejectedTransfers", rejectedTransfers);
             response.put("totalCount", totalCount);
 
-            if (rejectedTransfers.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

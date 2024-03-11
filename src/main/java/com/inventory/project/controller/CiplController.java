@@ -438,7 +438,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             response.put("totalCount", totalCount);
 
             if (createdCiplItems.isEmpty()) {
-                return ResponseEntity.noContent().build();
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -458,7 +459,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             response.put("totalCount", totalCount);
 
             if (verifiedCiplItems.isEmpty()) {
-                return ResponseEntity.noContent().build();
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -478,7 +480,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             response.put("totalCount", totalCount);
 
             if (rejectedCiplItems.isEmpty()) {
-                return ResponseEntity.noContent().build();
+                response.put("totalCount", 0); // Set total count to 0 if no data
+                return ResponseEntity.ok(response);
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
