@@ -395,5 +395,55 @@ private ConsumeService consumeService;
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/createdCount")
+    public ResponseEntity<Map<String, Object>> getCreatedConsumedItemsCount() {
+        try {
+            List<ConsumedItem> createdItems = consumedItemRepo.findByStatus("created");
+            int totalCount = createdItems.size();
+
+            // Create the response map including the list of created ConsumedItem items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("createdItems", createdItems);
+            response.put("totalCount", totalCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/verifiedCount")
+    public ResponseEntity<Map<String, Object>> getVerifiedConsumedItemsCount() {
+        try {
+            List<ConsumedItem> verifiedItems = consumedItemRepo.findByStatus("verified");
+            int totalCount = verifiedItems.size();
+
+            // Create the response map including the list of verified ConsumedItem items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("verifiedItems", verifiedItems);
+            response.put("totalCount", totalCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/rejectedCount")
+    public ResponseEntity<Map<String, Object>> getRejectedConsumedItemsCount() {
+        try {
+            List<ConsumedItem> rejectedItems = consumedItemRepo.findByStatus("rejected");
+            int totalCount = rejectedItems.size();
+
+            // Create the response map including the list of rejected ConsumedItem items and total count
+            Map<String, Object> response = new HashMap<>();
+            response.put("rejectedItems", rejectedItems);
+            response.put("totalCount", totalCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

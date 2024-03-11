@@ -797,5 +797,93 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         return responseDto;
     }
 
+    @GetMapping("/createdCount")
+    public ResponseEntity<StockViewResponse> getCreatedStockViewCount() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("created");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("created");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/verifiedCount")
+    public ResponseEntity<StockViewResponse> getVerifiedStockViewCount() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("verified");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("verified");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/rejectedCount")
+    public ResponseEntity<StockViewResponse> getRejectedStockViewCount() {
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("rejected");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("rejected");
+
+        int incomingStockCount = incomingStocks.size();
+        int bulkStockCount = bulkStocks.size();
+        int totalCount = incomingStockCount + bulkStockCount;
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapStatusIncomingStockToDTO(incomingStock);
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapStatusBulkStockToDTO(bulkStock);
+            stockViewList.add(stockView);
+        }
+
+        StockViewResponse response = new StockViewResponse();
+        response.setTotalCount(totalCount);
+        response.setIncomingStockCount(incomingStockCount);
+        response.setBulkStockCount(bulkStockCount);
+        response.setStockViewList(stockViewList);
+
+        return ResponseEntity.ok(response);
+    }
 
 }
