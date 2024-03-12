@@ -55,7 +55,6 @@ public class MtoService {
 //    }
 
     @Transactional
-
     public Mto createMto(Mto mto) {
         mto.setStatus("Created");
 
@@ -79,50 +78,19 @@ public class MtoService {
             locationReferenceMap.put(locationName, referenceNumber);
         }
 
-        // Set the destination sublocation
-        String destinationSublocation = mto.getDestinationSublocation();
-        mto.setDestinationSublocation(destinationSublocation);
+        // Retrieve the list of inventories with the same locationName
+        List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
-        // Check if the destination location has changed
-        if (!Objects.equals(locationName, destinationSublocation)) {
-            Location destinationLocation = locationService.getLocationByName(destinationSublocation);
-            if (destinationLocation != null) {
-                List<Address> addresses = destinationLocation.getAddresses();
-                if (!addresses.isEmpty()) {
-                    // Get the first address associated with the destination location
-                    Address newAddress = addresses.get(0);
-                    updateSublocationInInventory(destinationLocation, String.valueOf(mto.getDescription()), newAddress, 1); // Increase quantity for new location
-                } else {
-                    // Handle the case where no addresses are associated with the destination location
-                }
-            } else {
-                // Handle the case where destinationLocation is null
-                // You can log a message or throw an exception to indicate that the location was not found
-            }
+        // Update the address field of each inventory with the new subLocation from the Mto entity
+        for (Inventory inventory : inventories) {
+            Address address = new Address();
+            address.setAddress(String.valueOf(mto.getSubLocation())); // Assuming setAddress method exists in Address entity
+            inventory.setAddress(address); // Update address in Inventory
+            inventoryRepository.save(inventory);
         }
 
         return mtoRepository.save(mto);
     }
-
-
-    private void updateSublocationInInventory(Location location, String description, Address newAddress, int quantityChange) {
-        // Your logic to update the sublocation in the inventory goes here
-        // This method might involve querying the inventory database to find the sublocation based on the location and description,
-        // and then updating the quantity of items in that sublocation by the quantityChange amount.
-        // Here's a basic example assuming you have an InventoryItem entity:
-
-        Inventory item = inventoryRepository.findByLocationAndDescription(location, description);
-        if (item != null) {
-            item.setQuantity(item.getQuantity() + quantityChange);
-            // Update the address field of the inventory item
-            item.setAddress(newAddress);
-            inventoryRepository.save(item);
-        } else {
-            // Handle the case where the inventory item is not found
-        }
-    }
-
-
 
 
     private int getNextAvailableReferenceNumber() {
