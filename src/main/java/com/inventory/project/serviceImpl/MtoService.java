@@ -81,17 +81,45 @@ public class MtoService {
         // Retrieve the list of inventories with the same locationName
         List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
-        // Create and set the Address object using the subLocation from the Mto entity
-        Address address = new Address(mto.getSubLocation()); // Assuming Address has a constructor that accepts a String
-
-        // Update the address field of each inventory with the new Address object
+        // Iterate over the inventories to update quantities
         for (Inventory inventory : inventories) {
-            inventory.setAddress(address); // Update address in Inventory
-            inventoryRepository.save(inventory);
+            // Find matching item in Mto
+            for (int i = 0; i < mto.getQuantity().size(); i++) {
+                // Convert String to int
+                int mtoQuantity = Integer.parseInt(mto.getQuantity().get(i));
+                // Update inventory quantity if there is a match
+                if (inventory.getQuantity() == mtoQuantity) {
+                    int newQuantity = inventory.getQuantity() - mtoQuantity;
+                    // If remaining quantity is zero or less, remove the item
+                    if (newQuantity <= 0) {
+                        inventoryRepository.delete(inventory);
+                    } else {
+                        inventory.setQuantity(newQuantity);
+                        inventoryRepository.save(inventory);
+                    }
+                } else {
+                    // If quantity in Mto is less than inventory, create a new inventory item
+                    int remainingQuantity = inventory.getQuantity() - mtoQuantity;
+                    if (remainingQuantity > 0) {
+                        // Create a new inventory item with remaining quantity
+                        Inventory newInventoryItem = new Inventory();
+                        newInventoryItem.setLocationName(locationName);
+                        newInventoryItem.setQuantity(remainingQuantity);
+
+                        // Set other properties as needed
+                        // Save the new inventory item
+                        inventoryRepository.save(newInventoryItem);
+                    }
+                    // Update quantity of existing inventory item
+                    inventory.setQuantity(mtoQuantity);
+                    inventoryRepository.save(inventory);
+                }
+            }
         }
 
         return mtoRepository.save(mto);
     }
+
 
     private int getNextAvailableReferenceNumber() {
         return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;
