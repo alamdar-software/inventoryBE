@@ -81,17 +81,17 @@ public class MtoService {
         // Retrieve the list of inventories with the same locationName
         List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
-        // Update the address field of each inventory with the new subLocation from the Mto entity
+        // Create and set the Address object using the subLocation from the Mto entity
+        Address address = new Address(mto.getSubLocation()); // Assuming Address has a constructor that accepts a String
+
+        // Update the address field of each inventory with the new Address object
         for (Inventory inventory : inventories) {
-            Address address = new Address();
-            address.setAddress(String.valueOf(mto.getSubLocation())); // Assuming setAddress method exists in Address entity
             inventory.setAddress(address); // Update address in Inventory
             inventoryRepository.save(inventory);
         }
 
         return mtoRepository.save(mto);
     }
-
 
     private int getNextAvailableReferenceNumber() {
         return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;

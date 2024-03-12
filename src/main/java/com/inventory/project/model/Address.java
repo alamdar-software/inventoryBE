@@ -33,6 +33,18 @@ public class Address {
         // Other initialization logic if needed...
     }
 
+    public Address(List<String> subLocation) {
+        // Assuming you want to concatenate the sublocations into a single address string separated by commas
+        StringBuilder addressBuilder = new StringBuilder();
+        for (String subLoc : subLocation) {
+            addressBuilder.append(subLoc).append(", ");
+        }
+        // Remove the last comma and space
+        addressBuilder.setLength(addressBuilder.length() - 2);
+
+        this.address = addressBuilder.toString();
+    }
+
     public Long getId() {
         return id;
     }
