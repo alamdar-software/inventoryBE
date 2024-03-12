@@ -40,6 +40,8 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 
     Inventory findByDescriptionOrLocationName(String description, String locationName);
 
+    Inventory findByLocationAndDescription(Location location, String description);
+
 
 //    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
 

@@ -95,4 +95,7 @@ public class LocationService {
         return locationRepository.findAllByOrderByLocationNameAsc();
     }
 
+    public Location getLocationByName(String locationName) {
+        return locationRepository.findByLocationName(locationName);
+    }
 }

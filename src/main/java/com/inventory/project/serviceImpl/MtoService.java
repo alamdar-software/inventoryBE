@@ -1,6 +1,7 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.*;
+import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.MtoRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
@@ -15,12 +16,17 @@ public class MtoService {
 
     private final MtoRepository mtoRepository;
 
+    private LocationService locationService;
     private  MtoService mtoService;
     private final Map<String, Integer> locationReferenceMap = new HashMap<>();
 
+    private InventoryRepository inventoryRepository;
     @Autowired
-    public MtoService(MtoRepository mtoRepository) {
-        this.mtoRepository = mtoRepository;initializeLocationReferenceMap();
+    public MtoService(MtoRepository mtoRepository, LocationService locationService, InventoryRepository inventoryRepository) {
+        this.mtoRepository = mtoRepository;
+        this.locationService = locationService;
+        this.inventoryRepository = inventoryRepository;
+        initializeLocationReferenceMap();
     }
     public List<Mto> findApprovedMto() {
         return mtoRepository.findByStatus("approved"); // Assuming status field is named "status"
@@ -49,6 +55,7 @@ public class MtoService {
 //    }
 
     @Transactional
+
     public Mto createMto(Mto mto) {
         mto.setStatus("Created");
 
@@ -72,8 +79,51 @@ public class MtoService {
             locationReferenceMap.put(locationName, referenceNumber);
         }
 
+        // Set the destination sublocation
+        String destinationSublocation = mto.getDestinationSublocation();
+        mto.setDestinationSublocation(destinationSublocation);
+
+        // Check if the destination location has changed
+        if (!Objects.equals(locationName, destinationSublocation)) {
+            Location destinationLocation = locationService.getLocationByName(destinationSublocation);
+            if (destinationLocation != null) {
+                List<Address> addresses = destinationLocation.getAddresses();
+                if (!addresses.isEmpty()) {
+                    // Get the first address associated with the destination location
+                    Address newAddress = addresses.get(0);
+                    updateSublocationInInventory(destinationLocation, String.valueOf(mto.getDescription()), newAddress, 1); // Increase quantity for new location
+                } else {
+                    // Handle the case where no addresses are associated with the destination location
+                }
+            } else {
+                // Handle the case where destinationLocation is null
+                // You can log a message or throw an exception to indicate that the location was not found
+            }
+        }
+
         return mtoRepository.save(mto);
     }
+
+
+    private void updateSublocationInInventory(Location location, String description, Address newAddress, int quantityChange) {
+        // Your logic to update the sublocation in the inventory goes here
+        // This method might involve querying the inventory database to find the sublocation based on the location and description,
+        // and then updating the quantity of items in that sublocation by the quantityChange amount.
+        // Here's a basic example assuming you have an InventoryItem entity:
+
+        Inventory item = inventoryRepository.findByLocationAndDescription(location, description);
+        if (item != null) {
+            item.setQuantity(item.getQuantity() + quantityChange);
+            // Update the address field of the inventory item
+            item.setAddress(newAddress);
+            inventoryRepository.save(item);
+        } else {
+            // Handle the case where the inventory item is not found
+        }
+    }
+
+
+
 
     private int getNextAvailableReferenceNumber() {
         return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;

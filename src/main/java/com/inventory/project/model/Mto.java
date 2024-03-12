@@ -56,6 +56,8 @@ public class Mto {
 
     @ElementCollection
     private List<String> remarks = new ArrayList<>();
+
+    private  String destinationSublocation;
     @Column(name="reference_no")
     private String referenceNo;
 
@@ -181,5 +183,13 @@ public class Mto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDestinationSublocation() {
+        return destinationSublocation;
+    }
+
+    public void setDestinationSublocation(String destinationSublocation) {
+        this.destinationSublocation = destinationSublocation;
     }
 }
