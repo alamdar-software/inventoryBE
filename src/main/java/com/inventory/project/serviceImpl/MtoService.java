@@ -82,6 +82,7 @@ public class MtoService {
         List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
         // Iterate over the inventories to update quantities
+        // Iterate over the inventories to update quantities
         for (Inventory inventory : inventories) {
             // Find matching item in Mto
             for (int i = 0; i < mto.getQuantity().size(); i++) {
@@ -106,7 +107,13 @@ public class MtoService {
                         newInventoryItem.setLocationName(locationName);
                         newInventoryItem.setQuantity(remainingQuantity);
 
-                        // Set other properties as needed
+                        // Set other properties from the existing inventory
+                        newInventoryItem.setConsumedItem(inventory.getConsumedItem());
+                        newInventoryItem.setScrappedItem(inventory.getScrappedItem());
+                        newInventoryItem.setDescription(inventory.getDescription());
+                        newInventoryItem.setAddress(inventory.getAddress());
+                        // Set other fields as needed
+
                         // Save the new inventory item
                         inventoryRepository.save(newInventoryItem);
                     }
@@ -116,6 +123,7 @@ public class MtoService {
                 }
             }
         }
+
 
         return mtoRepository.save(mto);
     }
