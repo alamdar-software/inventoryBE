@@ -82,7 +82,6 @@ public class MtoService {
         List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
         // Iterate over the inventories to update quantities
-        // Iterate over the inventories to update quantities
         for (Inventory inventory : inventories) {
             // Find matching item in Mto
             for (int i = 0; i < mto.getQuantity().size(); i++) {
@@ -471,6 +470,4 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
 
         return filteredList;
     }
-
-
 }

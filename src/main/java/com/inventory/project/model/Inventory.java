@@ -39,9 +39,13 @@ public class Inventory {
     @JoinColumn(name = "location_id")
     @JsonIgnore
     private Location location;
+    private String minimum;
     public Inventory() {
     }
 
+    public void setMinimum(String minimum) {
+        this.minimum = minimum;
+    }
 
     public Address getAddress() {
         return address;
