@@ -131,6 +131,8 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
                     inventory.setLocation(location);
                     inventory.setItem(item);
                     inventory.setQuantity(0); // Set initial quantity to 0
+                    inventory.setConsumedItem(inventory.getConsumedItem());
+                    inventory.setScrappedItem(inventory.getScrappedItem());
                     // Set other fields as needed
                     inventory.setLocationName(location.getLocationName()); // Set location name
                     inventory.setDescription(item.getDescription()); // Set description from the item
@@ -139,10 +141,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
                     // Save the inventory
                     inventoryRepository.save(inventory);
                 }
-                // Populate consumedItem and scrappedItem from the retrieved inventory
-                String consumedItem = inventory.getConsumedItem();
-                String scrappedItem = inventory.getScrappedItem();
-                // Set other fields as needed
+
             }
         }
     }
