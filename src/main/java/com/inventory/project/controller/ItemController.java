@@ -13,10 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequestMapping("/item")
 @RestController
@@ -146,25 +143,43 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
         }
     }
 
+    @GetMapping("/viewInventories/{itemId}")
+    public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Item> optionalItem = itemRepository.findById(itemId);
+            if (optionalItem.isPresent()) {
+                Item item = optionalItem.get();
 
+                // Retrieve inventories for the item
+                List<Inventory> inventories = inventoryRepository.findByItem(item);
 
+                // Construct simplified response
+                response.put("description", item.getDescription());
 
-    @GetMapping("/inventoryList/{id}")
-    public ResponseEntity<List<Map<String, Object>>> getInventoryList(@PathVariable("id") Long id) {
-        List<Inventory> list = inventoryRepository.findByItem_IdOrderByQuantityDesc(id);
-        List<Map<String, Object>> responseList = new ArrayList<>();
-        for (Inventory inventory : list) {
-            Map<String, Object> inventoryMap = new HashMap<>();
-            inventoryMap.put("id", inventory.getId());
-            inventoryMap.put("quantity", inventory.getQuantity());
-            inventoryMap.put("consumedItem",inventory.getConsumedItem());
-            inventoryMap.put("scrappedItem",inventory.getScrappedItem());
-            inventoryMap.put("locationName", inventory.getLocationName());
-            inventoryMap.put("address", inventory.getAddress());
-            // Add other fields as needed
-            responseList.add(inventoryMap);
+                List<Map<String, Object>> inventoryList = new ArrayList<>();
+                for (Inventory inventory : inventories) {
+                    Map<String, Object> inventoryDetails = new HashMap<>();
+                    inventoryDetails.put("id", inventory.getId());
+                    inventoryDetails.put("quantity", inventory.getQuantity());
+                    inventoryDetails.put("locationName", inventory.getLocationName());
+                    inventoryDetails.put("address", inventory.getAddress().getAddress());
+                    inventoryDetails.put("description", inventory.getDescription());
+                    inventoryDetails.put("consumedItem",inventory.getConsumedItem());
+                    inventoryDetails.put("scrappedItem",inventory.getScrappedItem());
+                    inventoryList.add(inventoryDetails);
+                }
+                response.put("inventories", inventoryList);
+
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Item not found for ID: " + itemId);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            response.put("error", "Error retrieving item details: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return ResponseEntity.ok(responseList);
     }
 
 
