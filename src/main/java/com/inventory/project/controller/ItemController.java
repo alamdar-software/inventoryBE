@@ -151,10 +151,8 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
             if (optionalItem.isPresent()) {
                 Item item = optionalItem.get();
 
-                // Retrieve inventories for the item
                 List<Inventory> inventories = inventoryRepository.findByItem(item);
 
-                // Construct simplified response
                 response.put("description", item.getDescription());
 
                 List<Map<String, Object>> inventoryList = new ArrayList<>();
@@ -167,6 +165,7 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
                     inventoryDetails.put("description", inventory.getDescription());
                     inventoryDetails.put("consumedItem",inventory.getConsumedItem());
                     inventoryDetails.put("scrappedItem",inventory.getScrappedItem());
+                    inventoryDetails.put("minimumStock",item.getMinimumStock());
                     inventoryList.add(inventoryDetails);
                 }
                 response.put("inventories", inventoryList);
