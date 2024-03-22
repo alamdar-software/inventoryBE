@@ -1,5 +1,6 @@
 package com.inventory.project.repository;
 
+import com.inventory.project.model.Address;
 import com.inventory.project.model.Inventory;
 import com.inventory.project.model.Item;
 import com.inventory.project.model.Location;
@@ -47,6 +48,8 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     Inventory findByItemAndLocation(Item item, Location location);
 
     List<Inventory> findByItem(Item item);
+
+    Inventory findByItemAndLocationAndAddress(Item item, Location location, Address address);
 
 
 //    List<Inventory> findByInventoryDescription(String description);  // Corrected method name
