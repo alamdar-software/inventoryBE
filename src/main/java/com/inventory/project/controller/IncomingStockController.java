@@ -171,7 +171,6 @@ public class IncomingStockController {
 //    }
 // Your API endpoint
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
     IncomingStock incomingStock = new IncomingStock();
@@ -213,8 +212,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
                 .anyMatch(addr -> Objects.equals(addr.getAddress(), requestedAddress));
 
         if (addressFound) {
-            // Find the Inventory item by description or locationName
-            Inventory inventoryItem = inventoryRepo.findByDescriptionOrLocationName(incomingStockRequest.getDescription(), incomingStockRequest.getLocationName());
+            // Find the Inventory item by description and locationName
+            Inventory inventoryItem = inventoryRepo.findByDescriptionAndLocationName(incomingStockRequest.getDescription(), incomingStockRequest.getLocationName());
 
             if (inventoryItem != null) {
                 // Inventory item found, update its quantity
@@ -280,6 +279,115 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         return ResponseEntity.badRequest().body("Location not found.");
     }
 }
+
+//@PostMapping("/add")
+//public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
+//    IncomingStock incomingStock = new IncomingStock();
+//    incomingStock.setQuantity(incomingStockRequest.getQuantity());
+//    incomingStock.setUnitCost(incomingStockRequest.getUnitCost());
+//    incomingStock.setExtendedValue(incomingStockRequest.getExtendedValue());
+//    incomingStock.setDate(incomingStockRequest.getDate());
+//    incomingStock.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+//    incomingStock.setPn(incomingStockRequest.getPn());
+//    incomingStock.setSn(incomingStockRequest.getSn());
+//    incomingStock.setPrice(incomingStockRequest.getPrice());
+//    incomingStock.setRemarks(incomingStockRequest.getRemarks());
+//    incomingStock.setStandardPrice(incomingStockRequest.getStandardPrice());
+//    incomingStock.setImpaCode(incomingStockRequest.getImpaCode());
+//    incomingStock.setStoreNo(incomingStockRequest.getStoreNo());
+//    incomingStock.setStatus("Created");
+//
+//    Item item = new Item();
+//    item.setDescription(incomingStockRequest.getDescription());
+//    Address address = addressRepository.findFirstByAddressIgnoreCase(incomingStockRequest.getAddress());
+//    Category category = categoryRepository.findByName((incomingStockRequest.getName()));
+//    Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
+//    Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
+//    Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
+//    Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
+//
+//    String requestedAddress = incomingStockRequest.getAddress();
+//
+//    // Find the Location using locationName
+//    Location location = locationRepo.findByLocationName(incomingStockRequest.getLocationName());
+//
+//    // Check if the location was found
+//    if (location != null) {
+//        // Access the list of addresses associated with the location
+//        List<Address> addresses = location.getAddresses();
+//
+//        // Check if the provided address belongs to the found location
+//        boolean addressFound = addresses.stream()
+//                .anyMatch(addr -> Objects.equals(addr.getAddress(), requestedAddress));
+//
+//        if (addressFound) {
+//            // Find the Inventory item by description or locationName
+//            Inventory inventoryItem = inventoryRepo.findByDescriptionOrLocationName(incomingStockRequest.getDescription(), incomingStockRequest.getLocationName());
+//
+//            if (inventoryItem != null) {
+//                // Inventory item found, update its quantity
+//                int newQuantity = inventoryItem.getQuantity() + incomingStockRequest.getQuantity();
+//                inventoryItem.setQuantity(newQuantity);
+//                inventoryRepo.save(inventoryItem);
+//            } else {
+//                // Inventory item not found, create a new one
+//                Inventory newInventoryItem = new Inventory();
+//                newInventoryItem.setDescription(incomingStockRequest.getDescription());
+//                newInventoryItem.setLocationName(incomingStockRequest.getLocationName());
+//                newInventoryItem.setQuantity(incomingStockRequest.getQuantity());
+//                inventoryRepo.save(newInventoryItem);
+//                inventoryItem = newInventoryItem; // Use the newly created inventory item
+//            }
+//
+//            // Set all fields for incomingStock
+//            incomingStock.setItemDescription(item.getDescription());
+//            incomingStock.setLocation(location);
+//            incomingStock.setAddress(address);
+//            incomingStock.setCurrency(currency);
+//            incomingStock.setCategory(category);
+//            incomingStock.setBrand(brand);
+//            incomingStock.setUnit(unit);
+//            incomingStock.setInventory(inventoryItem); // Use the found or created inventory item
+//            incomingStock.setEntity(entity);
+//
+//            // Save incomingStock
+//            incomingStockRepo.save(incomingStock);
+//
+//            IncomingStockRequest responseDTO = new IncomingStockRequest();
+//            responseDTO.setLocationName(location.getLocationName());
+//            responseDTO.setAddress(requestedAddress);
+//            responseDTO.setQuantity(incomingStockRequest.getQuantity());
+//            responseDTO.setUnitCost(incomingStockRequest.getUnitCost());
+//            responseDTO.setExtendedValue(incomingStockRequest.getExtendedValue());
+//            responseDTO.setDate(incomingStockRequest.getDate());
+//            responseDTO.setPurchaseOrder(incomingStockRequest.getPurchaseOrder());
+//            responseDTO.setPn(incomingStockRequest.getPn());
+//            responseDTO.setSn(incomingStockRequest.getSn());
+//            responseDTO.setBlindCount(incomingStockRequest.getBlindCount());
+//            responseDTO.setPrice(incomingStockRequest.getPrice());
+//            responseDTO.setName(incomingStockRequest.getName());
+//            responseDTO.setDescription(incomingStockRequest.getDescription());
+//            responseDTO.setRemarks(incomingStockRequest.getRemarks());
+//            responseDTO.setCurrencyName(incomingStockRequest.getCurrencyName());
+//            responseDTO.setBrandName(incomingStockRequest.getBrandName());
+//            responseDTO.setUnitName(incomingStockRequest.getUnitName());
+//            responseDTO.setStandardPrice(incomingStockRequest.getStandardPrice());
+//            responseDTO.setImpaCode(incomingStockRequest.getImpaCode());
+//            responseDTO.setStoreNo(incomingStockRequest.getStoreNo());
+//            responseDTO.setEntityName(incomingStockRequest.getEntityName());
+//            responseDTO.setStatus("Created");
+//
+//            // Return the DTO object within ResponseEntity.ok
+//            return ResponseEntity.ok().body(responseDTO);
+//        } else {
+//            // Address not found for the given location
+//            return ResponseEntity.badRequest().body("Address not found for the specified location.");
+//        }
+//    } else {
+//        // Location not found
+//        return ResponseEntity.badRequest().body("Location not found.");
+//    }
+//}
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 

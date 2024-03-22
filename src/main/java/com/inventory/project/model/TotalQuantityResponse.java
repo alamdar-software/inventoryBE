@@ -3,6 +3,7 @@ package com.inventory.project.model;
 public class TotalQuantityResponse {
     private int purchasedQty;
 
+
     public TotalQuantityResponse() {
     }
 

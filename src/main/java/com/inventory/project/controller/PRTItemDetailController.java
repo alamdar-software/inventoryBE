@@ -3,6 +3,7 @@ package com.inventory.project.controller;
 import com.inventory.project.model.PRTItemDetail;
 import com.inventory.project.model.TotalQuantityResponse;
 import com.inventory.project.repository.BulkStockRepo;
+import com.inventory.project.repository.CiplRepository;
 import com.inventory.project.repository.IncomingStockRepo;
 import com.inventory.project.repository.PRTItemDetailRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,32 +22,57 @@ public class PRTItemDetailController {
     private final BulkStockRepo bulkStockRepository;
     private final IncomingStockRepo incomingStockRepository;
 
+    private final CiplRepository ciplRepository;
     @Autowired
-    public PRTItemDetailController(PRTItemDetailRepo prtItemDetailRepository, BulkStockRepo bulkStockRepository, IncomingStockRepo incomingStockRepository) {
+    public PRTItemDetailController(PRTItemDetailRepo prtItemDetailRepository, BulkStockRepo bulkStockRepository, IncomingStockRepo incomingStockRepository,CiplRepository ciplRepository) {
         this.prtItemDetailRepository = prtItemDetailRepository;
         this.bulkStockRepository = bulkStockRepository;
         this.incomingStockRepository = incomingStockRepository;
+        this.ciplRepository=ciplRepository;
     }
 
-    @GetMapping("/totalQuantity")
-    public ResponseEntity<TotalQuantityResponse> getTotalQuantity() {
-        // Fetch the list of PRTItemDetail entities
-        Iterable<PRTItemDetail> prtItemDetails = prtItemDetailRepository.findAll();
+//    @GetMapping("/totalQuantity")
+//    public ResponseEntity<TotalQuantityResponse> getTotalQuantity() {
+//        // Fetch the list of PRTItemDetail entities
+//        Iterable<PRTItemDetail> prtItemDetails = prtItemDetailRepository.findAll();
+//
+//        int totalQuantity = 0;
+//
+//        // Calculate the total quantity from incoming stock
+//        for (PRTItemDetail itemDetail : prtItemDetails) {
+//            totalQuantity += itemDetail.getPurchasedQty();
+//
+//        }
+//
+//        // Calculate the total quantity from bulk stock
+//        totalQuantity += bulkStockRepository.countByQuantityGreaterThan(0);
+//
+//        // Calculate the total quantity from incoming stock
+//        totalQuantity += incomingStockRepository.countByQuantityGreaterThan(0);
+//
+//        TotalQuantityResponse response = new TotalQuantityResponse(totalQuantity);
+//        return ResponseEntity.ok(response);
+//    }
+@GetMapping("/totalQuantity")
+public ResponseEntity<TotalQuantityResponse> getTotalQuantity() {
+    // Fetch the list of PRTItemDetail entities
+    Iterable<PRTItemDetail> prtItemDetails = prtItemDetailRepository.findAll();
 
-        int totalQuantity = 0;
+    int totalQuantity = 0;
 
-        // Calculate the total quantity from incoming stock
-        for (PRTItemDetail itemDetail : prtItemDetails) {
-            totalQuantity += itemDetail.getPurchasedQty();
-        }
+    // Calculate the total quantity from incoming stock
+    for (PRTItemDetail itemDetail : prtItemDetails) {
+        totalQuantity += itemDetail.getPurchasedQty();
 
-        // Calculate the total quantity from bulk stock
-        totalQuantity += bulkStockRepository.countByQuantityGreaterThan(0);
-
-        // Calculate the total quantity from incoming stock
-        totalQuantity += incomingStockRepository.countByQuantityGreaterThan(0);
-
-        TotalQuantityResponse response = new TotalQuantityResponse(totalQuantity);
-        return ResponseEntity.ok(response);
     }
+
+    // Calculate the total quantity from bulk stock
+    totalQuantity += bulkStockRepository.countByQuantityGreaterThan(0);
+
+    // Calculate the total quantity from incoming stock
+    totalQuantity += incomingStockRepository.countByQuantityGreaterThan(0);
+
+    TotalQuantityResponse response = new TotalQuantityResponse(totalQuantity);
+    return ResponseEntity.ok(response);
+}
 }
