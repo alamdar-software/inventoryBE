@@ -5,6 +5,7 @@ import com.inventory.project.repository.AddressRepository;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
+import com.inventory.project.serviceImpl.IncomingStockService;
 import com.inventory.project.serviceImpl.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventory")
@@ -31,7 +33,8 @@ public class InventoryController {
 
     @Autowired
     InventoryService inventoryService;
-
+    @Autowired
+    private IncomingStockService incomingStockService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
@@ -407,7 +410,44 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
 
         return ResponseEntity.ok(response);
     }
-
+//    @GetMapping("/data")
+//    public ResponseEntity<List<CombinedDto>> getData() {
+//        List<Inventory> inventoryItems = inventoryService.getAllInventory();
+//        List<CombinedDto> inventoryDTOList = inventoryItems.stream().map(this::convertInventoryToDTO).collect(Collectors.toList());
+//
+//        List<IncomingStock> incomingStockItems = incomingStockService.getAllIncomingStock();
+//        List<CombinedDto> incomingStockDTOList = incomingStockItems.stream().map(this::convertIncomingStockToDTO).collect(Collectors.toList());
+//
+//        inventoryDTOList.addAll(incomingStockDTOList); // Merge both lists
+//
+//        return ResponseEntity.ok(inventoryDTOList);
+//    }
+//
+//    private CombinedDto convertInventoryToDTO(Inventory inventory) {
+//        CombinedDto dto = new CombinedDto();
+//        dto.setId(inventory.getId());
+//        dto.setTransferredQty(inventory.getTransferredQty());
+//        dto.setRemainingQty(inventory.getRemainingQty());
+//        dto.setPurchasedQty(inventory.getPurchasedQty());
+//        dto.setDate(inventory.getDate());
+//        dto.setPurchaseOrder(inventory.getPurchaseOrder());
+//        dto.setItemType("Inventory");
+//        dto.setItemDescription(inventory.getItemDescription());
+//        dto.setLocationName(inventory.getLocationName());
+//        return dto;
+//    }
+//
+//    private CombinedDto convertIncomingStockToDTO(IncomingStock incomingStock) {
+//        CombinedDto dto = new CombinedDto();
+//        dto.setId(incomingStock.getId());
+//        dto.setTransferredQty(incomingStock.getTransferredQty());
+//        dto.setRemainingQty(incomingStock.getRemainingQty());
+//        dto.setPurchasedQty(incomingStock.getPurchasedQty());
+//        dto.setDate(incomingStock.getDate());
+//        dto.setPurchaseOrder(incomingStock.getPurchaseOrder());
+//        dto.setItemType("IncomingStock");
+//        return dto;
+//    }
 }
 
 

@@ -3,8 +3,10 @@ package com.inventory.project.repository;
 import com.inventory.project.model.BulkStockDto;
 import com.inventory.project.model.PRTItemDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,5 +23,9 @@ public interface PRTItemDetailRepo extends JpaRepository<PRTItemDetail,Long> {
     @Query("SELECT NEW com.inventory.project.model.BulkStockDto(i.incomingStock.purchaseOrder, i.receivedDate, i.receivedQty, i.remainingQty, i.transferredQty) FROM PRTItemDetail i WHERE i.inventory.id = :id AND i.type = :type")
     List<BulkStockDto> findByInventoryAndType(@Param("id") Long id, @Param("type") String type);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE PRTItemDetail pd SET pd.purchasedQty = pd.purchasedQty + ?1")
+    void updatePurchasedQty(int quantity);
 
 }

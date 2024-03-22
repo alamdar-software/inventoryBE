@@ -78,4 +78,8 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
 
 
     List<IncomingStock> findByStatusIgnoreCase(String created);
+
+    Integer countByQuantityGreaterThan(int quantity);
+
+
 }

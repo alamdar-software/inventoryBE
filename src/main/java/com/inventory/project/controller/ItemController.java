@@ -132,8 +132,8 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
                     inventory.setScrappedItem(inventory.getScrappedItem());
                     // Set other fields as needed
                     inventory.setLocationName(location.getLocationName()); // Set location name
-                    inventory.setDescription(item.getDescription()); // Set description from the item
-                    inventory.setAddress(address); // Set address
+                    inventory.setDescription(item.getDescription());
+                    inventory.setAddress(address);
 
                     // Save the inventory
                     inventoryRepository.save(inventory);
