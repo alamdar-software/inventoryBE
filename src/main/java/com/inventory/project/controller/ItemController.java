@@ -32,6 +32,8 @@ public class ItemController {
     private LocationRepository locationRepository;
     @Autowired
     private InventoryRepository inventoryRepository;
+    @Autowired
+    private IncomingStockRepo incomingStockRepo;
     @GetMapping("/add")
     public ResponseEntity<Map<String, Object>> add() {
         Map<String, Object> response = new HashMap<>();
@@ -113,65 +115,45 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
-//    private void createInventories(Item item) {
-//
-//        List<Location> locList = locationRepository.findAll();
-//        if (!locList.isEmpty()) {
-//            for (Location location : locList) {
-//                Address address = location.getAddresses().get(0); // Get the first address (assuming one location has only one address)
-//
-//                // Retrieve inventory for the given item and location
-//                Inventory inventory = inventoryRepository.findByItemAndLocation(item, location);
-//                if (inventory == null) {
-//                    // If inventory does not exist, create a new one
-//                    inventory = new Inventory();
-//                    inventory.setLocation(location);
-//                    inventory.setItem(item);
-//                    inventory.setQuantity(0); // Set initial quantity to 0
-//                    inventory.setConsumedItem(inventory.getConsumedItem());
-//                    inventory.setScrappedItem(inventory.getScrappedItem());
-//                    // Set other fields as needed
-//                    inventory.setLocationName(location.getLocationName()); // Set location name
-//                    inventory.setDescription(item.getDescription());
-//                    inventory.setAddress(address);
-//
-//                    // Save the inventory
-//                    inventoryRepository.save(inventory);
-//                }
-//
-//            }
-//        }
-//    }
-private void createInventories(Item item) {
-    List<Location> locList = locationRepository.findAll();
-    if (!locList.isEmpty()) {
-        for (Location location : locList) {
-            List<Address> addresses = location.getAddresses();
-            for (Address address : addresses) {
-                // Retrieve inventory for the given item, location, and address
-                Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
-                if (inventory == null) {
-                    // If inventory does not exist, create a new one
-                    inventory = new Inventory();
-                    inventory.setLocation(location);
-                    inventory.setItem(item);
-                    inventory.setQuantity(0); // Set initial quantity to 0
+    public void createInventories(Item item) {
+        List<Location> locList = locationRepository.findAll();
+        if (!locList.isEmpty()) {
+            for (Location location : locList) {
+                String locationName = location.getLocationName();
+                int incomingStockQuantity = incomingStockRepo.sumQuantityByLocationName(locationName);
+                System.out.println("Incoming Stock Quantity for location " + locationName + ": " + incomingStockQuantity);
 
-                    inventory.setConsumedItem(String.valueOf(0));
-                    inventory.setScrappedItem(String.valueOf(0));
+                if (incomingStockQuantity > 0) {
+                    for (Address address : location.getAddresses()) {
+                        // Retrieve inventory for the given item, location, and address
+                        Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
+                        if (inventory == null) {
+                            // If inventory does not exist, create a new one
+                            inventory = new Inventory();
+                            inventory.setLocation(location);
+                            inventory.setItem(item);
+                            inventory.setQuantity(0); // Set initial quantity to 0
+                            inventory.setConsumedItem("0");
+                            inventory.setScrappedItem("0");
+                            inventory.setLocationName(locationName);
+                            inventory.setDescription(item.getDescription());
+                            inventory.setAddress(address);
+                        }
+                        // Increase the quantity by incoming stock quantity
+                        int updatedQuantity = inventory.getQuantity() + incomingStockQuantity;
+                        System.out.println("Old Inventory Quantity: " + inventory.getQuantity() + ", Incoming Stock Quantity: " + incomingStockQuantity);
+                        System.out.println("Updated Inventory Quantity: " + updatedQuantity);
+                        inventory.setQuantity(updatedQuantity);
 
-                    // Set other fields as needed
-                    inventory.setLocationName(location.getLocationName());
-                    inventory.setDescription(item.getDescription());
-                    inventory.setAddress(address);
-
-                    // Save the inventory
-                    inventoryRepository.save(inventory);
+                        // Save the inventory
+                        inventoryRepository.save(inventory);
+                    }
                 }
             }
         }
     }
-}
+
+
 
     @GetMapping("/viewInventories/{itemId}")
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {

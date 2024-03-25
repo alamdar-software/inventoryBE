@@ -79,4 +79,5 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByLocationNameAndDescription(String locationName, String description);
 
     List<Mto> findByStatus(String created);
+
 }

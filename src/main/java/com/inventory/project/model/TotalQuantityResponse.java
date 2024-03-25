@@ -2,9 +2,11 @@ package com.inventory.project.model;
 
 public class TotalQuantityResponse {
     private int purchasedQty;
+    private int totalTransferredQuantity;
 
-
-    public TotalQuantityResponse() {
+    public TotalQuantityResponse(int totalTransferredQuantity, int purchasedQty) {
+        this.totalTransferredQuantity = totalTransferredQuantity;
+        this.purchasedQty = purchasedQty;
     }
 
     public TotalQuantityResponse(int purchasedQty) {

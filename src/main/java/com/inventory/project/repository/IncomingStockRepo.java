@@ -82,4 +82,5 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     Integer countByQuantityGreaterThan(int quantity);
 
 
-}
+    @Query("SELECT COALESCE(SUM(quantity), 0) FROM IncomingStock WHERE location.locationName = :locationName")
+    int sumQuantityByLocationName(String locationName);}
