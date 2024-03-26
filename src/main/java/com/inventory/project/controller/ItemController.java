@@ -176,7 +176,6 @@ public void createInventories(Item item) {
                 // Retrieve inventory for the given item, location, and address
                 Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
                 if (inventory == null) {
-                    // If inventory does not exist, create a new one with quantity 0
                     inventory = new Inventory();
                     inventory.setLocation(location);
                     inventory.setItem(item);
@@ -203,45 +202,6 @@ public void createInventories(Item item) {
     }
 }
 
-
-
-//    public void createInventories(Item item) {
-//        List<Location> locList = locationRepository.findAll();
-//        if (!locList.isEmpty()) {
-//            for (Location location : locList) {
-//                String locationName = location.getLocationName();
-//                int incomingStockQuantity = incomingStockRepo.sumQuantityByLocationName(locationName);
-//                System.out.println("Incoming Stock Quantity for location " + locationName + ": " + incomingStockQuantity);
-//
-//                if (incomingStockQuantity > 0) {
-//                    for (Address address : location.getAddresses()) {
-//                        // Retrieve inventory for the given item, location, and address
-//                        Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
-//                        if (inventory == null) {
-//                            // If inventory does not exist, create a new one
-//                            inventory = new Inventory();
-//                            inventory.setLocation(location);
-//                            inventory.setItem(item);
-//                            inventory.setQuantity(0); // Set initial quantity to 0
-//                            inventory.setConsumedItem("0");
-//                            inventory.setScrappedItem("0");
-//                            inventory.setLocationName(locationName);
-//                            inventory.setDescription(item.getDescription());
-//                            inventory.setAddress(address);
-//                        }
-//                        // Increase the quantity by incoming stock quantity
-//                        int updatedQuantity = inventory.getQuantity() + incomingStockQuantity;
-//                        System.out.println("Old Inventory Quantity: " + inventory.getQuantity() + ", Incoming Stock Quantity: " + incomingStockQuantity);
-//                        System.out.println("Updated Inventory Quantity: " + updatedQuantity);
-//                        inventory.setQuantity(updatedQuantity);
-//
-//                        // Save the inventory
-//                        inventoryRepository.save(inventory);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     @GetMapping("/viewInventories/{itemId}")
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {

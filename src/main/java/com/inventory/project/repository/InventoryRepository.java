@@ -61,6 +61,7 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 //    Integer findQuantityByItemAndLocation(@Param("item") Item item, @Param("location") String location);
 
     List<Inventory> findByDescriptionContains(String description);
+    List<Inventory> findByLocationNameAndDescriptionContaining(String locationName, String description);
 
 
 }
