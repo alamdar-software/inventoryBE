@@ -3,6 +3,7 @@ package com.inventory.project.repository;
 import com.inventory.project.model.Cipl;
 import com.inventory.project.model.ConsumedItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -34,4 +35,6 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
     boolean existsByItemAndLocationName(String item, String locationName);
 
     List<ConsumedItem> findByStatus(String created);
+    @Query("SELECT SUM(c.quantity) FROM ConsumedItem c WHERE c.locationName = :locationName")
+    int sumQuantityByLocationName(String locationName);
 }

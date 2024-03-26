@@ -60,5 +60,7 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 //    @Query("SELECT i.quantity FROM Inventory i WHERE i.item = :item AND i.location = :location")
 //    Integer findQuantityByItemAndLocation(@Param("item") Item item, @Param("location") String location);
 
+    List<Inventory> findByDescriptionContains(String description);
+
 
 }

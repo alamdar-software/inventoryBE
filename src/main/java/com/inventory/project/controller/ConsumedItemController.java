@@ -40,6 +40,84 @@ private ConsumeService consumeService;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
+//    @PostMapping("/add")
+//    public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
+//        List<String> items = consumedItem.getItem();
+//        List<String> subLocations = consumedItem.getSubLocations();
+//        List<String> quantities = consumedItem.getQuantity();
+//
+//        if (items.isEmpty() || subLocations.isEmpty() || quantities.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Items, Sublocations, or Quantities not provided");
+//        }
+//
+//        if (items.size() != subLocations.size() || items.size() != quantities.size()) {
+//            return ResponseEntity.badRequest().body("Items, Sublocations, or Quantities count mismatch");
+//        }
+//
+//        List<ConsumedItem> consumedItems = new ArrayList<>();
+//
+//        for (int i = 0; i < items.size(); i++) {
+//            String itemName = items.get(i);
+//            System.out.println("Item Name: " + itemName);
+//            String subLocation = subLocations.get(i);
+//            String quantity = quantities.get(i);
+//
+//
+//            // Search for the inventory item by description
+//            Inventory inventory = inventoryRepo.findByDescription(itemName);
+//            System.out.println("Inventory found: " + inventory);
+//            if (inventory != null) {
+//                int consumedQuantity = Integer.parseInt(quantity);
+//                int availableQuantity = inventory.getQuantity();
+//
+//                if (availableQuantity >= consumedQuantity) {
+//                    int updatedQuantity = availableQuantity - consumedQuantity;
+//                    inventory.setQuantity(updatedQuantity);
+//
+//                    // Append the consumed quantity to the inventory description
+//                    String updatedDescription = inventory.getDescription() + " (Consumed: " + consumedQuantity + ")";
+//                    inventory.setDescription(updatedDescription);
+//
+////                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
+////                    String updatedDescriptionAfterDeduction = updatedDescription.substring(consumedIndex);
+////                    inventory.setDescription(updatedDescriptionAfterDeduction);
+//
+//                    String currentConsumedQuantity = inventory.getConsumedItem();
+//                    int newConsumedQuantity = Integer.parseInt(quantity);
+//                    int totalConsumed = Integer.parseInt(currentConsumedQuantity) + newConsumedQuantity;
+//
+//                    inventory.setConsumedItem(String.valueOf(totalConsumed));
+//                    inventoryRepo.save(inventory);
+//
+//                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
+//                    String finalDescription = updatedDescription.substring(0, consumedIndex).trim();
+//                    inventory.setDescription(finalDescription);
+//                    inventoryRepo.save(inventory);
+//                    // Create a ConsumedItem instance for each item and save it to the list
+//                    ConsumedItem consumed = new ConsumedItem();
+//                    consumed.setLocationName(consumedItem.getLocationName());
+//                    consumed.setTransferDate(LocalDate.now());
+//                    consumed.setSn(Collections.singletonList(consumedItem.getSn().get(i)));
+//                    consumed.setPartNo(Collections.singletonList(consumedItem.getPartNo().get(i)));
+//                    consumed.setRemarks(Collections.singletonList(consumedItem.getRemarks().get(i)));
+//                    consumed.setDate(Collections.singletonList(consumedItem.getDate().get(i)));
+//                    consumed.setItem(Collections.singletonList(itemName));
+//                    consumed.setSubLocations(Collections.singletonList(subLocation));
+//                    consumed.setQuantity(Collections.singletonList(quantity));
+//                    consumed.setStatus("created");
+//                    consumedItems.add(consumed);
+//
+//                } else {
+//                    return ResponseEntity.badRequest().body("Insufficient quantity for item: " + itemName);
+//                }
+//            } else {
+//                return ResponseEntity.badRequest().body("Inventory not found for item: " + itemName);
+//            }
+//        }
+//
+//        consumedItemRepo.saveAll(consumedItems); // Save all ConsumedItems
+//        return ResponseEntity.status(HttpStatus.CREATED).body(consumedItems);
+//    }
     @PostMapping("/add")
     public ResponseEntity<?> addConsumedItem(@RequestBody ConsumedItem consumedItem) {
         List<String> items = consumedItem.getItem();
@@ -62,11 +140,13 @@ private ConsumeService consumeService;
             String subLocation = subLocations.get(i);
             String quantity = quantities.get(i);
 
+            // Search for the inventory items by description
+            List<Inventory> inventories = inventoryRepo.findByDescriptionContains(itemName);
 
-            // Search for the inventory item by description
-            Inventory inventory = inventoryRepo.findByDescription(itemName);
-            System.out.println("Inventory found: " + inventory);
-            if (inventory != null) {
+            if (!inventories.isEmpty()) {
+                // Get the first inventory item from the list
+                Inventory inventory = inventories.get(0);
+
                 int consumedQuantity = Integer.parseInt(quantity);
                 int availableQuantity = inventory.getQuantity();
 
@@ -78,21 +158,13 @@ private ConsumeService consumeService;
                     String updatedDescription = inventory.getDescription() + " (Consumed: " + consumedQuantity + ")";
                     inventory.setDescription(updatedDescription);
 
-//                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
-//                    String updatedDescriptionAfterDeduction = updatedDescription.substring(consumedIndex);
-//                    inventory.setDescription(updatedDescriptionAfterDeduction);
-
                     String currentConsumedQuantity = inventory.getConsumedItem();
                     int newConsumedQuantity = Integer.parseInt(quantity);
                     int totalConsumed = Integer.parseInt(currentConsumedQuantity) + newConsumedQuantity;
-
                     inventory.setConsumedItem(String.valueOf(totalConsumed));
+
                     inventoryRepo.save(inventory);
 
-                    int consumedIndex = updatedDescription.indexOf("(Consumed:");
-                    String finalDescription = updatedDescription.substring(0, consumedIndex).trim();
-                    inventory.setDescription(finalDescription);
-                    inventoryRepo.save(inventory);
                     // Create a ConsumedItem instance for each item and save it to the list
                     ConsumedItem consumed = new ConsumedItem();
                     consumed.setLocationName(consumedItem.getLocationName());
