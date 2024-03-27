@@ -156,7 +156,6 @@ public void createInventories(Item item) {
     }
 }
 
-
     @GetMapping("/viewInventories/{itemId}")
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {
         Map<String, Object> response = new HashMap<>();
@@ -183,18 +182,22 @@ public void createInventories(Item item) {
                 }
                 response.put("inventories", inventoryList);
 
-                // Add logic to retrieve consumed item quantity
-                int consumedItemQuantity = consumedItemRepo.sumQuantityByItemId(item.getId());
+                // Handle consumed item quantity
+                int consumedItemQuantity = 0;
+                if (consumedItemRepo != null) {
+                    Integer result = consumedItemRepo.sumQuantityByItemId(item.getId());
+                    consumedItemQuantity = (result != null) ? result : 0;
+                }
                 response.put("consumedItemQuantity", consumedItemQuantity);
 
                 return ResponseEntity.ok(response);
             } else {
                 response.put("error", "Item not found for ID: " + itemId);
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.ok(response); // Return 200 with response
             }
         } catch (Exception e) {
             response.put("error", "Error retrieving item details: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response); // Return 200 with error response
         }
     }
 
