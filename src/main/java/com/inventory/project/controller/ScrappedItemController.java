@@ -31,9 +31,8 @@ public class ScrappedItemController {
     private ScrappedItemService scrappedItemService;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/add")
-    public ResponseEntity<?> addScrappedItem(@RequestBody ScrappedItem scrappedItem) {
+    public ResponseEntity<?> addConsumedItem(@RequestBody ScrappedItem scrappedItem) {
         List<String> items = scrappedItem.getItem();
         List<String> subLocations = scrappedItem.getSubLocations();
         List<String> quantities = scrappedItem.getQuantity();
@@ -51,74 +50,60 @@ public class ScrappedItemController {
         for (int i = 0; i < items.size(); i++) {
             String itemName = items.get(i);
             String subLocation = subLocations.get(i);
-            String quantity = quantities.get(i);
+            int scrappedQuantity = Integer.parseInt(quantities.get(i));
 
-            if (quantity == null || quantity.isEmpty()) {
-                return ResponseEntity.badRequest().body("Quantity is null or empty for item: " + itemName);
-            }
+            // Search for the inventory items by description
+            List<Inventory> inventories = inventoryRepository.findByDescriptionContains(itemName);
 
-            try {
-                int scrappedQuantity = Integer.parseInt(quantity);
+            if (!inventories.isEmpty()) {
+                boolean itemProcessed = false;
+                for (Inventory inventory : inventories) {
+                    int availableQuantity = inventory.getQuantity();
+                    if (availableQuantity >= scrappedQuantity) {
+                        int updatedQuantity = availableQuantity - scrappedQuantity;
+                        inventory.setQuantity(updatedQuantity);
 
-                if (scrappedQuantity <= 0) {
-                    return ResponseEntity.badRequest().body("Invalid quantity for item: " + itemName);
+                        // Append the consumed quantity to the inventory description
+                        String updatedDescription = inventory.getDescription() + " (Consumed: " + scrappedQuantity + ")";
+                        inventory.setDescription(updatedDescription);
+
+                        String currentConsumedQuantity = inventory.getConsumedItem();
+                        int newConsumedQuantity = scrappedQuantity;
+                        int totalConsumed = Integer.parseInt(currentConsumedQuantity) + newConsumedQuantity;
+                        inventory.setConsumedItem(String.valueOf(totalConsumed));
+
+                        inventoryRepository.save(inventory);
+                        itemProcessed = true;
+                        break; // Break out of the loop once an inventory is processed
+                    }
                 }
 
-                // Search for the inventory items by description
-                List<Inventory> inventories = inventoryRepository.findAllByDescription(itemName);
-
-                if (!inventories.isEmpty()) {
-                    boolean itemProcessed = false;
-                    for (Inventory inventory : inventories) {
-                        int availableQuantity = inventory.getQuantity();
-                        if (availableQuantity >= scrappedQuantity) {
-                            int updatedQuantity = availableQuantity - scrappedQuantity;
-                            inventory.setQuantity(updatedQuantity);
-
-                            String updatedDescription = inventory.getDescription() + " (Scrapped: " + scrappedQuantity + ")";
-                            inventory.setDescription(updatedDescription);
-
-                            String currentScrappedQuantity = inventory.getScrappedItem();
-                            int newScrappedQuantity = scrappedQuantity;
-                            int totalScrapped = Integer.parseInt(currentScrappedQuantity) + newScrappedQuantity;
-                            inventory.setScrappedItem(String.valueOf(totalScrapped));
-
-                            inventoryRepository.save(inventory);
-                            itemProcessed = true;
-                            break; // Break out of the loop once an inventory is processed
-                        }
-                    }
-
-                    if (!itemProcessed) {
-                        return ResponseEntity.badRequest().body("Insufficient quantity for item: " + itemName);
-                    }
-                } else {
-                    return ResponseEntity.badRequest().body("Inventory not found for item: " + itemName);
+                if (!itemProcessed) {
+                    return ResponseEntity.badRequest().body("Insufficient quantity for item: " + itemName);
                 }
-
-                // Set additional fields of ScrappedItem
-                ScrappedItem scrappedItemEntry = new ScrappedItem();
-                scrappedItemEntry.setLocationName(scrappedItem.getLocationName());
-                scrappedItemEntry.setTransferDate(LocalDate.now());
-                scrappedItemEntry.setSn(Collections.singletonList(scrappedItem.getSn().get(i)));
-                scrappedItemEntry.setPartNo(Collections.singletonList(scrappedItem.getPartNo().get(i)));
-                scrappedItemEntry.setRemarks(Collections.singletonList(scrappedItem.getRemarks().get(i)));
-                scrappedItemEntry.setDate(Collections.singletonList(scrappedItem.getDate().get(i)));
-                scrappedItemEntry.setItem(Collections.singletonList(itemName));
-                scrappedItemEntry.setSubLocations(Collections.singletonList(subLocation));
-                scrappedItemEntry.setQuantity(Collections.singletonList(quantity));
-                scrappedItemEntry.setStatus("created");
-
-                scrappedItemRepository.save(scrappedItemEntry);
-                scrappedItems.add(scrappedItemEntry);
-
-            } catch (NumberFormatException e) {
-                return ResponseEntity.badRequest().body("Invalid quantity format for item: " + itemName);
+            } else {
+                return ResponseEntity.badRequest().body("Inventory not found for item: " + itemName);
             }
+
+            // Create a ConsumedItem instance for each item and save it to the list
+            ScrappedItem scrapped = new ScrappedItem();
+            scrapped.setLocationName(scrappedItem.getLocationName());
+            scrapped.setTransferDate(LocalDate.now());
+            scrapped.setSn(Collections.singletonList(scrappedItem.getSn().get(i)));
+            scrapped.setPartNo(Collections.singletonList(scrappedItem.getPartNo().get(i)));
+            scrapped.setRemarks(Collections.singletonList(scrappedItem.getRemarks().get(i)));
+            scrapped.setDate(Collections.singletonList(scrappedItem.getDate().get(i)));
+            scrapped.setItem(Collections.singletonList(itemName));
+            scrapped.setSubLocations(Collections.singletonList(subLocation));
+            scrapped.setQuantity(Collections.singletonList(String.valueOf(scrappedQuantity)));
+            scrapped.setStatus("created");
+            scrappedItems.add(scrapped);
         }
 
+        scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
