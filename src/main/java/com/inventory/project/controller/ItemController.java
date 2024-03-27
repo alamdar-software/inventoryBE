@@ -166,7 +166,6 @@ public void createInventories(Item item) {
                 Item item = optionalItem.get();
 
                 List<Inventory> inventories = inventoryRepository.findByItem(item);
-
                 response.put("description", item.getDescription()); // Keep the description as it is
 
                 List<Map<String, Object>> inventoryList = new ArrayList<>();
@@ -184,6 +183,10 @@ public void createInventories(Item item) {
                 }
                 response.put("inventories", inventoryList);
 
+                // Add logic to retrieve consumed item quantity
+                int consumedItemQuantity = consumedItemRepo.sumQuantityByItemId(item.getId());
+                response.put("consumedItemQuantity", consumedItemQuantity);
+
                 return ResponseEntity.ok(response);
             } else {
                 response.put("error", "Item not found for ID: " + itemId);
@@ -194,6 +197,7 @@ public void createInventories(Item item) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 
 
 

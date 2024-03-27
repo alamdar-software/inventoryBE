@@ -151,7 +151,7 @@ private ConsumeService consumeService;
                         inventory.setQuantity(updatedQuantity);
 
                         // Append the consumed quantity to the inventory description
-                        String updatedDescription = inventory.getDescription() + " (Consumed: " + consumedQuantity + ")";
+                        String updatedDescription = inventory.getDescription()  + consumedQuantity ;
                         inventory.setDescription(updatedDescription);
 
                         String currentConsumedQuantity = inventory.getConsumedItem();

@@ -37,7 +37,9 @@ public class ConsumedItem {
     private List<String> partNo;
     @ElementCollection
     private List<String> date;
-
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item items;
 @ManyToOne
 private Inventory inventory;
 
@@ -150,5 +152,13 @@ private String status;
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Item getItems() {
+        return items;
+    }
+
+    public void setItems(Item items) {
+        this.items = items;
     }
 }
