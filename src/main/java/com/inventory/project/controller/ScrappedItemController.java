@@ -64,7 +64,7 @@ public class ScrappedItemController {
                         inventory.setQuantity(updatedQuantity);
 
                         // Append the consumed quantity to the inventory description
-                        String updatedDescription = inventory.getDescription() + " (Consumed: " + scrappedQuantity + ")";
+                        String updatedDescription = inventory.getDescription() +   scrappedQuantity ;
                         inventory.setDescription(updatedDescription);
 
                         String currentConsumedQuantity = inventory.getConsumedItem();
