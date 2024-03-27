@@ -32,7 +32,7 @@ public class ScrappedItemController {
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
-    @PostMapping("/add-scrapped")
+    @PostMapping("/add")
     public ResponseEntity<?> addScrappedItem(@RequestBody ScrappedItem scrappedItem) {
         List<String> items = scrappedItem.getItem();
         List<String> subLocations = scrappedItem.getSubLocations();
