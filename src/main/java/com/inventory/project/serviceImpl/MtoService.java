@@ -106,12 +106,10 @@ public class MtoService {
                         newInventoryItem.setLocationName(locationName);
                         newInventoryItem.setQuantity(remainingQuantity);
 
-                        // Set other properties from the existing inventory
                         newInventoryItem.setConsumedItem(inventory.getConsumedItem());
                         newInventoryItem.setScrappedItem(inventory.getScrappedItem());
                         newInventoryItem.setDescription(inventory.getDescription());
                         newInventoryItem.setAddress(inventory.getAddress());
-                        // Set other fields as needed
 
                         // Save the new inventory item
                         inventoryRepository.save(newInventoryItem);

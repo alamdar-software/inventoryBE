@@ -67,4 +67,6 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     List<Inventory> findAllByDescription(String itemName);
 
     List<Inventory> findAllByDescriptionOrLocationName(String description, String locationName);
+
+    Inventory findTopByOrderByIdDesc();
 }
