@@ -125,6 +125,7 @@ public class MtoService {
 //        return mtoRepository.save(mto);
 //    }
 
+
     @Transactional
     public Mto createMto(Mto mto) {
         mto.setStatus("Created");
@@ -154,30 +155,22 @@ public class MtoService {
 
         // Iterate over the inventories to update quantities
         for (Inventory inventory : inventories) {
-            // Find matching item in Mto
             for (int i = 0; i < mto.getQuantity().size(); i++) {
-                // Convert String to int
                 int mtoQuantity = Integer.parseInt(mto.getQuantity().get(i));
-                // Update inventory quantity if there is a match
                 if (inventory.getQuantity() == mtoQuantity) {
+                    // Update inventory quantity if there is a match
                     int newQuantity = inventory.getQuantity() - mtoQuantity;
-                    // If remaining quantity is zero or less, remove the item
                     if (newQuantity <= 0) {
                         inventoryRepository.delete(inventory);
                     } else {
                         inventory.setQuantity(newQuantity);
                         inventoryRepository.save(inventory);
                     }
-                } else {
-                    // If quantity in Mto is less than inventory, update the quantity of existing inventory item
-                    int remainingQuantity = inventory.getQuantity() - mtoQuantity;
-                    if (remainingQuantity >= 0) {
-                        inventory.setQuantity(remainingQuantity);
-                        inventoryRepository.save(inventory);
-                    }
+                    break; // No need to check further quantities for this inventory
                 }
             }
         }
+
         return mtoRepository.save(mto);
     }
 
