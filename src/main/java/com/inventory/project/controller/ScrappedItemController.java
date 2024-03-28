@@ -63,11 +63,7 @@ public class ScrappedItemController {
                         int updatedQuantity = availableQuantity - scrappedQuantity;
                         inventory.setQuantity(updatedQuantity);
 
-                        // Append the consumed quantity to the inventory description
-                        String updatedDescription = inventory.getDescription() +   scrappedQuantity ;
-                        inventory.setDescription(updatedDescription);
-
-                        String currentConsumedQuantity = inventory.getConsumedItem();
+                        String currentConsumedQuantity = inventory.getScrappedItem();
                         int newConsumedQuantity = scrappedQuantity;
                         int totalConsumed = Integer.parseInt(currentConsumedQuantity) + newConsumedQuantity;
                         inventory.setConsumedItem(String.valueOf(totalConsumed));
@@ -85,7 +81,7 @@ public class ScrappedItemController {
                 return ResponseEntity.badRequest().body("Inventory not found for item: " + itemName);
             }
 
-            // Create a ConsumedItem instance for each item and save it to the list
+            // Create a ScrappedItem instance for each item and save it to the list
             ScrappedItem scrapped = new ScrappedItem();
             scrapped.setLocationName(scrappedItem.getLocationName());
             scrapped.setTransferDate(LocalDate.now());
@@ -100,7 +96,7 @@ public class ScrappedItemController {
             scrappedItems.add(scrapped);
         }
 
-        scrappedItemRepository.saveAll(scrappedItems); // Save all ConsumedItems
+        scrappedItemRepository.saveAll(scrappedItems); // Save all ScrappedItems
         return ResponseEntity.status(HttpStatus.CREATED).body(scrappedItems);
     }
 
