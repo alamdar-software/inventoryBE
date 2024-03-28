@@ -66,7 +66,7 @@ public class ScrappedItemController {
                         String currentConsumedQuantity = inventory.getScrappedItem();
                         int newConsumedQuantity = scrappedQuantity;
                         int totalConsumed = Integer.parseInt(currentConsumedQuantity) + newConsumedQuantity;
-                        inventory.setConsumedItem(String.valueOf(totalConsumed));
+                        inventory.setScrappedItem(String.valueOf(totalConsumed));
 
                         inventoryRepository.save(inventory);
                         itemProcessed = true;
