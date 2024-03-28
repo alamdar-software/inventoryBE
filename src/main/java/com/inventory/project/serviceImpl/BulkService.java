@@ -45,16 +45,18 @@ public class BulkService {
             String locationName = bulkStock.getLocationName();
             int quantity = bulkStock.getQuantity().get(i);
 
-            // Find or create the Inventory item
-            Inventory inventoryItem = inventoryRepository.findByDescriptionOrLocationName(description, locationName);
+            // Find all inventory items matching the description or location name
+            List<Inventory> inventoryItems = inventoryRepository.findAllByDescriptionOrLocationName(description, locationName);
 
-            if (inventoryItem != null) {
-                // Inventory item found, update its quantity
-                int newQuantity = inventoryItem.getQuantity() + quantity;
-                inventoryItem.setQuantity(newQuantity);
-                inventoryRepository.save(inventoryItem);
+            if (inventoryItems != null && !inventoryItems.isEmpty()) {
+                // Inventory items found, update their quantities
+                for (Inventory inventoryItem : inventoryItems) {
+                    int newQuantity = inventoryItem.getQuantity() + quantity;
+                    inventoryItem.setQuantity(newQuantity);
+                    inventoryRepository.save(inventoryItem);
+                }
             } else {
-                // Inventory item not found, create a new one
+                // No inventory items found, create a new one
                 Inventory newInventoryItem = new Inventory();
                 newInventoryItem.setDescription(description);
                 newInventoryItem.setLocationName(locationName);
