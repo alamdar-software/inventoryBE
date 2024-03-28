@@ -100,20 +100,13 @@ public class MtoService {
                 } else {
                     // If quantity in Mto is less than inventory, create a new inventory item
                     int remainingQuantity = inventory.getQuantity() - mtoQuantity;
+                    // If quantity in Mto is less than inventory, update the quantity of existing inventory item
                     if (remainingQuantity > 0) {
-                        // Create a new inventory item with remaining quantity
-                        Inventory newInventoryItem = new Inventory();
-                        newInventoryItem.setLocationName(locationName);
-                        newInventoryItem.setQuantity(remainingQuantity);
-
-                        newInventoryItem.setConsumedItem(inventory.getConsumedItem());
-                        newInventoryItem.setScrappedItem(inventory.getScrappedItem());
-                        newInventoryItem.setDescription(inventory.getDescription());
-                        newInventoryItem.setAddress(inventory.getAddress());
-
-                        // Save the new inventory item
-                        inventoryRepository.save(newInventoryItem);
+                        // Update quantity of existing inventory item
+                        inventory.setQuantity(mtoQuantity);
+                        inventoryRepository.save(inventory);
                     }
+
                     // Update quantity of existing inventory item
                     inventory.setQuantity(mtoQuantity);
                     inventoryRepository.save(inventory);
