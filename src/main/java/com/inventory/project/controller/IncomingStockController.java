@@ -196,11 +196,11 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     Item item = new Item();
     item.setDescription(incomingStockRequest.getDescription());
     Address address = addressRepository.findFirstByAddressIgnoreCase(incomingStockRequest.getAddress());
-    Category category = categoryRepository.findByName((incomingStockRequest.getName()));
+    Category category = categoryRepository.findByName(incomingStockRequest.getName());
     Brand brand = brandRepository.findByBrandName(incomingStockRequest.getBrandName());
     Unit unit = unitRepository.findByUnitName(incomingStockRequest.getUnitName());
     Entity entity = entityModelRepo.findByEntityName(incomingStockRequest.getEntityName());
-    Currency currency = currencyRepository.findTopByCurrencyName((incomingStockRequest.getCurrencyName()));
+    Currency currency = currencyRepository.findTopByCurrencyName(incomingStockRequest.getCurrencyName());
 
     String requestedAddress = incomingStockRequest.getAddress();
 
@@ -213,10 +213,12 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
         List<Address> addresses = location.getAddresses();
 
         // Check if the provided address belongs to the found location
-        boolean addressFound = addresses.stream()
-                .anyMatch(addr -> Objects.equals(addr.getAddress(), requestedAddress));
+        Address foundAddress = addresses.stream()
+                .filter(addr -> Objects.equals(addr.getAddress(), requestedAddress))
+                .findFirst()
+                .orElse(null);
 
-        if (addressFound) {
+        if (foundAddress != null) {
             // Find the Inventory items by description and locationName
             List<Inventory> inventoryItems = inventoryRepo.findAllByDescriptionOrLocationName(incomingStockRequest.getDescription(), incomingStockRequest.getLocationName());
 
@@ -225,9 +227,10 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
             // Iterate over each inventory item
             for (Inventory inventoryItem : inventoryItems) {
-                // Check if the inventory item matches the provided description and locationName
+                // Check if the inventory item matches the provided description, locationName, and address
                 if (inventoryItem.getDescription().equals(incomingStockRequest.getDescription()) &&
-                        inventoryItem.getLocationName().equals(incomingStockRequest.getLocationName())) {
+                        inventoryItem.getLocationName().equals(incomingStockRequest.getLocationName()) &&
+                        inventoryItem.getAddress().equals(foundAddress)) {
                     // Inventory item found, update its quantity
                     int newQuantity = inventoryItem.getQuantity() + incomingStockRequest.getQuantity();
                     inventoryItem.setQuantity(newQuantity);
@@ -240,10 +243,11 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
 
             // Check if the inventory was not updated
             if (!inventoryUpdated) {
-                // Create a new inventory item since none matched the provided description and locationName
+                // Create a new inventory item since none matched the provided description, locationName, and address
                 Inventory newInventoryItem = new Inventory();
                 newInventoryItem.setDescription(incomingStockRequest.getDescription());
                 newInventoryItem.setLocationName(incomingStockRequest.getLocationName());
+                newInventoryItem.setAddress(foundAddress); // Set the selected address
                 newInventoryItem.setQuantity(incomingStockRequest.getQuantity());
                 inventoryRepo.save(newInventoryItem);
             }
@@ -251,22 +255,17 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             // Set all fields for incomingStock
             incomingStock.setItemDescription(item.getDescription());
             incomingStock.setLocation(location);
-            incomingStock.setAddress(address);
+            incomingStock.setAddress(foundAddress); // Set the selected address
             incomingStock.setCurrency(currency);
             incomingStock.setCategory(category);
             incomingStock.setBrand(brand);
             incomingStock.setUnit(unit);
-
-            // Retrieve the last saved inventory item for consistency
-            Inventory lastInventoryItem = inventoryRepo.findTopByOrderByIdDesc();
-
-            // Set the last saved inventory item to incomingStock
-            incomingStock.setInventory(lastInventoryItem);
             incomingStock.setEntity(entity);
 
             // Save incomingStock
             incomingStockRepo.save(incomingStock);
 
+            // Create and return the responseDTO
             IncomingStockRequest responseDTO = new IncomingStockRequest();
             responseDTO.setLocationName(location.getLocationName());
             responseDTO.setAddress(requestedAddress);
@@ -300,7 +299,8 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
     } else {
         // Location not found
         return ResponseEntity.badRequest().body("Location not found.");
-    }}
+    }
+}
 
 //@PostMapping("/add")
 //public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
