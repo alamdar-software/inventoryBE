@@ -97,29 +97,30 @@ public class MtoService {
                         inventory.setQuantity(newQuantity);
                         inventoryRepository.save(inventory);
                     }
-//                } else {
-//                    // If quantity in Mto is less than inventory, create a new inventory item
-//                    int remainingQuantity = inventory.getQuantity() - mtoQuantity;
-//                    if (remainingQuantity > 0) {
-//                        // Create a new inventory item with remaining quantity
-//                        Inventory newInventoryItem = new Inventory();
-//                        newInventoryItem.setLocationName(locationName);
-//                        newInventoryItem.setQuantity(remainingQuantity);
-//
-//                        newInventoryItem.setConsumedItem(inventory.getConsumedItem());
-//                        newInventoryItem.setScrappedItem(inventory.getScrappedItem());
-//                        newInventoryItem.setDescription(inventory.getDescription());
-//                        newInventoryItem.setAddress(inventory.getAddress());
-//
-//                        // Save the new inventory item
-//                        inventoryRepository.save(newInventoryItem);
-//                    }
+                } else {
+                    // If quantity in Mto is less than inventory, create a new inventory item
+                    int remainingQuantity = inventory.getQuantity() - mtoQuantity;
+                    if (remainingQuantity > 0) {
+                        // Create a new inventory item with remaining quantity
+                        Inventory newInventoryItem = new Inventory();
+                        newInventoryItem.setLocationName(locationName);
+                        newInventoryItem.setQuantity(remainingQuantity);
+
+                        newInventoryItem.setConsumedItem(inventory.getConsumedItem());
+                        newInventoryItem.setScrappedItem(inventory.getScrappedItem());
+                        newInventoryItem.setDescription(inventory.getDescription());
+                        newInventoryItem.setAddress(inventory.getAddress());
+
+                        // Save the new inventory item
+                        inventoryRepository.save(newInventoryItem);
+                    }
                     // Update quantity of existing inventory item
                     inventory.setQuantity(mtoQuantity);
                     inventoryRepository.save(inventory);
                 }
             }
         }
+
 
         return mtoRepository.save(mto);
     }
