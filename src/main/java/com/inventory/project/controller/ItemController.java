@@ -202,47 +202,6 @@ public void createInventories(Item item) {
     }
 
 
-
-
-//    @GetMapping("/viewInventories/{itemId}")
-//    public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {
-//        Map<String, Object> response = new HashMap<>();
-//        try {
-//            Optional<Item> optionalItem = itemRepository.findById(itemId);
-//            if (optionalItem.isPresent()) {
-//                Item item = optionalItem.get();
-//
-//                List<Inventory> inventories = inventoryRepository.findByItem(item);
-//
-//                response.put("description", item.getDescription());
-//
-//                List<Map<String, Object>> inventoryList = new ArrayList<>();
-//                for (Inventory inventory : inventories) {
-//                    Map<String, Object> inventoryDetails = new HashMap<>();
-//                    inventoryDetails.put("id", inventory.getId());
-//                    inventoryDetails.put("quantity", inventory.getQuantity());
-//                    inventoryDetails.put("locationName", inventory.getLocationName());
-//                    inventoryDetails.put("address", inventory.getAddress().getAddress());
-//                    inventoryDetails.put("description", inventory.getDescription());
-//                    inventoryDetails.put("consumedItem",inventory.getConsumedItem());
-//                    inventoryDetails.put("scrappedItem",inventory.getScrappedItem());
-//                    inventoryDetails.put("minimumStock",item.getMinimumStock());
-//                    inventoryList.add(inventoryDetails);
-//                }
-//                response.put("inventories", inventoryList);
-//
-//                return ResponseEntity.ok(response);
-//            } else {
-//                response.put("error", "Item not found for ID: " + itemId);
-//                return ResponseEntity.notFound().build();
-//            }
-//        } catch (Exception e) {
-//            response.put("error", "Error retrieving item details: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//        }
-//    }
-
-
 //@PostMapping("/add")
 //public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
 //    Map<String, Object> response = new HashMap<>();
