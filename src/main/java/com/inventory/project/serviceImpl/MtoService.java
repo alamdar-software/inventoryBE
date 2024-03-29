@@ -124,55 +124,64 @@ public class MtoService {
 //
 //        return mtoRepository.save(mto);
 //    }
+@Transactional
+public Mto createMto(Mto mto) {
+    mto.setStatus("Created");
 
+    String locationName = mto.getLocationName();
 
-    @Transactional
-    public Mto createMto(Mto mto) {
-        mto.setStatus("Created");
+    int referenceNumber;
+    if (!locationReferenceMap.containsKey(locationName)) {
+        // If it's a new locationName, get the current max reference number and increment by 1
+        int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
+        referenceNumber = maxReference + 1;
+    } else {
+        // If it's an existing locationName, keep the existing reference number
+        referenceNumber = locationReferenceMap.get(locationName);
+    }
 
-        String locationName = mto.getLocationName();
+    String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
+    mto.setReferenceNo(formattedReferenceNumber);
 
-        int referenceNumber;
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, get the current max reference number and increment by 1
-            int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
-            referenceNumber = maxReference + 1;
-        } else {
-            // If it's an existing locationName, keep the existing reference number
-            referenceNumber = locationReferenceMap.get(locationName);
-        }
+    if (!locationReferenceMap.containsKey(locationName)) {
+        // If it's a new locationName, add it to the map with its reference number
+        locationReferenceMap.put(locationName, referenceNumber);
+    }
 
-        String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
-        mto.setReferenceNo(formattedReferenceNumber);
+    // Retrieve the list of inventories with the same locationName
+    List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, add it to the map with its reference number
-            locationReferenceMap.put(locationName, referenceNumber);
-        }
-
-        // Retrieve the list of inventories with the same locationName
-        List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
-
-        // Iterate over the inventories to update quantities
-        for (Inventory inventory : inventories) {
-            for (int i = 0; i < mto.getQuantity().size(); i++) {
-                int mtoQuantity = Integer.parseInt(mto.getQuantity().get(i));
-                if (inventory.getQuantity() == mtoQuantity) {
-                    // Update inventory quantity if there is a match
-                    int newQuantity = inventory.getQuantity() - mtoQuantity;
-                    if (newQuantity <= 0) {
-                        inventoryRepository.delete(inventory);
-                    } else {
-                        inventory.setQuantity(newQuantity);
-                        inventoryRepository.save(inventory);
-                    }
-                    break; // No need to check further quantities for this inventory
+    // Iterate over the inventories to update quantities
+    // Iterate over the inventories to update quantities
+    for (Inventory inventory : inventories) {
+        // Find matching item in Mto
+        for (int i = 0; i < mto.getQuantity().size(); i++) {
+            // Convert String to int
+            int mtoQuantity = Integer.parseInt(mto.getQuantity().get(i));
+            // Update inventory quantity if there is a match
+            if (inventory.getQuantity() == mtoQuantity) {
+                int newQuantity = inventory.getQuantity() - mtoQuantity;
+                // If remaining quantity is zero or less, remove the item
+                if (newQuantity <= 0) {
+                    inventoryRepository.delete(inventory);
+                } else {
+                    inventory.setQuantity(newQuantity);
+                    inventoryRepository.save(inventory);
                 }
+            } else {
+                // Update quantity of existing inventory item
+                inventory.setQuantity(mtoQuantity);
+                inventoryRepository.save(inventory);
             }
         }
-
-        return mtoRepository.save(mto);
     }
+
+
+
+    return mtoRepository.save(mto);
+}
+
+
 
     private int getNextAvailableReferenceNumber() {
         return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;
