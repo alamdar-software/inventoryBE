@@ -130,6 +130,23 @@ public Mto createMto(Mto mto) {
 
     String locationName = mto.getLocationName();
 
+        int referenceNumber;
+        if (!locationReferenceMap.containsKey(locationName)) {
+            // If it's a new locationName, get the current max reference number and increment by 1
+            int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
+            referenceNumber = maxReference + 1;
+        } else {
+            // If it's an existing locationName, keep the existing reference number
+            referenceNumber = locationReferenceMap.get(locationName);
+        }
+
+        String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
+        mto.setReferenceNo(formattedReferenceNumber);
+
+        if (!locationReferenceMap.containsKey(locationName)) {
+            // If it's a new locationName, add it to the map with its reference number
+            locationReferenceMap.put(locationName, referenceNumber);
+        }
     // Retrieve the list of inventories with the same locationName
     List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
