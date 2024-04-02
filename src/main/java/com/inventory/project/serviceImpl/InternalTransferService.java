@@ -1,10 +1,8 @@
 package com.inventory.project.serviceImpl;
 
-import com.inventory.project.model.Cipl;
-import com.inventory.project.model.InternalTransfer;
-import com.inventory.project.model.Mto;
-import com.inventory.project.model.SearchCriteria;
+import com.inventory.project.model.*;
 import com.inventory.project.repository.InternalTransferRepo;
+import com.inventory.project.repository.InventoryRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import java.util.*;
 public class InternalTransferService {
     private final InternalTransferRepo internalTransferRepository;
 
+    private InventoryRepository inventoryRepository;
     private final Map<String, Integer> locationReferenceMap = new HashMap<>();
 
     @Autowired
@@ -89,6 +88,51 @@ public class InternalTransferService {
             // If it's a new locationName, add it to the map with its reference number
             locationReferenceMap.put(locationName, referenceNumber);
         }
+        List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
+
+        // Iterate over the inventories to update quantities
+        for (Inventory inventory : inventories) {
+            // Find matching item in Mto
+            for (int i = 0; i < internalTransfer.getQuantity().size(); i++) {
+                // Convert String to int
+                int mtoQuantity = Integer.parseInt(internalTransfer.getQuantity().get(i));
+                // Update inventory quantity if there is a match
+                if (inventory.getQuantity() == mtoQuantity) {
+                    int newQuantity = inventory.getQuantity() - mtoQuantity;
+                    // If remaining quantity is zero or less, remove the item
+                    if (newQuantity <= 0) {
+                        inventoryRepository.delete(inventory);
+                    } else {
+                        inventory.setQuantity(newQuantity);
+                        inventoryRepository.save(inventory);
+                    }
+                } else {
+                    // If quantity in Mto is less than inventory, create a new inventory item
+                    int remainingQuantity = inventory.getQuantity() - mtoQuantity;
+                    if (remainingQuantity > 0) {
+                        // Update quantity of existing inventory item
+                        inventory.setQuantity(remainingQuantity);
+                        inventoryRepository.save(inventory);
+                    } else {
+                        // If quantity in Mto is more than inventory, add to existing inventory item
+                        int additionalQuantity = mtoQuantity - inventory.getQuantity();
+                        inventory.setQuantity(mtoQuantity);
+                        inventoryRepository.save(inventory);
+                        // If there is a destination sublocation, find the inventory and add quantity
+                        if (internalTransfer.getDestination() != null && !internalTransfer.getDestination().isEmpty()) {
+                            List<String> destinationSublocations = Collections.singletonList(internalTransfer.getDestination());
+                            String destinationSublocation = destinationSublocations.get(i);
+                            Inventory destinationInventory = inventoryRepository.findByLocationNameAndAddress_Address(locationName, destinationSublocation);
+                            if (destinationInventory != null) {
+                                destinationInventory.setQuantity(destinationInventory.getQuantity() + additionalQuantity);
+                                inventoryRepository.save(destinationInventory);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         return internalTransferRepository.save(internalTransfer);
     }
