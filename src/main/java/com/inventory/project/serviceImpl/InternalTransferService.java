@@ -19,8 +19,9 @@ public class InternalTransferService {
     private final Map<String, Integer> locationReferenceMap = new HashMap<>();
 
     @Autowired
-    public InternalTransferService(InternalTransferRepo internalTransferRepository) {
+    public InternalTransferService(InternalTransferRepo internalTransferRepository,InventoryRepository inventoryRepository) {
         this.internalTransferRepository = internalTransferRepository;initializeLocationReferenceMap();
+        this.inventoryRepository=inventoryRepository;
     }
     public List<InternalTransfer> findApprovedInternalTransfers() {
         return internalTransferRepository.findByStatus("approved"); // Assuming status field is named "status"
