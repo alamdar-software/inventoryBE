@@ -541,4 +541,29 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
 
         return filteredList;
     }
+
+    public int getPurchaseQtyForIncomingStock(Long incomingStockId) {
+        // Retrieve the list of Mto entities associated with the provided IncomingStock ID
+        List<Mto> mtoList = mtoRepository.findByIncomingStockId(incomingStockId);
+
+        // Calculate the total purchase quantity from the retrieved Mto entities
+        int totalPurchaseQty = 0;
+        for (Mto mto : mtoList) {
+            // Assuming quantity is a list of strings, parse each string to integer
+            for (String quantityStr : mto.getQuantity()) {
+                try {
+                    totalPurchaseQty += Integer.parseInt(quantityStr);
+                } catch (NumberFormatException e) {
+                    // Handle the case where quantityStr cannot be parsed to integer
+                    // Log the error or handle it based on your application's requirements
+                    System.err.println("Error parsing quantity string: " + quantityStr);
+                }
+            }
+        }
+
+        return totalPurchaseQty;
+    }
+    public List<Mto> getMtoByIncomingStockId(Long incomingStockId) {
+        return mtoRepository.findByIncomingStockId(incomingStockId);
+    }
 }

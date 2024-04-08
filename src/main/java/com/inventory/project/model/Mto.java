@@ -62,6 +62,10 @@ public class Mto {
     private String referenceNo;
 
     private String status;
+    @ManyToOne
+    @JoinColumn(name = "incoming_stock_id")
+    private IncomingStock incomingStock;
+
     public Mto() {
     }
 
@@ -191,5 +195,13 @@ public class Mto {
 
     public void setDestinationSublocation(String destinationSublocation) {
         this.destinationSublocation = destinationSublocation;
+    }
+
+    public IncomingStock getIncomingStock() {
+        return incomingStock;
+    }
+
+    public void setIncomingStock(IncomingStock incomingStock) {
+        this.incomingStock = incomingStock;
     }
 }

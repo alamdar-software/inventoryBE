@@ -80,4 +80,5 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
 
     List<Mto> findByStatus(String created);
 
+    List<Mto> findByIncomingStockId(Long incomingStockId);
 }

@@ -11,44 +11,47 @@ import java.time.LocalDate;
 public class PRTItemDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
 
     //to get purchase details
     @ManyToOne
     @JoinColumn(name="incoming_stock_id")
-    IncomingStock incomingStock;
+   private IncomingStock incomingStock;
 
+    @ManyToOne
+    private BulkStock bulkStock;
     //transferred qty from this po
     @Column(name="transferred_qty")
-    int transferredQty;
+    private  int transferredQty;
 
 
     //qty recieved through transfer
     @Column(name="received_qty")
-    int receivedQty;
+    private int receivedQty;
 
     //purchased item qty
     @Column(name="purchased_qty")
-    int purchasedQty;
+    private int purchasedQty;
 
     //remaining qty after transfer and received
     @Column(name="remaining_qty")
-    int remainingQty;
-
+    private int remainingQty;
+    @Column(name="purchase_order")
+    private String purchaseOrder;
     @ManyToOne
     @JoinColumn(name = "inventory_id")
-    Inventory inventory;
+    private Inventory inventory;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name="purchase_date")
-    LocalDate purchaseDate;
+    private LocalDate purchaseDate;
 
     @Column(name="type")
-    String type;
+    private String type;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name="received_date")
-    LocalDate receivedDate;
+    private LocalDate receivedDate;
 
     public Long getId() {
         return id;
@@ -68,6 +71,14 @@ public class PRTItemDetail {
 
     public int getTransferredQty() {
         return transferredQty;
+    }
+
+    public BulkStock getBulkStock() {
+        return bulkStock;
+    }
+
+    public void setBulkStock(BulkStock bulkStock) {
+        this.bulkStock = bulkStock;
     }
 
     public void setTransferredQty(int transferredQty) {
@@ -128,6 +139,14 @@ public class PRTItemDetail {
 
     public void setReceivedDate(LocalDate receivedDate) {
         this.receivedDate = receivedDate;
+    }
+
+    public String getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public void setPurchaseOrder(String purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
 
 }
