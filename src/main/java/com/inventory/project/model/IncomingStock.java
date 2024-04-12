@@ -101,7 +101,10 @@ public class IncomingStock {
     @JoinColumn(name = "entity_id")
     private Entity entity;
 
+@ManyToOne
+@JoinColumn(name = "mto_id")
 
+private Mto  mto;
     public IncomingStock() {
     }
 
@@ -325,5 +328,13 @@ public class IncomingStock {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public Mto getMto() {
+        return mto;
+    }
+
+    public void setMto(Mto mto) {
+        this.mto = mto;
     }
 }

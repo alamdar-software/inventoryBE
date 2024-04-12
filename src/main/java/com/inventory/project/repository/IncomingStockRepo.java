@@ -1,9 +1,6 @@
 package com.inventory.project.repository;
 
-import com.inventory.project.model.IncomingStock;
-import com.inventory.project.model.Inventory;
-import com.inventory.project.model.Item;
-import com.inventory.project.model.Location;
+import com.inventory.project.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
@@ -83,4 +81,13 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
 
 
     @Query("SELECT COALESCE(SUM(quantity), 0) FROM IncomingStock WHERE location.locationName = :locationName")
-    int sumQuantityByLocationName(String locationName);}
+    int sumQuantityByLocationName(String locationName);
+    Optional<IncomingStock> findByItemId(Long itemId);
+
+    List<IncomingStock> findByItem(Item item);
+
+
+
+
+    List<IncomingStock> findByItemAndAddress(Item item, Address address);
+}

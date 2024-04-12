@@ -52,6 +52,8 @@ public class PRTItemDetail {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name="received_date")
     private LocalDate receivedDate;
+    @ManyToOne
+    private Item item;
 
     public Long getId() {
         return id;

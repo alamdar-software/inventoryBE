@@ -35,6 +35,7 @@ public class IncomingStockService {
     private BulkStockRepo bulkStockRepo;
     @Autowired
     private EntityRepository entityRepository;
+
     @Autowired
     public IncomingStockService(IncomingStockRepo incomingStockRepo, BulkStockRepo bulkStockRepo) {
         this.incomingStockRepo = incomingStockRepo;
@@ -492,6 +493,9 @@ public class IncomingStockService {
 //        Map other fields accordingly
 
         return incomingStock;
+    }
+    public Optional<IncomingStock> getByItemId(Long itemId) {
+        return incomingStockRepo.findByItemId(itemId);
     }
 
 }

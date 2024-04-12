@@ -1,17 +1,16 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.*;
-import com.inventory.project.repository.BulkStockRepo;
-import com.inventory.project.repository.CiplRepository;
-import com.inventory.project.repository.IncomingStockRepo;
-import com.inventory.project.repository.PRTItemDetailRepo;
+import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/prtItem")
@@ -37,7 +36,15 @@ public class PRTItemDetailController {
 
     @Autowired
     private InternalTransferService internalTransferService;
+    @Autowired
+    private ItemRepository itemRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+@Autowired
+private AddressRepository addressRepository;
+@Autowired
+private MtoRepository mtoRepository;
     @Autowired
     public PRTItemDetailController(PRTItemDetailRepo prtItemDetailRepository,
                                    BulkStockRepo bulkStockRepository,
@@ -88,60 +95,136 @@ public class PRTItemDetailController {
 //            return ResponseEntity.notFound().build();
 //        }
 //    }
-@GetMapping("/view/{id}")
-public ResponseEntity<?> viewStockDetails(@PathVariable("id") Long id) {
-    // Check if the ID is not null and greater than 0
-    if (id == null || id <= 0) {
-        return ResponseEntity.badRequest().body("Invalid ID provided.");
-    }
+// Controller method
+//@GetMapping("/view/{id}")
+//public ResponseEntity<?> viewStockDetails(@PathVariable("id") Long id) {
+//    // Check if the ID is not null and greater than 0
+//    if (id == null || id <= 0) {
+//        return ResponseEntity.badRequest().body("Invalid ID provided.");
+//    }
+//
+//    // Retrieve the IncomingStock by ID
+//    Optional<IncomingStock> optionalIncomingStock = incomingStockService.getById(id);
+//
+//    // Check if the IncomingStock is present
+//    if (optionalIncomingStock.isPresent()) {
+//        IncomingStock incomingStock = optionalIncomingStock.get();
+//
+//        // Calculate transferred quantity from MTO entities
+//        int transferredQtyFromMto = mtoService.getPurchaseQtyForIncomingStock(id);
+//
+//        // Retrieve MTO data for the IncomingStock
+//        List<Mto> mtoList = mtoService.getMtoByIncomingStockId(id);
+//
+//        // Calculate total MTO quantity
+//        int totalMtoQuantity = 0;
+//        for (Mto mto : mtoList) {
+//            // Assuming mto.getQuantity() returns the quantity associated with the MTO
+//            totalMtoQuantity += mto.getQuantity().size(); // Adjust this based on your Mto entity structure
+//        }
+//
+//        // Create a response object with the required fields from IncomingStock and MTO
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("id", incomingStock.getId());
+//        response.put("purchaseQty", incomingStock.getQuantity());
+//        response.put("purchaseOrder", incomingStock.getPurchaseOrder());
+//        response.put("date", incomingStock.getDate());
+//
+//        // Get the remaining quantity from IncomingStock
+//        int remainingQty = incomingStock.getQuantity() - transferredQtyFromMto;
+//        response.put("remainingQty", remainingQty);
+//        response.put("transferredQty", transferredQtyFromMto + totalMtoQuantity); // Include MTO quantity
+//
+//        // Add other required fields from IncomingStock as needed
+//
+//        return ResponseEntity.ok(response);
+//    } else {
+//        // IncomingStock not found
+//        return ResponseEntity.notFound().build();
+//    }
+//}
+@GetMapping("/viewItem/{itemId}")
+public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable Long itemId) {
+    List<Map<String, Object>> response = new ArrayList<>();
+    try {
+        Optional<Item> optionalItem = itemRepository.findById(itemId);
+        if (optionalItem.isPresent()) {
+            Item item = optionalItem.get();
 
-    // Retrieve the IncomingStock by ID
-    Optional<IncomingStock> optionalIncomingStock = incomingStockService.getById(id);
+            // Retrieve incoming stock for the item description
+            List<IncomingStock> incomingStockList = incomingStockRepository.findByItemDescription(item.getDescription());
+            System.out.println("Number of incoming stock records found: " + incomingStockList.size()); // Debug
 
-    // Check if the IncomingStock is present
-    if (optionalIncomingStock.isPresent()) {
-        IncomingStock incomingStock = optionalIncomingStock.get();
+            // Fetch the corresponding Mto entity
+            List<Mto> mtoList = mtoRepository.findByDescription(item.getDescription());
 
-        // Calculate transferred quantity from MTO entities
-        int transferredQtyFromMto = mtoService.getPurchaseQtyForIncomingStock(id);
+            for (IncomingStock incomingStock : incomingStockList) {
+                Map<String, Object> stockDetails = new HashMap<>();
+                stockDetails.put("id", incomingStock.getId());
+                stockDetails.put("purchaseOrder", incomingStock.getPurchaseOrder());
+                stockDetails.put("date", incomingStock.getDate());
+                stockDetails.put("quantity", incomingStock.getQuantity());
+                stockDetails.put("RemainingQty", incomingStock.getQuantity());
 
-        // Create a response object with the required fields from IncomingStock
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", incomingStock.getId());
-        response.put("purchaseQty", incomingStock.getQuantity());
-        response.put("purchaseOrder", incomingStock.getPurchaseOrder());
-        response.put("date", incomingStock.getDate());
+                // Fetch Mto entity and include its quantity
+                String mtoQuantityString = "";
+                if (!mtoList.isEmpty()) {
+                    Mto mto = mtoList.get(0); // Assuming there is only one Mto corresponding to the item description
+                    mtoQuantityString = String.join(",", mto.getQuantity());
+                } else {
+                    mtoQuantityString = "N/A";
+                }
+                stockDetails.put("TransferedQty", mtoQuantityString);
 
-        // Get the remaining quantity from IncomingStock
-        int remainingQty = incomingStock.getQuantity() - transferredQtyFromMto;
-        response.put("remainingQty", remainingQty);
-        response.put("transferredQty", transferredQtyFromMto); // Set the transferredQty to MTO quantity
+                // Add more fields from IncomingStock as needed
+                response.add(stockDetails);
+            }
 
-        // Add other required fields from IncomingStock as needed
-
-        // Retrieve MTO data for the IncomingStock
-        List<Mto> mtoList = mtoService.getMtoByIncomingStockId(id);
-
-        // Create a list to hold MTO details
-        List<Map<String, Object>> mtoDetails = new ArrayList<>();
-        for (Mto mto : mtoList) {
-            // Create a map to hold MTO details
-            Map<String, Object> mtoMap = new HashMap<>();
-            mtoMap.put("id", mto.getId());
-            // Add other required fields from MTO as needed
-
-            // Add MTO details map to the list
-            mtoDetails.add(mtoMap);
+            return ResponseEntity.ok(response);
+        } else {
+            response.add(Collections.singletonMap("error", "Item not found for ID: " + itemId));
+            return ResponseEntity.ok(response); // Return 200 with response
         }
-
-        response.put("mtoDetails", mtoDetails); // Add MTO details to the response
-
-        return ResponseEntity.ok(response);
-    } else {
-        // IncomingStock not found
-        return ResponseEntity.notFound().build();
+    } catch (Exception e) {
+        response.add(Collections.singletonMap("error", "Error retrieving incoming stock: " + e.getMessage()));
+        return ResponseEntity.ok(response); // Return 200 with error response
     }
 }
+
+//    @GetMapping("/view/{itemId}")
+//    public ResponseEntity<?> viewItemDetails(@PathVariable("itemId") Long itemId) {
+//        // Check if the Item ID is not null and greater than 0
+//        if (itemId == null || itemId <= 0) {
+//            return ResponseEntity.badRequest().body("Invalid Item ID provided.");
+//        }
+//
+//        // Retrieve the item by ID
+//        Optional<Item> optionalItem = itemRepository.findById(itemId);
+//
+//        // Check if the item is present
+//        if (optionalItem.isPresent()) {
+//            Item item = optionalItem.get();
+//
+//            // Check if the item has an associated IncomingStock
+//            IncomingStock incomingStock = item.getIncomingStock();
+//            if (incomingStock == null) {
+//                return ResponseEntity.notFound().build();
+//            }
+//
+//            // Create a response object with the required fields
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("purchaseQty", incomingStock.getQuantity());
+//            response.put("purchaseOrder", incomingStock.getPurchaseOrder());
+//            response.put("date", incomingStock.getDate());
+//
+//            // Add other fields as needed
+//
+//            return ResponseEntity.ok(response);
+//        } else {
+//            // Item not found for the given ID
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 
 
 //@GetMapping("/view/{id}")

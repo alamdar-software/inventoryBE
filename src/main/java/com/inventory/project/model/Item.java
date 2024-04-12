@@ -39,7 +39,10 @@ public class Item {
     @OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
 
     private List<Inventory> inventories;
-
+@ManyToOne
+private IncomingStock incomingStock;
+@ManyToOne
+private PRTItemDetail prtItemDetail;
     public Item() {
 
     }
@@ -128,5 +131,19 @@ public class Item {
         this.inventories = inventories;
     }
 
+    public IncomingStock getIncomingStock() {
+        return incomingStock;
+    }
 
+    public void setIncomingStock(IncomingStock incomingStock) {
+        this.incomingStock = incomingStock;
+    }
+
+    public PRTItemDetail getPrtItemDetail() {
+        return prtItemDetail;
+    }
+
+    public void setPrtItemDetail(PRTItemDetail prtItemDetail) {
+        this.prtItemDetail = prtItemDetail;
+    }
 }
