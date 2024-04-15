@@ -564,6 +564,7 @@ public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest inco
             responseDTO.setLocationName(incomingStock.getLocation() != null ? incomingStock.getLocation().getLocationName() : null);
             responseDTO.setAddress(incomingStock.getAddress().getAddress());
         }
+        responseDTO.setStatus(incomingStock.getStatus()); // Set the status from the IncomingStock entity
 
         return responseDTO;
     }
