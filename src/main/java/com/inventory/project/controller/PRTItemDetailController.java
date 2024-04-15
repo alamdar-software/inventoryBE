@@ -143,7 +143,7 @@ private MtoRepository mtoRepository;
 //        return ResponseEntity.notFound().build();
 //    }
 //}
-@GetMapping("/viewItem/{itemId}")
+@GetMapping("/viewPo/{itemId}")
 public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable Long itemId) {
     List<Map<String, Object>> response = new ArrayList<>();
     try {
