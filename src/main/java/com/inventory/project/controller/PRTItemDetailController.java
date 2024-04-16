@@ -4,13 +4,10 @@ import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
 import com.inventory.project.serviceImpl.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/prtItem")
@@ -155,9 +152,18 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
             List<IncomingStock> incomingStockList = incomingStockRepository.findByItemDescription(item.getDescription());
             System.out.println("Number of incoming stock records found: " + incomingStockList.size()); // Debug
 
-            // Fetch the corresponding Mto entity
+            // Fetch the corresponding Mto entities
             List<Mto> mtoList = mtoRepository.findByDescription(item.getDescription());
+            System.out.println("Number of MTO entries found: " + mtoList.size()); // Debug
 
+            // Map MTO quantities by their corresponding IDs
+            Map<Long, List<String>> mtoQuantitiesMap = new HashMap<>();
+            for (Mto mto : mtoList) {
+                // Store MTO description and quantity by ID
+                mtoQuantitiesMap.put(mto.getId(), mto.getQuantity());
+            }
+
+            // Iterate through each incoming stock
             for (IncomingStock incomingStock : incomingStockList) {
                 Map<String, Object> stockDetails = new HashMap<>();
                 stockDetails.put("id", incomingStock.getId());
@@ -166,15 +172,15 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
                 stockDetails.put("quantity", incomingStock.getQuantity());
                 stockDetails.put("RemainingQty", incomingStock.getQuantity());
 
-                // Fetch Mto entity and include its quantity
-                String mtoQuantityString = "";
-                if (!mtoList.isEmpty()) {
-                    Mto mto = mtoList.get(0); // Assuming there is only one Mto corresponding to the item description
-                    mtoQuantityString = String.join(",", mto.getQuantity());
+                // Fetch Mto description by ID
+                String mtoDescription = "";
+                Optional<Mto> optionalMto = mtoRepository.findById(incomingStock.getId());
+                if (optionalMto.isPresent()) {
+                    mtoDescription = String.valueOf(optionalMto.get().getQuantity());
                 } else {
-                    mtoQuantityString = "N/A";
+                    mtoDescription = "N/A";
                 }
-                stockDetails.put("TransferedQty", mtoQuantityString);
+                stockDetails.put("TransferedQty", mtoDescription);
 
                 // Add more fields from IncomingStock as needed
                 response.add(stockDetails);
@@ -190,6 +196,7 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
         return ResponseEntity.ok(response); // Return 200 with error response
     }
 }
+
 
 //    @GetMapping("/view/{itemId}")
 //    public ResponseEntity<?> viewItemDetails(@PathVariable("itemId") Long itemId) {
