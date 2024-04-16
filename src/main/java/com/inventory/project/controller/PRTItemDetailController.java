@@ -150,7 +150,7 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
 
             // Retrieve incoming stock for the item description
             List<IncomingStock> incomingStockList = incomingStockRepository.findByItemDescription(item.getDescription());
-            System.out.println("Number of incoming stock records found: " + incomingStockList.size()); // Debug
+            System.out.println("Number of incoming stock records found also: " + incomingStockList.size()); // Debug
 
             // Fetch the corresponding Mto entities
             List<Mto> mtoList = mtoRepository.findByDescription(item.getDescription());
