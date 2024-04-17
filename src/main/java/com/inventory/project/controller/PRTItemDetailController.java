@@ -38,10 +38,10 @@ public class PRTItemDetailController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
-@Autowired
-private AddressRepository addressRepository;
-@Autowired
-private MtoRepository mtoRepository;
+    @Autowired
+    private AddressRepository addressRepository;
+    @Autowired
+    private MtoRepository mtoRepository;
     @Autowired
     public PRTItemDetailController(PRTItemDetailRepo prtItemDetailRepository,
                                    BulkStockRepo bulkStockRepository,
@@ -57,7 +57,7 @@ private MtoRepository mtoRepository;
         this.incomingStockService=incomingStockService;
     }
 
-//
+    //
 //    @GetMapping("/view/{id}")
 //    public ResponseEntity<?> viewIncomingStock(@PathVariable("id") Long id) {
 //        // Check if the ID is not null and greater than 0
@@ -140,62 +140,62 @@ private MtoRepository mtoRepository;
 //        return ResponseEntity.notFound().build();
 //    }
 //}
-@GetMapping("/viewPo/{itemId}")
-public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable Long itemId) {
-    List<Map<String, Object>> response = new ArrayList<>();
-    try {
-        Optional<Item> optionalItem = itemRepository.findById(itemId);
-        if (optionalItem.isPresent()) {
-            Item item = optionalItem.get();
+    @GetMapping("/viewPo/{itemId}")
+    public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable Long itemId) {
+        List<Map<String, Object>> response = new ArrayList<>();
+        try {
+            Optional<Item> optionalItem = itemRepository.findById(itemId);
+            if (optionalItem.isPresent()) {
+                Item item = optionalItem.get();
 
-            // Retrieve incoming stock for the item description
-            List<IncomingStock> incomingStockList = incomingStockRepository.findByItemDescription(item.getDescription());
-            System.out.println("Number of incoming stock records found: " + incomingStockList.size()); // Debug
+                // Retrieve incoming stock for the item description
+                List<IncomingStock> incomingStockList = incomingStockRepository.findByItemDescription(item.getDescription());
+                System.out.println("Number of incoming stock records found also: " + incomingStockList.size()); // Debug
 
-            // Fetch the corresponding Mto entities
-            List<Mto> mtoList = mtoRepository.findByDescription(item.getDescription());
-            System.out.println("Number of MTO entries found: " + mtoList.size()); // Debug
+                // Fetch the corresponding Mto entities
+                List<Mto> mtoList = mtoRepository.findByDescription(item.getDescription());
+                System.out.println("Number of MTO entries found: " + mtoList.size()); // Debug
 
-            // Map MTO quantities by their corresponding IDs
-            Map<Long, List<String>> mtoQuantitiesMap = new HashMap<>();
-            for (Mto mto : mtoList) {
-                // Store MTO description and quantity by ID
-                mtoQuantitiesMap.put(mto.getId(), mto.getQuantity());
-            }
-
-            // Iterate through each incoming stock
-            for (IncomingStock incomingStock : incomingStockList) {
-                Map<String, Object> stockDetails = new HashMap<>();
-                stockDetails.put("id", incomingStock.getId());
-                stockDetails.put("purchaseOrder", incomingStock.getPurchaseOrder());
-                stockDetails.put("date", incomingStock.getDate());
-                stockDetails.put("quantity", incomingStock.getQuantity());
-                stockDetails.put("RemainingQty", incomingStock.getQuantity());
-
-                // Fetch Mto description by ID
-                String mtoDescription = "";
-                Optional<Mto> optionalMto = mtoRepository.findById(incomingStock.getId());
-                if (optionalMto.isPresent()) {
-                    mtoDescription = String.valueOf(optionalMto.get().getQuantity());
-                } else {
-                    mtoDescription = "N/A";
+                // Map MTO quantities by their corresponding IDs
+                Map<Long, List<String>> mtoQuantitiesMap = new HashMap<>();
+                for (Mto mto : mtoList) {
+                    // Store MTO description and quantity by ID
+                    mtoQuantitiesMap.put(mto.getId(), mto.getQuantity());
                 }
-                stockDetails.put("TransferedQty", mtoDescription);
 
-                // Add more fields from IncomingStock as needed
-                response.add(stockDetails);
+                // Iterate through each incoming stock
+                for (IncomingStock incomingStock : incomingStockList) {
+                    Map<String, Object> stockDetails = new HashMap<>();
+                    stockDetails.put("id", incomingStock.getId());
+                    stockDetails.put("purchaseOrder", incomingStock.getPurchaseOrder());
+                    stockDetails.put("date", incomingStock.getDate());
+                    stockDetails.put("quantity", incomingStock.getQuantity());
+                    stockDetails.put("RemainingQty", incomingStock.getQuantity());
+
+                    // Fetch Mto description by ID
+                    String mtoDescription = "";
+                    Optional<Mto> optionalMto = mtoRepository.findById(incomingStock.getId());
+                    if (optionalMto.isPresent()) {
+                        mtoDescription = String.valueOf(optionalMto.get().getQuantity());
+                    } else {
+                        mtoDescription = "N/A";
+                    }
+                    stockDetails.put("TransferedQty", mtoDescription);
+
+                    // Add more fields from IncomingStock as needed
+                    response.add(stockDetails);
+                }
+
+                return ResponseEntity.ok(response);
+            } else {
+                response.add(Collections.singletonMap("error", "Item not found for ID: " + itemId));
+                return ResponseEntity.ok(response); // Return 200 with response
             }
-
-            return ResponseEntity.ok(response);
-        } else {
-            response.add(Collections.singletonMap("error", "Item not found for ID: " + itemId));
-            return ResponseEntity.ok(response); // Return 200 with response
+        } catch (Exception e) {
+            response.add(Collections.singletonMap("error", "Error retrieving incoming stock: " + e.getMessage()));
+            return ResponseEntity.ok(response); // Return 200 with error response
         }
-    } catch (Exception e) {
-        response.add(Collections.singletonMap("error", "Error retrieving incoming stock: " + e.getMessage()));
-        return ResponseEntity.ok(response); // Return 200 with error response
     }
-}
 
 
 //    @GetMapping("/view/{itemId}")
