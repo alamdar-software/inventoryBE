@@ -170,7 +170,7 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
                 stockDetails.put("purchaseOrder", incomingStock.getPurchaseOrder());
                 stockDetails.put("date", incomingStock.getDate());
                 stockDetails.put("quantity", incomingStock.getQuantity());
-                stockDetails.put("RemainingQty", incomingStock.getQuantity());
+                stockDetails.put("RemainingQuantity", incomingStock.getQuantity());
 
                 // Fetch Mto description by ID
                 String mtoDescription = "";
@@ -182,7 +182,7 @@ public ResponseEntity<List<Map<String, Object>>> getIncomingStock(@PathVariable 
                 }
                 stockDetails.put("TransferedQty", mtoDescription);
 
-                // Add more fields from IncomingStock as needed
+                // Add more fields from Incoming Stocks as needed
                 response.add(stockDetails);
             }
 
