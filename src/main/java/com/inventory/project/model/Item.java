@@ -138,7 +138,7 @@ private PRTItemDetail prtItemDetail;
     public void setIncomingStock(IncomingStock incomingStock) {
         this.incomingStock = incomingStock;
     }
-
+//Prt
     public PRTItemDetail getPrtItemDetail() {
         return prtItemDetail;
     }

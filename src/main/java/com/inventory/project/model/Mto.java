@@ -196,7 +196,7 @@ public class Mto {
     public void setDestinationSublocation(String destinationSublocation) {
         this.destinationSublocation = destinationSublocation;
     }
-
+//Incoming
     public IncomingStock getIncomingStock() {
         return incomingStock;
     }
