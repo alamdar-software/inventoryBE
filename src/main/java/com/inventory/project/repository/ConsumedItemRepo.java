@@ -45,4 +45,5 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
     int sumQuantityByLocationNameAndItem(String locationName, Item item);
 
     @Query("SELECT COALESCE(SUM(ci.quantity), 0) FROM ConsumedItem ci WHERE ci.items.id = :itemId")
-    int sumQuantityByItemId(Long itemId);}
+    int sumQuantityByItemId(Long itemId);
+}

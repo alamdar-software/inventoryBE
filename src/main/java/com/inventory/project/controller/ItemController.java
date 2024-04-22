@@ -1,7 +1,9 @@
 package com.inventory.project.controller;
 
+import com.inventory.project.helper.Helper;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.*;
+import com.inventory.project.serviceImpl.ItemService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @RequestMapping("/item")
@@ -36,6 +40,11 @@ public class ItemController {
     private IncomingStockRepo incomingStockRepo;
     @Autowired
     private ConsumedItemRepo consumedItemRepo;
+
+    @Autowired
+    private ItemService itemService;
+
+
     @GetMapping("/add")
     public ResponseEntity<Map<String, Object>> add() {
         Map<String, Object> response = new HashMap<>();
@@ -366,6 +375,45 @@ public void createInventories(Item item) {
         }
     }
 
+//    @PostMapping("/product/upload")
+//    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
+//        if (Helper.checkExcelFormat(file)) {
+//            //true
+//
+//            this.itemService.save(file);
+//
+//            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
+//
+//
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload excel file ");
+//    }
+//
+//
+//    @GetMapping("/product")
+//    public List<Item> getAllProduct() {
+//        return this.itemService.getAllProducts();
+//    }
+@PostMapping("/categories/upload")
+public ResponseEntity<List<Category>> uploadCategories(@RequestParam("file") MultipartFile file) {
+    try {
+        List<Category> categories = itemService.uploadCategories(file);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    } catch (IOException e) {
+        e.printStackTrace();
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
 
+    @PostMapping("/units/upload")
+    public ResponseEntity<List<Unit>> uploadUnits(@RequestParam("file") MultipartFile file) {
+        try {
+            List<Unit> units = itemService.uploadUnits(file);
+            return new ResponseEntity<>(units, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 

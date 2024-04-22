@@ -120,11 +120,11 @@ public class PRTItemDetailController {
 
             } else {
                 response.add(Collections.singletonMap("error", "Item not found for ID: " + itemId));
-                return ResponseEntity.ok(response); // Return 200 with response
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             response.add(Collections.singletonMap("error", "Error retrieving incoming stock: " + e.getMessage()));
-            return ResponseEntity.ok(response); // Return 200 with error response
+            return ResponseEntity.ok(response);
         }
     }
 
