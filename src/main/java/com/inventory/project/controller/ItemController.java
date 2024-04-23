@@ -375,45 +375,33 @@ public void createInventories(Item item) {
         }
     }
 
-//    @PostMapping("/product/upload")
-//    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
-//        if (Helper.checkExcelFormat(file)) {
-//            //true
-//
-//            this.itemService.save(file);
-//
-//            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
-//
-//
-//        }
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload excel file ");
-//    }
-//
-//
-//    @GetMapping("/product")
-//    public List<Item> getAllProduct() {
-//        return this.itemService.getAllProducts();
-//    }
-@PostMapping("/categories/upload")
-public ResponseEntity<List<Category>> uploadCategories(@RequestParam("file") MultipartFile file) {
-    try {
-        List<Category> categories = itemService.uploadCategories(file);
-        return new ResponseEntity<>(categories, HttpStatus.OK);
-    } catch (IOException e) {
-        e.printStackTrace();
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-}
-
-    @PostMapping("/units/upload")
-    public ResponseEntity<List<Unit>> uploadUnits(@RequestParam("file") MultipartFile file) {
-        try {
-            List<Unit> units = itemService.uploadUnits(file);
-            return new ResponseEntity<>(units, HttpStatus.OK);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @PostMapping("/location/upload")
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
+        if (Helper.checkExcelFormat(file)) {
+            //true
+            this.itemService.save(file);
+            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload an Excel file");
     }
+
+    @PostMapping("/category/upload")
+    public ResponseEntity<?> uploadCat(@RequestParam("file") MultipartFile file) {
+        if (Helper.checkExcelFormat(file)) {
+            //true
+
+            this.itemService.saveCategory(file);
+
+            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
+
+
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload excel file ");
+    }
+    @GetMapping("/location")
+    public List<Location> getAllLocations() {
+        return this.itemService.getAllLocations();
+    }
+
 }
 

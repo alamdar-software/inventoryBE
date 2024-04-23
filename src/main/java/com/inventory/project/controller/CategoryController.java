@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/category")
 @CrossOrigin("*")
@@ -68,16 +70,15 @@ public class CategoryController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
-    public ResponseEntity<Page<Category>> viewCategories(@RequestParam(defaultValue = "1") int page,
-                                                         @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<Category>> viewCategories() {
         try {
-            Pageable pageable = PageRequest.of(page - 1, size);
-            Page<Category> categoryPage = categoryRepository.findAll(pageable);
-            return ResponseEntity.ok(categoryPage);
+            List<Category> categories = categoryRepository.findAll();
+            return ResponseEntity.ok(categories);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null); // Handle error appropriately
         }
     }
+
 
     @PreAuthorize("hasRole('SUPERADMIN')")
 
