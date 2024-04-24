@@ -385,23 +385,66 @@ public void createInventories(Item item) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload an Excel file");
     }
 
-    @PostMapping("/category/upload")
-    public ResponseEntity<?> uploadCat(@RequestParam("file") MultipartFile file) {
-        if (Helper.checkExcelFormat(file)) {
-            //true
 
-            this.itemService.saveCategory(file);
-
-            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
-
-
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload excel file ");
-    }
     @GetMapping("/location")
     public List<Location> getAllLocations() {
         return this.itemService.getAllLocations();
     }
+    @PostMapping("/upload/category")
+    public ResponseEntity<String> uploadCategoryFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please upload a file");
+        }
 
+        try {
+            itemService.saveCategory(file);
+            return ResponseEntity.ok().body("Category data uploaded successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to upload category data: " + e.getMessage());
+        }
+    }
+    @PostMapping("/upload/unit")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please upload a file");
+        }
+        try {
+            itemService.saveUnit(file);
+            return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to upload file: " + file.getOriginalFilename());
+        }
+    }
+    @PostMapping("/upload/item")
+    public ResponseEntity<String> uploadItems(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please upload an Excel file.");
+        }
+
+        if (!Helper.checkExcelFormat(file)) {
+            return ResponseEntity.badRequest().body("Invalid file format. Please upload an Excel file.");
+        }
+
+        try {
+            itemService.saveItems(file);
+            return ResponseEntity.ok("Items uploaded successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("An error occurred while processing the file.");
+        }
+    }
+    @PostMapping("/upload/brand")
+    public ResponseEntity<String> uploadBrandsFromExcel(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please upload an Excel file.");
+        }
+
+        if (!Helper.checkExcelFormat(file)) {
+            return ResponseEntity.badRequest().body("Please upload a valid Excel file.");
+        }
+
+        itemService.saveBrandsFromExcel(file);
+        return ResponseEntity.ok("Brands uploaded successfully.");
+    }
 }
 

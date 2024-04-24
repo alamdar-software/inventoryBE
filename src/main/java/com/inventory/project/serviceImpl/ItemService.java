@@ -1,14 +1,8 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.helper.Helper;
-import com.inventory.project.model.Category;
-import com.inventory.project.model.Item;
-import com.inventory.project.model.Location;
-import com.inventory.project.model.Unit;
-import com.inventory.project.repository.CategoryRepository;
-import com.inventory.project.repository.ItemRepository;
-import com.inventory.project.repository.LocationRepository;
-import com.inventory.project.repository.UnitRepository;
+import com.inventory.project.model.*;
+import com.inventory.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +21,8 @@ public class ItemService {
 
     @Autowired
     private LocationRepository locationRepo;
+    @Autowired
+    private BrandRepository brandRepository;
 
     public void save(MultipartFile file) {
 
@@ -44,13 +40,37 @@ public class ItemService {
     }
 
     public void saveCategory(MultipartFile file) {
-
         try {
-            List<Category> products = Helper.convertExcelToListOfProduct(file.getInputStream());
-            this.categoryRepository.saveAll(products);
+            List<Category> categories = Helper.convertExcelToCategories(file.getInputStream());
+            this.categoryRepository.saveAll(categories);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+    }
+    public void saveUnit(MultipartFile file) {
+        try {
+            List<Unit> units = Helper.convertExcelToUnits(file.getInputStream());
+            this.unitRepository.saveAll(units);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void saveItems(MultipartFile file) {
+        try {
+            List<Item> items = Helper.convertExcelToItems(file.getInputStream());
+            itemRepository.saveAll(items);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle exception appropriately
+        }
+    }
+    public void saveBrandsFromExcel(MultipartFile file) {
+        try {
+            List<Brand> brands = Helper.convertExcelToBrands(file.getInputStream());
+            brandRepository.saveAll(brands);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle exception
+        }
     }
 }

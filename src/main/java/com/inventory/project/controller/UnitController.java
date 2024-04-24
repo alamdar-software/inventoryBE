@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/unit")
 @CrossOrigin("*")
@@ -57,16 +59,15 @@ public class UnitController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
-    public ResponseEntity<Page<Unit>> viewUnits(@RequestParam(defaultValue = "1") int page,
-                                                @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<Unit>> viewUnits() {
         try {
-            Pageable pageable = PageRequest.of(page - 1, size);
-            Page<Unit> unitPage = unitRepo.findAll(pageable);
-            return ResponseEntity.ok(unitPage);
+            List<Unit> units = unitRepo.findAll();
+            return ResponseEntity.ok(units);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("get/{id}")

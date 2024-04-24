@@ -34,19 +34,16 @@ public class PickupController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
-    public ResponseEntity<List<Pickup>> getAllPickups(
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize
-    ) {
-        Pageable paging = PageRequest.of(pageNo, pageSize);
-        Page<Pickup> pagedResult = pickupRepository.findAll(paging);
+    public ResponseEntity<List<Pickup>> getAllPickups() {
+        List<Pickup> allPickups = pickupRepository.findAll();
 
-        if (pagedResult.hasContent()) {
-            return ResponseEntity.ok(pagedResult.getContent());
+        if (!allPickups.isEmpty()) {
+            return ResponseEntity.ok(allPickups);
         } else {
             return ResponseEntity.noContent().build();
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")

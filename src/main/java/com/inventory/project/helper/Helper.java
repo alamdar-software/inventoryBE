@@ -31,7 +31,19 @@ public class Helper {
     public static List<Location> convertExcelToLocations(InputStream is) {
         return convertExcelToList(is, "Sheet1", Location.class);
     }
+    public static List<Category> convertExcelToCategories(InputStream is) {
+        return convertExcelToList(is, "Sheet1", Category.class);
+    }
+    public static List<Unit> convertExcelToUnits(InputStream is) {
+        return convertExcelToList(is, "Sheet1", Unit.class);
+    }
 
+    public static List<Item> convertExcelToItems(InputStream is) {
+        return convertExcelToList(is, "Sheet1", Item.class);
+    }
+    public static List<Brand> convertExcelToBrands(InputStream is) {
+        return convertExcelToList(is, "Sheet1", Brand.class);
+    }
     private static <T> List<T> convertExcelToList(InputStream is, String sheetName, Class<T> entityClass) {
         List<T> list = new ArrayList<>();
         try (XSSFWorkbook workbook = new XSSFWorkbook(is)) {
@@ -68,6 +80,51 @@ public class Helper {
             } else if (entityClass.equals(Address.class)) {
                 entity = entityClass.getDeclaredConstructor().newInstance();
                 ((Address) entity).setAddress(getStringValue(row.getCell(0)));
+            } else if (entityClass.equals(Category.class)) {
+                entity = entityClass.getDeclaredConstructor().newInstance();
+                // Assuming name is in the second column
+                Cell nameCell = row.getCell(1);
+                if (nameCell != null) {
+                    ((Category) entity).setName(getStringValue(nameCell));
+                }
+            }else if (entityClass.equals(Unit.class)) {
+                entity = entityClass.getDeclaredConstructor().newInstance();
+                // Assuming unitName is in the third column (index 2)
+                Cell unitNameCell = row.getCell(2);
+                if (unitNameCell != null) {
+                    ((Unit) entity).setUnitName(getStringValue(unitNameCell));
+                }
+            }else if (entityClass.equals(Item.class)) {
+                entity = entityClass.getDeclaredConstructor().newInstance();
+                Cell descriptionCell = row.getCell(0); // Assuming description is in the first column (index 0)
+                Cell nameCell = row.getCell(1); // Assuming name is in the second column (index 1)
+                Cell unitNameCell = row.getCell(2); // Assuming unitName is in the third column (index 2)
+                Cell minimumStockCell = row.getCell(3); // Assuming minimumStock is in the fourth column (index 3)
+
+                if (descriptionCell != null) {
+                    ((Item) entity).setDescription(getStringValue(descriptionCell));
+                }
+                if (nameCell != null) {
+                    ((Item) entity).setName(getStringValue(nameCell));
+                }
+                if (unitNameCell != null) {
+                    ((Item) entity).setUnitName(getStringValue(unitNameCell));
+                }   if (minimumStockCell != null) {
+                    // Convert the numeric value to string and set it as minimumStock
+                    if (minimumStockCell.getCellType() == CellType.NUMERIC) {
+                        double numericValue = minimumStockCell.getNumericCellValue();
+                        ((Item) entity).setMinimumStock(String.valueOf((int) numericValue));
+                    } else {
+                        ((Item) entity).setMinimumStock(getStringValue(minimumStockCell));
+                    }
+                }
+
+            } else if (entityClass.equals(Brand.class)) {
+                entity = entityClass.getDeclaredConstructor().newInstance();
+                Cell brandCell = row.getCell(0); // Assuming brand name is in the first column (index 0)
+                if (brandCell != null) {
+                    ((Brand) entity).setBrandName(getStringValue(brandCell));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,61 +146,5 @@ public class Helper {
         return null;
     }
 
-    public static List<Category> convertExcelToListOfProduct(InputStream is) {
-        List<Category> list = new ArrayList<>();
-
-        try {
-
-
-            XSSFWorkbook workbook = new XSSFWorkbook(is);
-
-            XSSFSheet sheet = workbook.getSheet("Sheet1");
-
-            int rowNumber = 0;
-            Iterator<Row> iterator = sheet.iterator();
-
-            while (iterator.hasNext()) {
-                Row row = iterator.next();
-
-                if (rowNumber == 0) {
-                    rowNumber++;
-                    continue;
-                }
-
-                Iterator<Cell> cells = row.iterator();
-
-                int cid = 0;
-
-                Category p = new Category();
-
-                while (cells.hasNext()) {
-                    Cell cell = cells.next();
-
-                    switch (cid) {
-                        case 0:
-                            p.setId(Long.valueOf((int) cell.getNumericCellValue()));
-                            break;
-                        case 1:
-                            p.setName(cell.getStringCellValue());
-                            break;
-                        default:
-                            break;
-                    }
-                    cid++;
-
-                }
-
-                list.add(p);
-
-
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-
-    }
 
 }
