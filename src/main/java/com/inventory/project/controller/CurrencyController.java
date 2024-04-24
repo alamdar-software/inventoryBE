@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/currency")
@@ -84,22 +81,16 @@ public class CurrencyController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/view")
-    public ResponseEntity<Map<String, Object>> viewCurrencies(@RequestParam(defaultValue = "0") int page) {
-        try {
-            Pageable pageable = PageRequest.of(page, 10);
-            Page<Currency> currencyPage = currencyRepo.findAll(pageable);
+    public ResponseEntity<List<Currency>> getAllPickups() {
+        List<Currency> allPickups = currencyRepo.findAll();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("currencyList", currencyPage.getContent());
-            response.put("currentPage", currencyPage.getNumber());
-            response.put("totalPages", currencyPage.getTotalPages());
-            response.put("totalItems", currencyPage.getTotalElements());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Error fetching currencies: " + e.getMessage()));
+        if (!allPickups.isEmpty()) {
+            return ResponseEntity.ok(allPickups);
+        } else {
+            return ResponseEntity.noContent().build();
         }
     }
+
     @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")
