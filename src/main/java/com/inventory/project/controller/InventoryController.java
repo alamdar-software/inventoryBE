@@ -36,68 +36,60 @@ public class InventoryController {
     @Autowired
     private IncomingStockService incomingStockService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/add")
     public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
         Map<String, Object> response = new HashMap<>();
 
         try {
             Item item = itemRepo.findByDescription(inventoryRequest.getDescription());
-            Location location = locationRepo.findByLocationName(inventoryRequest.getLocationName());
 
-            if (item != null && location != null) {
+            // Use locationName directly from inventoryRequest
+            String locationName = inventoryRequest.getLocationName();
 
-                Inventory inventory = new Inventory();
-                inventory.setDescription(item.getDescription());
-                inventory.setLocationName(location.getLocationName());
-                inventory.setQuantity(inventoryRequest.getQuantity());
-                String addressString = inventoryRequest.getAddress().getAddress();
+            Inventory inventory = new Inventory();
+            inventory.setDescription(item.getDescription());
+            inventory.setLocationName(locationName);
+            inventory.setQuantity(inventoryRequest.getQuantity());
+            String addressString = inventoryRequest.getAddress().getAddress();
 
-                Address address = new Address();
-                address.setAddress(addressString); // Assuming addressString is fetched correctly
+            Address address = new Address();
+            address.setAddress(addressString); // Assuming addressString is fetched correctly
 
-                inventory.setAddress(address);
-                inventory.setConsumedItem(inventoryRequest.getConsumedItem());
-                inventory.setScrappedItem(inventoryRequest.getScrappedItem());
+            inventory.setAddress(address);
+            inventory.setConsumedItem(inventoryRequest.getConsumedItem());
+            inventory.setScrappedItem(inventoryRequest.getScrappedItem());
 
-                Inventory savedInventory = inventoryRepo.save(inventory);
+            Inventory savedInventory = inventoryRepo.save(inventory);
 
-                response.put("success", "Inventory added successfully");
-                response.put("inventory", savedInventory);
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "Item or location not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
+            response.put("success", "Inventory added successfully");
+            response.put("inventory", savedInventory);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("error", "Error adding Inventory: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-//@PostMapping("/add")
-//public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
-//    Map<String, Object> response = new HashMap<>();
+
+//    @PostMapping("/add")
+//    public ResponseEntity<Map<String, Object>> addInventory(@RequestBody Inventory inventoryRequest) {
+//        Map<String, Object> response = new HashMap<>();
 //
-//    try {
-//        Item item = itemRepo.findByDescription(inventoryRequest.getDescription());
+//        try {
+//            Item item = itemRepo.findByDescription(inventoryRequest.getDescription());
+//            Location location = locationRepo.findByLocationName(inventoryRequest.getLocationName());
 //
+//            if (item != null && location != null) {
 //
-//        // Fetch the Address object based on the address string
-//        Address address = addressRepository.findByAddress(inventoryRequest.getAddress().getAddress());
-//
-//        if (item != null && address != null) {
-//            Location location = locationRepo.findByLocationNameAndAddresses(
-//                    inventoryRequest.getLocationName(),
-//                    inventoryRequest.getAddress()
-//
-//            );
-//
-//            if (location != null) {
 //                Inventory inventory = new Inventory();
 //                inventory.setDescription(item.getDescription());
 //                inventory.setLocationName(location.getLocationName());
 //                inventory.setQuantity(inventoryRequest.getQuantity());
-//                inventory.setAddress(inventoryRequest.getAddress());
+//                String addressString = inventoryRequest.getAddress().getAddress();
+//
+//                Address address = new Address();
+//                address.setAddress(addressString); // Assuming addressString is fetched correctly
+//
+//                inventory.setAddress(address);
 //                inventory.setConsumedItem(inventoryRequest.getConsumedItem());
 //                inventory.setScrappedItem(inventoryRequest.getScrappedItem());
 //
@@ -107,18 +99,15 @@ public class InventoryController {
 //                response.put("inventory", savedInventory);
 //                return ResponseEntity.ok(response);
 //            } else {
-//                response.put("error", "Location not found");
+//                response.put("error", "Item or location not found");
 //                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 //            }
-//        } else {
-//            response.put("error", "Item or address not found");
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+//        } catch (Exception e) {
+//            response.put("error", "Error adding Inventory: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //        }
-//    } catch (Exception e) {
-//        response.put("error", "Error adding Inventory: " + e.getMessage());
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 //    }
-//}
+
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PutMapping("/update/{id}")
@@ -297,7 +286,6 @@ public class InventoryController {
             return ResponseEntity.badRequest().build();
         }
 
-        // Print criteria and result to check for issues
         System.out.println("Received search criteria: " + criteria);
         System.out.println("Returning inventory list: " + inventoryList);
 
@@ -448,6 +436,7 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
 //        dto.setItemType("IncomingStock");
 //        return dto;
 //    }
+
 }
 
 

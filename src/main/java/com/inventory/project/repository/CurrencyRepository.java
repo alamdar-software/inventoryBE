@@ -4,6 +4,8 @@ import com.inventory.project.model.Currency;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface CurrencyRepository extends JpaRepository<Currency,Long> {
     boolean existsByCurrencyName(String currencyName);
 
@@ -14,5 +16,7 @@ public interface CurrencyRepository extends JpaRepository<Currency,Long> {
     Currency findByCurrencyName(String currencyName);
     Currency findTopByCurrencyName(String currencyName);
 
+
+    List<Currency> findByCurrencyNameIgnoreCase(String currencyName);
 
 }

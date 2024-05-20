@@ -36,8 +36,7 @@ public class InventoryService {
     }
 
     public List<Inventory> getMtoByDescription(String description) {
-        Inventory inventory = inventoryRepository.findByDescription(description);
-        return inventory != null ? Collections.singletonList(inventory) : Collections.emptyList();
+        return inventoryRepository.findAllByDescription(description);
     }
 
 
@@ -104,6 +103,7 @@ public class InventoryService {
 
         return itemInventoryDtos;
     }
+
 
 
 

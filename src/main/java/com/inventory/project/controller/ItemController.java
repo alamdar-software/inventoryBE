@@ -81,6 +81,52 @@ public class ItemController {
 //        }
 //    }
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+//@PostMapping("/add")
+//public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
+//    Map<String, Object> response = new HashMap<>();
+//
+//    try {
+//
+//        Item item = new Item();
+//        item.setItemName(itemRequest.getItemName());
+//        item.setMinimumStock(itemRequest.getMinimumStock());
+//        item.setDescription(itemRequest.getDescription());
+//
+//        Category category = categoryRepository.findByName(itemRequest.getName());
+//        if (category != null) {
+//            item.setCategory(category);
+//            item.setName(category.getName()); // Set name from the fetched category
+//        } else {
+//            // Handle category not found error
+//            response.put("error", "Category not found for name: " + itemRequest.getName());
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//
+//        // Similarly, fetch and set the Unit
+//        Unit unit = unitRepository.findByUnitName(itemRequest.getUnitName());
+//        if (unit != null) {
+//            item.setUnit(unit);
+//            item.setUnitName(unit.getUnitName()); // Set unitName from the fetched unit
+//        } else {
+//            // Handle unit not found error
+//            response.put("error", "Unit not found for name: " + itemRequest.getUnitName());
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//
+//        Item savedItem = itemRepository.save(item);
+//
+//        // Create inventories for the saved item
+//        createInventories(savedItem);
+//
+//        response.put("success", "Item added successfully");
+//        response.put("item", savedItem);
+//
+//        return ResponseEntity.ok(response);
+//    } catch (Exception e) {
+//        response.put("error", "Error adding Item: " + e.getMessage());
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//    }
+//}
 @PostMapping("/add")
 public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest) {
     Map<String, Object> response = new HashMap<>();
@@ -91,26 +137,13 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
         item.setMinimumStock(itemRequest.getMinimumStock());
         item.setDescription(itemRequest.getDescription());
 
-        Category category = categoryRepository.findByName(itemRequest.getName());
-        if (category != null) {
-            item.setCategory(category);
-            item.setName(category.getName()); // Set name from the fetched category
-        } else {
-            // Handle category not found error
-            response.put("error", "Category not found for name: " + itemRequest.getName());
-            return ResponseEntity.badRequest().body(response);
-        }
+        // Set category directly
+        item.setCategory(itemRequest.getCategory());
+        item.setName(itemRequest.getName()); // Set name directly
 
-        // Similarly, fetch and set the Unit
-        Unit unit = unitRepository.findByUnitName(itemRequest.getUnitName());
-        if (unit != null) {
-            item.setUnit(unit);
-            item.setUnitName(unit.getUnitName()); // Set unitName from the fetched unit
-        } else {
-            // Handle unit not found error
-            response.put("error", "Unit not found for name: " + itemRequest.getUnitName());
-            return ResponseEntity.badRequest().body(response);
-        }
+        // Set unit directly
+        item.setUnit(itemRequest.getUnit());
+        item.setUnitName(itemRequest.getUnitName()); // Set unitName directly
 
         Item savedItem = itemRepository.save(item);
 

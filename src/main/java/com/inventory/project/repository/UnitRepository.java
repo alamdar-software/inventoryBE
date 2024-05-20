@@ -18,5 +18,6 @@ public interface UnitRepository extends JpaRepository<Unit,Long> {
     @Query("SELECT u.unitName FROM Unit u") // Assuming 'unitName' is the property in your Unit entity
 
     List<String> findAllUnitNames();
+    List<Unit> findByUnitNameIgnoreCase(String unitName);
 
 }

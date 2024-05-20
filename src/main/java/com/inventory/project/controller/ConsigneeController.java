@@ -30,32 +30,34 @@ public class ConsigneeController {
     @Autowired
     private LocationRepository locationRepo;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-@PostMapping("/add")
-public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
-    Map<String, Object> response = new HashMap<>();
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> addConsignee(@RequestBody Consignee consignee) {
+        Map<String, Object> response = new HashMap<>();
 
-    try {
-        String locationName = consignee.getLocationName();
+        try {
+            String locationName = consignee.getLocationName();
 
-        Location location = locationRepo.findByLocationName(locationName);
-        if (location == null) {
-            response.put("error", "Location not found");
-            return ResponseEntity.badRequest().body(response);
+            List<Location> locations = locationRepo.findAllByLocationName(locationName);
+            if (locations.isEmpty()) {
+                response.put("error", "Location not found");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Set the consignee's location to the first found location's name
+            consignee.setLocationName(locations.get(0).getLocationName());
+
+            // Save the consignee
+            Consignee savedConsignee = consigneeRepo.save(consignee);
+
+            response.put("success", "Consignee added successfully");
+            response.put("consignee", savedConsignee);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "Error adding consignee: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
-        consignee.setLocationName(location.getLocationName()); // Set locationName from Location entity
-
-        Consignee savedConsignee = consigneeRepo.save(consignee);
-
-        response.put("success", "Consignee added successfully");
-        response.put("consignee", savedConsignee);
-
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        response.put("error", "Error adding consignee: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-}
 
 
     private boolean consigneeContainsNullFields(Consignee consignee) {
