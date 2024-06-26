@@ -2,6 +2,7 @@ package com.inventory.project.controller;
 
 import com.inventory.project.model.Consignee;
 import com.inventory.project.model.Location;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.ConsigneeRepository;
 import com.inventory.project.repository.LocationRepository;
 import jakarta.servlet.http.HttpSession;
@@ -148,5 +149,21 @@ public class ConsigneeController {
         model.put("totalPages", list.getTotalPages());
         model.put("totalItems", list.getTotalElements());
         model.put("locationList", locationRepo.findAll());
+    }
+    @PostMapping("/search")
+    public ResponseEntity<List<Consignee>> searchConsignees(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getConsigneeName() == null || criteria.getConsigneeName().isEmpty()) {
+            List<Consignee> allConsignees = consigneeRepo.findAll();
+            if (allConsignees.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(allConsignees);
+        }
+
+        List<Consignee> consigneeList = consigneeRepo.findByConsigneeName(criteria.getConsigneeName());
+        if (consigneeList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(consigneeList);
     }
 }

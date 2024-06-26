@@ -31,4 +31,5 @@ public interface ConsigneeRepository extends JpaRepository<Consignee,Long> {
     @Query("SELECT c FROM Consignee c JOIN c.location l WHERE l.locationName = :locationName")
     List<Consignee> findByLocationName(@Param("locationName") String locationName);
 
+    List<Consignee> findByConsigneeName(String consigneeName);
 }

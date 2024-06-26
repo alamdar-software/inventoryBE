@@ -193,39 +193,76 @@ public class LocationController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
 //    }
+@PostMapping("/search")
+public ResponseEntity<List<LocationDto>> searchLocations(
+        @RequestParam(required = false) String locationName,
+        @RequestParam(required = false) String address) {
 
-    @PostMapping("/search")
-    public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
-        List<Location> locationList;
+    List<Location> locationList;
 
-        if (criteria == null ||
-                (criteria.getLocationName() == null || criteria.getLocationName().isEmpty()) &&
-                        (criteria.getAddress() == null || criteria.getAddress().isEmpty())) {
-            locationList = locationService.getAllLocations();
-        } else if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
-            locationList = locationService.searchByAddress(criteria.getAddress());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            locationList = locationService.getLocationByLocationName(criteria.getLocationName());
+    // Check if both parameters are null or empty
+    if ((locationName == null || locationName.isEmpty()) &&
+            (address == null || address.isEmpty())) {
+        // Fetch all locations when no criteria are provided
+        locationList = locationService.getAllLocations();
+    } else {
+        // Perform the search based on the provided criteria (if any)
+        if (address != null && !address.isEmpty()) {
+            locationList = locationService.searchByAddress(address);
         } else {
-            return ResponseEntity.badRequest().build();
+            locationList = locationService.getLocationByLocationName(locationName);
         }
-
-        if (locationList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<LocationDto> locationDTOs = locationList.stream()
-                .map(location -> new LocationDto(
-                        location.getId(),
-                        location.getLocationName(),
-                        location.getAddresses().stream()
-                                .map(address -> address.getAddress())
-                                .collect(Collectors.joining(", "))
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(locationDTOs);
     }
+
+    if (locationList.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    // Map Location entities to LocationDto objects
+    List<LocationDto> locationDTOs = locationList.stream()
+            .map(location -> new LocationDto(
+                    location.getId(),
+                    location.getLocationName(),
+                    location.getAddresses().stream()
+                            .map(addressObj -> addressObj.getAddress())
+                            .collect(Collectors.joining(", "))
+            ))
+            .collect(Collectors.toList());
+
+    return ResponseEntity.ok(locationDTOs);
+}
+    //    @PostMapping("/search")
+//    public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
+//        List<Location> locationList;
+//
+//        if (criteria == null ||
+//                (criteria.getLocationName() == null || criteria.getLocationName().isEmpty()) &&
+//                        (criteria.getAddress() == null || criteria.getAddress().isEmpty())) {
+//            locationList = locationService.getAllLocations();
+//        } else if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+//            locationList = locationService.searchByAddress(criteria.getAddress());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            locationList = locationService.getLocationByLocationName(criteria.getLocationName());
+//        } else {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        if (locationList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        List<LocationDto> locationDTOs = locationList.stream()
+//                .map(location -> new LocationDto(
+//                        location.getId(),
+//                        location.getLocationName(),
+//                        location.getAddresses().stream()
+//                                .map(address -> address.getAddress())
+//                                .collect(Collectors.joining(", "))
+//                ))
+//                .collect(Collectors.toList());
+//
+//        return ResponseEntity.ok(locationDTOs);
+//    }
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllCounts() {
         List<Location> locations = locationRepo.findAll();
