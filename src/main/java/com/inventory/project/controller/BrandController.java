@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.inventory.project.model.SearchCriteria;
+import com.inventory.project.serviceImpl.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,8 @@ import jakarta.servlet.http.HttpSession;
 public class BrandController {
     @Autowired
     private BrandRepository brandRepository;
+    @Autowired
+    private BrandService brandService;
 
 //    @GetMapping("/view/{page}")
 //    public ResponseEntity<Map<String, Object>> viewBrands(@PathVariable("page") int page, HttpSession session) {
@@ -170,5 +174,22 @@ public ResponseEntity<List<Brand>> viewAllBrands() {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion unsuccessful");
         }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Brand>> searchBrands(@RequestBody(required = false) SearchCriteria criteria) {
+        List<Brand> brandList;
+
+        if (criteria == null || (criteria.getBrandName() == null || criteria.getBrandName().isEmpty())) {
+            brandList = brandService.getAllBrands(); // Return all brands if criteria is null or brandName is empty
+        } else {
+            brandList = brandService.findByBrandName(criteria.getBrandName()); // Search by brandName if provided
+        }
+
+        if (brandList.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Return not found if no brands match the criteria
+        }
+
+        return ResponseEntity.ok(brandList); // Return matching brands
     }
 }

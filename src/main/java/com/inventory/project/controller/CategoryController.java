@@ -1,8 +1,10 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.Category;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.CategoryRepository;
 
+import com.inventory.project.serviceImpl.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,8 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private CategoryService categoryService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @PostMapping("/add")
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
@@ -91,4 +95,22 @@ public class CategoryController {
             return ResponseEntity.status(500).body("Deletion Unsuccessful");
         }
     }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Category>> searchCategories(@RequestBody(required = false) SearchCriteria criteria) {
+        List<Category> categoryList;
+
+        if (criteria == null || (criteria.getName() == null || criteria.getName().isEmpty())) {
+            categoryList = categoryService.getAllCategories(); // Return all categories if criteria is null or name is empty
+        } else {
+            categoryList = categoryService.findByCategoryName(criteria.getName()); // Search by name if provided
+        }
+
+        if (categoryList.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Return not found if no categories match the criteria
+        }
+
+        return ResponseEntity.ok(categoryList); // Return matching categories
+    }
+
 }

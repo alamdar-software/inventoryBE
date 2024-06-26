@@ -33,6 +33,7 @@ public class SearchCriteria {
    private String companyName;
    private String unitName;
     private String consigneeName;
+    private String brandName;
     public SearchCriteria() {
     }
 
@@ -191,5 +192,13 @@ public class SearchCriteria {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 }
