@@ -1,7 +1,9 @@
 package com.inventory.project.controller;
 
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.model.Unit;
 import com.inventory.project.repository.UnitRepository;
+import com.inventory.project.serviceImpl.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,9 @@ public class UnitController {
 
     @Autowired
     private UnitRepository unitRepo;
+
+    @Autowired
+    private UnitService unitService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
@@ -91,5 +96,22 @@ public class UnitController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Deletion Unsuccessful");
         }
+    }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Unit>> searchUnits(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getUnitName() == null || criteria.getUnitName().isEmpty()) {
+            List<Unit> allUnits = unitService.getAllUnits();
+            return ResponseEntity.ok(allUnits);
+        }
+
+        List<Unit> unitList = unitService.findByUnitName(criteria.getUnitName());
+
+        if (unitList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(unitList);
     }
 }

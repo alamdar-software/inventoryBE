@@ -1,9 +1,11 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.Location;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.model.Shipper;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.repository.ShipperRepository;
+import com.inventory.project.serviceImpl.ShipperService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,8 @@ public class ShipperController {
 
     @Autowired
     private LocationRepository locationRepository;
+    @Autowired
+    private ShipperService shipperService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
@@ -149,5 +153,22 @@ public class ShipperController {
         model.put("currentPage", page);
         model.put("totalPages", list.getTotalPages());
         model.put("totalItems", list.getTotalElements());
+    }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Shipper>> searchShippers(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getShipperName() == null || criteria.getShipperName().isEmpty()) {
+            List<Shipper> allShippers = shipperService.getAllShippers();
+            return ResponseEntity.ok(allShippers);
+        }
+
+        List<Shipper> shipperList = shipperService.findByShipperName(criteria.getShipperName());
+
+        if (shipperList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(shipperList);
     }
 }

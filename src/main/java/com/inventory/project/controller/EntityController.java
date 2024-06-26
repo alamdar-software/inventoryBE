@@ -1,7 +1,9 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.Entity;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.EntityRepository;
+import com.inventory.project.serviceImpl.EntityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,8 @@ public class EntityController {
     @Autowired
     private EntityRepository entityRepository;
 
+    @Autowired
+    private EntityService entityService;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/add")
@@ -82,5 +86,22 @@ public class EntityController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Entity>> searchEntities(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getEntityName() == null || criteria.getEntityName().isEmpty()) {
+            List<Entity> allEntities = entityService.getAllEntities();
+            return ResponseEntity.ok(allEntities);
+        }
+
+        List<Entity> entityList = entityService.findByEntityName(criteria.getEntityName());
+
+        if (entityList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(entityList);
     }
 }

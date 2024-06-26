@@ -1,7 +1,9 @@
 package com.inventory.project.controller;
 
 import com.inventory.project.model.Pickup;
+import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.PickupRepository;
+import com.inventory.project.serviceImpl.PickupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,8 @@ public class PickupController {
     @Autowired
     private PickupRepository pickupRepository;
 
+    @Autowired
+    private PickupService pickupService;
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
@@ -91,4 +95,22 @@ public class PickupController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Pickup>> searchPickups(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getCompanyName() == null || criteria.getCompanyName().isEmpty()) {
+            List<Pickup> allPickups = pickupService.getAllPickups();
+            return ResponseEntity.ok(allPickups);
+        }
+
+        List<Pickup> pickupList = pickupService.findByCompanyName(criteria.getCompanyName());
+
+        if (pickupList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(pickupList);
+    }
+
 }

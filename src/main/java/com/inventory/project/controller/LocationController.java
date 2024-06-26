@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/location")
@@ -194,15 +195,14 @@ public class LocationController {
 //    }
 
     @PostMapping("/search")
-    public ResponseEntity<List<Location>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
-        if (criteria == null) {
-            List<Location> allLocations = locationService.getAllLocations();
-            return ResponseEntity.ok(allLocations);
-        }
-
+    public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
         List<Location> locationList;
 
-        if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+        if (criteria == null ||
+                (criteria.getLocationName() == null || criteria.getLocationName().isEmpty()) &&
+                        (criteria.getAddress() == null || criteria.getAddress().isEmpty())) {
+            locationList = locationService.getAllLocations();
+        } else if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
             locationList = locationService.searchByAddress(criteria.getAddress());
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
             locationList = locationService.getLocationByLocationName(criteria.getLocationName());
@@ -214,10 +214,18 @@ public class LocationController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(locationList);
+        List<LocationDto> locationDTOs = locationList.stream()
+                .map(location -> new LocationDto(
+                        location.getId(),
+                        location.getLocationName(),
+                        location.getAddresses().stream()
+                                .map(address -> address.getAddress())
+                                .collect(Collectors.joining(", "))
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(locationDTOs);
     }
-
-
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getAllCounts() {
         List<Location> locations = locationRepo.findAll();

@@ -15,4 +15,5 @@ public interface EntityRepository extends JpaRepository<Entity,Long> {
 //    Entity findByNameAndId(@Param("entityName") String entityName, @Param("id") Long id);
 List<Entity> findByEntityNameIgnoreCase(String entityName);
 
+
 }
