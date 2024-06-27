@@ -114,38 +114,47 @@ public class LocationController {
     }
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
-    @PutMapping("/update/{locationId}/addresses/{addressId}")
-    public ResponseEntity<Location> updateAddress(
-            @PathVariable("locationId") Long locationId,
-            @PathVariable("addressId") Long addressId,
-            @RequestBody Address updatedAddress
+    @PutMapping("/update/{id}")
+    public ResponseEntity<LocationDto> updateAddress(
+            @PathVariable("id") Long addressId,
+            @RequestBody AddressUpdateRequest addressUpdateRequest
     ) {
-        Optional<Location> locationOptional = locationRepo.findById(locationId);
+        String updatedLocationName = addressUpdateRequest.getLocationName();
+        String updatedAddress = addressUpdateRequest.getAddress();
 
-        if (locationOptional.isPresent()) {
-            Location existingLocation = locationOptional.get();
+        // Find the address by ID
+        Optional<Address> addressOptional = addressRepository.findById(addressId);
 
-            // Check if the address is associated with the given location
-            Optional<Address> existingAddressOptional = existingLocation.getAddresses()
-                    .stream()
-                    .filter(address -> address.getId().equals(addressId))
-                    .findFirst();
+        if (addressOptional.isPresent()) {
+            Address existingAddress = addressOptional.get();
+            Location existingLocation = existingAddress.getLocation();
 
-            if (existingAddressOptional.isPresent()) {
-                Address existingAddress = existingAddressOptional.get();
-                existingAddress.setAddress(updatedAddress.getAddress());
-                addressRepository.save(existingAddress);
-
-
-                Location savedLocation = locationRepo.save(existingLocation);
-                return new ResponseEntity<>(savedLocation, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            // Update the location name
+            if (existingLocation != null) {
+                existingLocation.setLocationName(updatedLocationName);
+                locationRepo.save(existingLocation);
             }
+
+            // Update the address
+            existingAddress.setAddress(updatedAddress);
+            addressRepository.save(existingAddress);
+
+            // Create a LocationDto with the updated information
+            String concatenatedAddress = existingLocation.getAddresses().stream()
+                    .map(Address::getAddress)
+                    .collect(Collectors.joining(", "));
+            LocationDto locationDto = new LocationDto(
+                    existingLocation.getId(),
+                    existingLocation.getLocationName(),
+                    concatenatedAddress
+            );
+
+            return new ResponseEntity<>(locationDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("getLocation/{locationId}/{addressId}")
