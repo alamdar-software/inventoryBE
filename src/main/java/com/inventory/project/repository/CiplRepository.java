@@ -66,4 +66,11 @@ List<Cipl> findByItemAndRepairServiceAndTransferDateBetween(String item, boolean
     List<Cipl> findByLocationNameAndTransferDateBetweenAndItem(String locationName, LocalDate startDate, LocalDate endDate, String item);
 
     List<Cipl> findByStatus(String created);
+
+    List<Cipl> findByStatusIgnoreCase(String status);
+    List<Cipl> findByItemContainingIgnoreCaseAndStatusIgnoreCase(String item, String status);
+    List<Cipl> findByLocationNameIgnoreCaseAndStatusIgnoreCase(String locationName, String status);
+    List<Cipl> findByTransferDateAndStatusIgnoreCase(LocalDate transferDate, String status);
+    List<Cipl> findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndStatusIgnoreCase(String item, String locationName, String status);
+    List<Cipl> findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndTransferDateAndStatusIgnoreCase(String item, String locationName, LocalDate transferDate, String status);
 }

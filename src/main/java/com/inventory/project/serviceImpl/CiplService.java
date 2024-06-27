@@ -424,4 +424,32 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
     public List<Cipl> searchByLocationAndDescription(String locationName, String item) {
         return ciplRepository.findByItemAndLocationName(item, locationName);
     }
+    public List<Cipl> getCiplByStatus(String status) {
+        return ciplRepository.findByStatusIgnoreCase(status);
+    }
+
+    public List<Cipl> getCiplByItemAndStatus(String item, String status) {
+        return ciplRepository.findByItemContainingIgnoreCaseAndStatusIgnoreCase(item, status);
+    }
+
+    public List<Cipl> getCiplByLocationAndStatus(String locationName, String status) {
+        return ciplRepository.findByLocationNameIgnoreCaseAndStatusIgnoreCase(locationName, status);
+    }
+
+//    public List<Cipl> getCiplByTransferDateAndStatus(Date transferDate, String status) {
+//        return ciplRepository.findByTransferDateAndStatusIgnoreCase(transferDate, status);
+//    }
+
+    public List<Cipl> getCiplByItemLocationAndStatus(String item, String locationName, String status) {
+        return ciplRepository.findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndStatusIgnoreCase(item, locationName, status);
+    }
+
+    public List<Cipl> getCiplByItemLocationTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status) {
+        return ciplRepository.findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndTransferDateAndStatusIgnoreCase(item, locationName, transferDate, status);
+    }
+
+    public List<Cipl> getCiplByTransferDateAndStatus(LocalDate transferDate, String status) {
+        return ciplRepository.findByTransferDateAndStatusIgnoreCase(transferDate, status);
+
+    }
 }

@@ -138,53 +138,111 @@ public class CiplController {
 //    }
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
-    @PostMapping("/search")
-    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
-        if (criteria == null) {
-            List<Cipl> allCipl = ciplService.getAllCipl();
-            return ResponseEntity.ok(allCipl);
-        }
-
-        List<Cipl> ciplList = new ArrayList<>();
-
-        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
-                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(
-                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
-
-            if (ciplList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
-                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            ciplList = ciplService.getCiplByItemAndLocation(
-                    criteria.getItem(), criteria.getLocationName());
-        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
-            ciplList = ciplService.getCiplByItem(criteria.getItem());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByLocationAndTransferDate(
-                    criteria.getLocationName(), criteria.getTransferDate());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            ciplList = ciplService.getCiplByLocation(criteria.getLocationName());
-        } else if (criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByTransferDate(criteria.getTransferDate());
-
-            if (ciplList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (ciplList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(ciplList);
+//    @PostMapping("/search")
+//    public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+//        if (criteria == null) {
+//            List<Cipl> allCipl = ciplService.getAllCipl();
+//            return ResponseEntity.ok(allCipl);
+//        }
+//
+//        List<Cipl> ciplList = new ArrayList<>();
+//
+//        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+//                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+//                && criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByItemAndLocationAndTransferDate(
+//                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+//
+//            if (ciplList.isEmpty()) {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+//                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            ciplList = ciplService.getCiplByItemAndLocation(
+//                    criteria.getItem(), criteria.getLocationName());
+//        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+//            ciplList = ciplService.getCiplByItem(criteria.getItem());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+//                && criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByLocationAndTransferDate(
+//                    criteria.getLocationName(), criteria.getTransferDate());
+//        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+//            ciplList = ciplService.getCiplByLocation(criteria.getLocationName());
+//        } else if (criteria.getTransferDate() != null) {
+//            ciplList = ciplService.getCiplByTransferDate(criteria.getTransferDate());
+//
+//            if (ciplList.isEmpty()) {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } else {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        if (ciplList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok(ciplList);
+//    }
+@PostMapping("/search")
+public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+    if (criteria == null) {
+        List<Cipl> allCipl = ciplService.getAllCipl();
+        return ResponseEntity.ok(allCipl);
     }
 
+    List<Cipl> ciplList = new ArrayList<>();
+
+    if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+            && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByItemLocationTransferDateAndStatus(
+                criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+
+    } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+            && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByItemLocationAndStatus(
+                criteria.getItem(), criteria.getLocationName(), criteria.getStatus());
+
+    } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByItemAndStatus(criteria.getItem(), criteria.getStatus());
+
+    } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByLocationAndTransferDate(
+                criteria.getLocationName(), criteria.getTransferDate());
+
+    } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
+
+    } else if (criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByTransferDateAndStatus(criteria.getTransferDate(), criteria.getStatus());
+
+    } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+        ciplList = ciplService.getCiplByItem(criteria.getItem());
+
+    } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+        ciplList = ciplService.getCiplByLocation(criteria.getLocationName());
+
+    } else if (criteria.getTransferDate() != null) {
+        ciplList = ciplService.getCiplByTransferDate(criteria.getTransferDate());
+
+    } else if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        ciplList = ciplService.getCiplByStatus(criteria.getStatus());
+
+    } else {
+        return ResponseEntity.badRequest().build();
+    }
+
+    if (ciplList.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    return ResponseEntity.ok(ciplList);
+}
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
