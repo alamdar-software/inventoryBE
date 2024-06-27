@@ -6,6 +6,7 @@ import com.inventory.project.model.Mto;
 import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.CiplRepository;
 import io.micrometer.common.util.StringUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,44 +105,25 @@ public class CiplService {
         cipl.setStatus("Created");
 
         String locationName = cipl.getLocationName();
-
-        int referenceNumber;
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, get the current max reference number and increment by 1
-            int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
-            referenceNumber = maxReference + 1;
-        } else {
-            // If it's an existing locationName, keep the existing reference number
-            referenceNumber = locationReferenceMap.get(locationName);
-        }
+        int referenceNumber = getNextReferenceNumber(locationName);
 
         String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
         cipl.setReferenceNo(formattedReferenceNumber);
 
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, add it to the map with its reference number
-            locationReferenceMap.put(locationName, referenceNumber);
-        }
+        // Update the reference number map
+        locationReferenceMap.put(locationName, referenceNumber);
 
         return ciplRepository.save(cipl);
     }
 
-    private int getNextAvailableReferenceNumber() {
-        return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;
-    }
-
-    private void incrementNextAvailableReferenceNumber() {
-        int nextReferenceNumber = getNextAvailableReferenceNumber();
-        locationReferenceMap.values().forEach(value -> {
-            if (value < nextReferenceNumber) {
-                value++;
-            }
-        });
-    }
-
-
     public int getNextReferenceNumber(String locationName) {
-        return locationReferenceMap.getOrDefault(locationName, 1);
+        // Fetch the maximum reference number for the location from the database
+        List<Cipl> ciplList = ciplRepository.findByLocationName(locationName);
+        int maxReferenceNumber = ciplList.stream()
+                .mapToInt(cipl -> extractReferenceNumber(cipl.getReferenceNo()))
+                .max()
+                .orElse(0);
+        return maxReferenceNumber + 1;
     }
 
     public String generateReferenceNumber(String locationName, int referenceNumber) {
@@ -149,33 +131,31 @@ public class CiplService {
         return String.format("%s_%d_%04d", locationName, year, referenceNumber);
     }
 
-    private void initializeLocationReferenceMap() {
-        List<Cipl> allCiplItems = ciplRepository.findAll();
-        for (Cipl cipl : allCiplItems) {
-            String locationName = cipl.getLocationName();
-            int currentReferenceNumber = extractReferenceNumber(cipl.getReferenceNo());
-            if (!locationReferenceMap.containsKey(locationName)) {
-                locationReferenceMap.put(locationName, currentReferenceNumber);
-            } else {
-                int existingNumber = locationReferenceMap.get(locationName);
-                if (currentReferenceNumber > existingNumber) {
-                    locationReferenceMap.put(locationName, currentReferenceNumber);
-                }
-            }
-        }
-    }
-
     private int extractReferenceNumber(String referenceNo) {
         if (referenceNo != null) {
             String[] parts = referenceNo.split("_");
             if (parts.length > 0) {
-                return Integer.parseInt(parts[parts.length - 1]);
+                try {
+                    return Integer.parseInt(parts[parts.length - 1]);
+                } catch (NumberFormatException e) {
+                    // Log the error and return 0 if the reference number is not a valid integer
+                    System.err.println("Invalid reference number format: " + referenceNo);
+                }
             }
         }
         return 0;
     }
 
-
+    // Initialize the location reference map based on existing data
+    @PostConstruct
+    private void initializeLocationReferenceMap() {
+        List<Cipl> allCiplItems = ciplRepository.findAll();
+        for (Cipl cipl : allCiplItems) {
+            String locationName = cipl.getLocationName();
+            int currentReferenceNumber = extractReferenceNumber(cipl.getReferenceNo());
+            locationReferenceMap.put(locationName, Math.max(locationReferenceMap.getOrDefault(locationName, 0), currentReferenceNumber));
+        }
+    }
 
     public List<Cipl> getCiplByItemAndLocation(String item, String locationName) {
         return ciplRepository.findByItemAndLocationName(item, locationName);
@@ -452,4 +432,48 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         return ciplRepository.findByTransferDateAndStatusIgnoreCase(transferDate, status);
 
     }
+
+    public List<Cipl> getCiplByAllCriteria(String item, String locationName, LocalDate transferDate, String status, String referenceNumber) {
+        return ciplRepository.findByItemAndLocationNameAndTransferDateAndStatusAndReferenceNoContaining(item, locationName, transferDate, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByItemLocationStatusAndReferenceNumber(String item, String locationName, String status, String referenceNumber) {
+        return ciplRepository.findByItemAndLocationNameAndStatusAndReferenceNoContaining(item, locationName, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByItemStatusAndReferenceNumber(String item, String status, String referenceNumber) {
+        return ciplRepository.findByItemAndStatusAndReferenceNoContaining(item, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByLocationTransferDateStatusAndReferenceNumber(String locationName, LocalDate transferDate, String status, String referenceNumber) {
+        return ciplRepository.findByLocationNameAndTransferDateAndStatusAndReferenceNoContaining(locationName, transferDate, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByLocationStatusAndReferenceNumber(String locationName, String status, String referenceNumber) {
+        return ciplRepository.findByLocationNameAndStatusAndReferenceNoContaining(locationName, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByTransferDateStatusAndReferenceNumber(LocalDate transferDate, String status, String referenceNumber) {
+        return ciplRepository.findByTransferDateAndStatusAndReferenceNoContaining(transferDate, status, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByItemAndReferenceNumber(String item, String referenceNumber) {
+        return ciplRepository.findByItemAndReferenceNoContaining(item, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByLocationAndReferenceNumber(String locationName, String referenceNumber) {
+        return ciplRepository.findByLocationNameAndReferenceNoContaining(locationName, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByTransferDateAndReferenceNumber(LocalDate transferDate, String referenceNumber) {
+        return ciplRepository.findByTransferDateAndReferenceNoContaining(transferDate, referenceNumber);
+    }
+
+    public List<Cipl> getCiplByStatusAndReferenceNumber(String status, String referenceNumber) {
+        return ciplRepository.findByStatusAndReferenceNoContaining(status, referenceNumber);
+    }
+    public List<Cipl> getCiplByReferenceNumber(String referenceNumber) {
+        return ciplRepository.findByReferenceNoContaining(referenceNumber);
+    }
+
 }

@@ -35,6 +35,7 @@ public class SearchCriteria {
     private String consigneeName;
     private String brandName;
     private String status;
+    private String referenceNumber;
     public SearchCriteria() {
     }
 
@@ -209,5 +210,13 @@ public class SearchCriteria {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
     }
 }

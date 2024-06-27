@@ -73,4 +73,26 @@ List<Cipl> findByItemAndRepairServiceAndTransferDateBetween(String item, boolean
     List<Cipl> findByTransferDateAndStatusIgnoreCase(LocalDate transferDate, String status);
     List<Cipl> findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndStatusIgnoreCase(String item, String locationName, String status);
     List<Cipl> findByItemContainingIgnoreCaseAndLocationNameIgnoreCaseAndTransferDateAndStatusIgnoreCase(String item, String locationName, LocalDate transferDate, String status);
+
+    List<Cipl> findByItemAndLocationNameAndTransferDateAndStatusAndReferenceNoContaining(String item, String locationName, LocalDate transferDate, String status, String referenceNumber);
+
+    List<Cipl> findByItemAndLocationNameAndStatusAndReferenceNoContaining(String item, String locationName, String status, String referenceNumber);
+
+    List<Cipl> findByItemAndStatusAndReferenceNoContaining(String item, String status, String referenceNumber);
+
+    List<Cipl> findByLocationNameAndTransferDateAndStatusAndReferenceNoContaining(String locationName, LocalDate transferDate, String status, String referenceNumber);
+
+    List<Cipl> findByLocationNameAndStatusAndReferenceNoContaining(String locationName, String status, String referenceNumber);
+
+    List<Cipl> findByItemAndReferenceNoContaining(String item, String referenceNumber);
+
+    List<Cipl> findByTransferDateAndStatusAndReferenceNoContaining(LocalDate transferDate, String status, String referenceNumber);
+
+    List<Cipl> findByLocationNameAndReferenceNoContaining(String locationName, String referenceNumber);
+
+    List<Cipl> findByTransferDateAndReferenceNoContaining(LocalDate transferDate, String referenceNumber);
+
+    List<Cipl> findByStatusAndReferenceNoContaining(String status, String referenceNumber);
+
+    List<Cipl> findByReferenceNoContaining(String referenceNumber);
 }

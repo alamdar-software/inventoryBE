@@ -195,31 +195,54 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
     if (criteria.getItem() != null && !criteria.getItem().isEmpty()
             && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByItemLocationTransferDateAndStatus(
-                criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByAllCriteria(
+                criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate(),
+                criteria.getStatus(), criteria.getReferenceNumber());
 
     } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
             && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByItemLocationAndStatus(
-                criteria.getItem(), criteria.getLocationName(), criteria.getStatus());
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByItemLocationStatusAndReferenceNumber(
+                criteria.getItem(), criteria.getLocationName(), criteria.getStatus(), criteria.getReferenceNumber());
 
     } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
-            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByItemAndStatus(criteria.getItem(), criteria.getStatus());
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByItemStatusAndReferenceNumber(criteria.getItem(), criteria.getStatus(), criteria.getReferenceNumber());
 
     } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByLocationAndTransferDate(
-                criteria.getLocationName(), criteria.getTransferDate());
+            && criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByLocationTransferDateStatusAndReferenceNumber(
+                criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus(), criteria.getReferenceNumber());
 
     } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
+            && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByLocationStatusAndReferenceNumber(criteria.getLocationName(), criteria.getStatus(), criteria.getReferenceNumber());
 
-    } else if (criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
-        ciplList = ciplService.getCiplByTransferDateAndStatus(criteria.getTransferDate(), criteria.getStatus());
+    } else if (criteria.getTransferDate() != null && criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByTransferDateStatusAndReferenceNumber(criteria.getTransferDate(), criteria.getStatus(), criteria.getReferenceNumber());
+
+    } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByItemAndReferenceNumber(criteria.getItem(), criteria.getReferenceNumber());
+
+    } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByLocationAndReferenceNumber(criteria.getLocationName(), criteria.getReferenceNumber());
+
+    } else if (criteria.getTransferDate() != null
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByTransferDateAndReferenceNumber(criteria.getTransferDate(), criteria.getReferenceNumber());
+
+    } else if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()
+            && criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByStatusAndReferenceNumber(criteria.getStatus(), criteria.getReferenceNumber());
 
     } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
         ciplList = ciplService.getCiplByItem(criteria.getItem());
@@ -233,6 +256,9 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
     } else if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
         ciplList = ciplService.getCiplByStatus(criteria.getStatus());
 
+    } else if (criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        ciplList = ciplService.getCiplByReferenceNumber(criteria.getReferenceNumber());
+
     } else {
         return ResponseEntity.badRequest().build();
     }
@@ -243,6 +269,7 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
     return ResponseEntity.ok(ciplList);
 }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 

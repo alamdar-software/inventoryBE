@@ -212,23 +212,24 @@ public class LocationController {
 //        }
 //    }
 @PostMapping("/search")
-public ResponseEntity<List<LocationDto>> searchLocations(
-        @RequestParam(required = false) String locationName,
-        @RequestParam(required = false) String address) {
-
+public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
     List<Location> locationList;
 
-    // Check if both parameters are null or empty
-    if ((locationName == null || locationName.isEmpty()) &&
-            (address == null || address.isEmpty())) {
-        // Fetch all locations when no criteria are provided
+    if (criteria == null || (isEmpty(criteria.getLocationName()) && isEmpty(criteria.getAddress()))) {
+        // Fetch all locations when no criteria or empty criteria are provided
         locationList = locationService.getAllLocations();
     } else {
-        // Perform the search based on the provided criteria (if any)
-        if (address != null && !address.isEmpty()) {
-            locationList = locationService.searchByAddress(address);
-        } else {
+        // Extract search criteria
+        String locationName = criteria.getLocationName();
+        String address = criteria.getAddress();
+
+        // Perform search based on provided criteria
+        if (!isEmpty(locationName) && !isEmpty(address)) {
+            locationList = locationService.searchByLocationNameAndAddress(locationName, address);
+        } else if (!isEmpty(locationName)) {
             locationList = locationService.getLocationByLocationName(locationName);
+        } else {
+            locationList = locationService.searchByAddress(address);
         }
     }
 
@@ -236,19 +237,26 @@ public ResponseEntity<List<LocationDto>> searchLocations(
         return ResponseEntity.notFound().build();
     }
 
-    // Map Location entities to LocationDto objects
-    List<LocationDto> locationDTOs = locationList.stream()
-            .map(location -> new LocationDto(
-                    location.getId(),
-                    location.getLocationName(),
-                    location.getAddresses().stream()
-                            .map(addressObj -> addressObj.getAddress())
-                            .collect(Collectors.joining(", "))
-            ))
-            .collect(Collectors.toList());
-
+    List<LocationDto> locationDTOs = mapToLocationDtoList(locationList);
     return ResponseEntity.ok(locationDTOs);
 }
+
+    private boolean isEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    private List<LocationDto> mapToLocationDtoList(List<Location> locations) {
+        return locations.stream()
+                .map(location -> new LocationDto(
+                        location.getId(),
+                        location.getLocationName(),
+                        location.getAddresses().stream()
+                                .map(Address::getAddress)
+                                .collect(Collectors.joining(", "))
+                ))
+                .collect(Collectors.toList());
+    }
+
     //    @PostMapping("/search")
 //    public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
 //        List<Location> locationList;
@@ -297,5 +305,22 @@ public ResponseEntity<List<LocationDto>> searchLocations(
     }
 
 
+    @GetMapping("/viewAll")
+    public ResponseEntity<List<LocationDto>> getAllLocation() {
+        List<Location> locations = locationRepo.findAll();
+        if (locations.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
+        List<LocationDto> locationDtos = locations.stream()
+                .map(this::mapToLocationDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(locationDtos);
+    }
+
+    private LocationDto mapToLocationDto(Location location) {
+        String addressString = location.getAddresses().isEmpty() ? "" : location.getAddresses().get(0).getAddress(); // Assuming only one address per location for simplicity
+        return new LocationDto(location.getId(), location.getLocationName(), addressString);
+    }
 }

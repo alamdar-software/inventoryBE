@@ -125,6 +125,9 @@ public class Cipl {
     private String totalAmount;
 
     private String status;
+    private String entityType;
+
+
     public Long getId() {
         return id;
     }
@@ -394,5 +397,13 @@ public class Cipl {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 }

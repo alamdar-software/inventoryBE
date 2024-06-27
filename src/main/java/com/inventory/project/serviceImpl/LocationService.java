@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -97,5 +98,9 @@ public class LocationService {
 
     public Location getLocationByName(String locationName) {
         return locationRepository.findByLocationName(locationName);
+    }
+
+    public List<Location> searchByLocationNameAndAddress(String locationName, String address) {
+        return locationRepository.findByLocationNameAndAddresses_Address(locationName, address);
     }
 }
