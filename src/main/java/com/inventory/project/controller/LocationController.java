@@ -76,19 +76,28 @@ public class LocationController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Object> getLocationById(@PathVariable Long id) {
-        try {
-            Optional<Location> locationOptional = locationRepo.findById(id);
-            if (locationOptional.isPresent()) {
-                Location location = locationOptional.get();
-                return ResponseEntity.ok(location);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location not found for ID: " + id);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching location: " + e.getMessage());
+    public ResponseEntity<LocationDto> getLocationById(@PathVariable("id") Long locationId) {
+        Optional<Location> locationOptional = locationRepo.findById(locationId);
+
+        if (locationOptional.isPresent()) {
+            Location location = locationOptional.get();
+
+            // Create a LocationDto with the retrieved information
+            String concatenatedAddress = location.getAddresses().stream()
+                    .map(Address::getAddress)
+                    .collect(Collectors.joining(", "));
+            LocationDto locationDto = new LocationDto(
+                    location.getId(),
+                    location.getLocationName(),
+                    concatenatedAddress
+            );
+
+            return new ResponseEntity<>(locationDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/edit/{id}")
