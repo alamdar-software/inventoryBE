@@ -95,4 +95,8 @@ List<Cipl> findByItemAndRepairServiceAndTransferDateBetween(String item, boolean
     List<Cipl> findByStatusAndReferenceNoContaining(String status, String referenceNumber);
 
     List<Cipl> findByReferenceNoContaining(String referenceNumber);
+    @Query("SELECT m FROM Cipl m JOIN m.item d WHERE d LIKE %:item%")
+    List<Cipl> findCiplByDescriptionContaining(@Param("item") String item);
+
+
 }

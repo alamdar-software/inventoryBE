@@ -130,36 +130,25 @@ public Mto createMto(Mto mto) {
 
     String locationName = mto.getLocationName();
 
-        int referenceNumber;
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, get the current max reference number and increment by 1
-            int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
-            referenceNumber = maxReference + 1;
-        } else {
-            // If it's an existing locationName, keep the existing reference number
-            referenceNumber = locationReferenceMap.get(locationName);
-        }
+    // Always get the next available reference number
+    int referenceNumber = getNextAvailableReferenceNumber();
 
-        String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
-        mto.setReferenceNo(formattedReferenceNumber);
+    // Generate the formatted reference number
+    String formattedReferenceNumber = generateReferenceNumber("Mto", locationName, referenceNumber);
+    mto.setReferenceNo(formattedReferenceNumber);
 
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, add it to the map with its reference number
-            locationReferenceMap.put(locationName, referenceNumber);
-        }
+    locationReferenceMap.put(locationName, referenceNumber);
+
     // Retrieve the list of inventories with the same locationName
     List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
     // Iterate over the inventories to update quantities
     for (Inventory inventory : inventories) {
-        // Find matching item in Mto
         for (int i = 0; i < mto.getQuantity().size(); i++) {
-            // Convert String to int
             int mtoQuantity = Integer.parseInt(mto.getQuantity().get(i));
-            // Update inventory quantity if there is a match
+
             if (inventory.getQuantity() == mtoQuantity) {
                 int newQuantity = inventory.getQuantity() - mtoQuantity;
-                // If remaining quantity is zero or less, remove the item
                 if (newQuantity <= 0) {
                     inventoryRepository.delete(inventory);
                 } else {
@@ -167,21 +156,16 @@ public Mto createMto(Mto mto) {
                     inventoryRepository.save(inventory);
                 }
             } else {
-                // If quantity in Mto is less than inventory, create a new inventory item
                 int remainingQuantity = inventory.getQuantity() - mtoQuantity;
                 if (remainingQuantity > 0) {
-                    // Update quantity of existing inventory item
                     inventory.setQuantity(remainingQuantity);
                     inventoryRepository.save(inventory);
                 } else {
-                    // If quantity in Mto is more than inventory, add to existing inventory item
                     int additionalQuantity = mtoQuantity - inventory.getQuantity();
                     inventory.setQuantity(mtoQuantity);
                     inventoryRepository.save(inventory);
-                    // If there is a destination sublocation, find the inventory and add quantity
                     if (mto.getDestinationSublocation() != null && !mto.getDestinationSublocation().isEmpty()) {
-                        List<String> destinationSublocations = Collections.singletonList(mto.getDestinationSublocation());
-                        String destinationSublocation = destinationSublocations.get(i);
+                        String destinationSublocation = mto.getDestinationSublocation();
                         Inventory destinationInventory = inventoryRepository.findByLocationNameAndAddress_Address(locationName, destinationSublocation);
                         if (destinationInventory != null) {
                             destinationInventory.setQuantity(destinationInventory.getQuantity() + additionalQuantity);
@@ -196,30 +180,13 @@ public Mto createMto(Mto mto) {
     return mtoRepository.save(mto);
 }
 
-
-
-
     private int getNextAvailableReferenceNumber() {
         return locationReferenceMap.values().stream().max(Integer::compare).orElse(0) + 1;
     }
 
-    private void incrementNextAvailableReferenceNumber() {
-        int nextReferenceNumber = getNextAvailableReferenceNumber();
-        locationReferenceMap.values().forEach(value -> {
-            if (value < nextReferenceNumber) {
-                value++;
-            }
-        });
-    }
-
-
-    public int getNextReferenceNumber(String locationName) {
-        return locationReferenceMap.getOrDefault(locationName, 1);
-    }
-
-    public String generateReferenceNumber(String locationName, int referenceNumber) {
+    public String generateReferenceNumber(String entityName, String locationName, int referenceNumber) {
         int year = LocalDate.now().getYear();
-        return String.format("%s_%d_%04d", locationName, year, referenceNumber);
+        return String.format("%s_%s_%d_%04d", entityName, locationName, year, referenceNumber);
     }
 
     private void initializeLocationReferenceMap() {
@@ -247,6 +214,12 @@ public Mto createMto(Mto mto) {
         }
         return 0;
     }
+
+    // Remove this method
+ public int getNextReferenceNumber(String locationName) {
+     return locationReferenceMap.getOrDefault(locationName, 1);
+ }
+
 
     public List<Mto> getMtoByDescriptionAndLocation(String description, String locationName) {
         return mtoRepository.findByDescriptionAndLocationName(description, locationName);
@@ -569,6 +542,31 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         }
 
         return totalPurchaseQty;
+    }
+
+    public List<Mto> getMtoByDescriptionAndLocationAndStatus(String description, String locationName, String status) {
+        return mtoRepository.findMtoByDescriptionAndLocationAndStatus(description, locationName, status);
+    }
+
+    public List<Mto> getMtoByDescriptionAndLocationAndTransferDateAndStatus(String description, String locationName, LocalDate transferDate, String status) {
+        return mtoRepository.findMtoByDescriptionAndLocationAndTransferDateAndStatus(description, locationName, transferDate, status);
+    }
+
+    public List<Mto> getMtoByStatus(String status) {
+        return mtoRepository.findMtoByStatus(status);
+    }
+
+    public List<Mto> getMtoByLocationAndStatus(String locationName, String status) {
+        return mtoRepository.findMtoByLocationAndStatus(locationName, status);
+    }
+    public List<Mto> getMtoByReferenceNo(String referenceNo) {
+        return mtoRepository.findByReferenceNoContaining(referenceNo);
+    }
+
+    public String generateReferenceNumber(String locationName, int referenceNumber) {
+        String entityName = "Mto";
+        int year = LocalDate.now().getYear();
+        return String.format("%s_%s_%d_%04d", entityName, locationName, year, referenceNumber);
     }
 
 }

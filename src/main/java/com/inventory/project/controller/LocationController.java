@@ -2,6 +2,8 @@ package com.inventory.project.controller;
 
 import com.inventory.project.model.*;
 import com.inventory.project.repository.AddressRepository;
+import com.inventory.project.repository.InventoryRepository;
+import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
 import com.inventory.project.serviceImpl.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +31,11 @@ public class LocationController {
 //    @Autowired
 //    PurchaseItemRepository purchaseItemRepository;
 //
-//    @Autowired
-//    ItemRepository itemRepository;
-//
-//    @Autowired
-//    InventoryRepository inventoryRepository;
+    @Autowired
+private ItemRepository itemRepository;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
 
     @Autowired
@@ -48,6 +50,19 @@ public class LocationController {
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
+//    @PostMapping("/add")
+//    public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
+//        Location addedLocation = locationService.addAddressToLocation(
+//                locationAddressDTO.getLocationName(),
+//                locationAddressDTO.getAddress()
+//        );
+//
+//        if (addedLocation != null) {
+//            return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//    }
     @PostMapping("/add")
     public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
         Location addedLocation = locationService.addAddressToLocation(
@@ -56,9 +71,40 @@ public class LocationController {
         );
 
         if (addedLocation != null) {
+            // Create inventories for the added location
+            createInventoriesForLocation(addedLocation);
+
             return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public void createInventoriesForLocation(Location location) {
+        List<Item> itemList = itemRepository.findAll(); // Assuming itemRepository is injected or available
+        if (!itemList.isEmpty()) {
+            for (Item item : itemList) {
+                String locationName = location.getLocationName();
+                List<Address> addresses = location.getAddresses();
+                for (Address address : addresses) {
+                    // Retrieve inventory for the given item, location, and address
+                    Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
+                    if (inventory == null) {
+                        inventory = new Inventory();
+                        inventory.setLocation(location);
+                        inventory.setItem(item);
+                        inventory.setQuantity(0); // Set initial quantity
+                        inventory.setConsumedItem("0");
+                        inventory.setScrappedItem("0");
+                        inventory.setLocationName(locationName);
+                        inventory.setDescription(item.getDescription());
+                        inventory.setAddress(address);
+                    }
+
+                    // Save or update the inventory
+                    inventoryRepository.save(inventory);
+                }
+            }
         }
     }
 
@@ -211,6 +257,8 @@ public class LocationController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
 //    }
+@PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
+
 @PostMapping("/search")
 public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {
     List<Location> locationList;
@@ -225,11 +273,14 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
 
         // Perform search based on provided criteria
         if (!isEmpty(locationName) && !isEmpty(address)) {
-            locationList = locationService.searchByLocationNameAndAddress(locationName, address);
+            locationList = locationService.searchByExactLocationNameAndAddress(locationName, address);
         } else if (!isEmpty(locationName)) {
             locationList = locationService.getLocationByLocationName(locationName);
-        } else {
+        } else if (!isEmpty(address)) {
             locationList = locationService.searchByAddress(address);
+        } else {
+            // Fetch all locations when both criteria are empty strings
+            locationList = locationService.getAllLocations();
         }
     }
 
@@ -237,7 +288,7 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
         return ResponseEntity.notFound().build();
     }
 
-    List<LocationDto> locationDTOs = mapToLocationDtoList(locationList);
+    List<LocationDto> locationDTOs = mapToLocationDtoList(locationList, criteria);
     return ResponseEntity.ok(locationDTOs);
 }
 
@@ -245,16 +296,18 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
         return str == null || str.trim().isEmpty();
     }
 
-    private List<LocationDto> mapToLocationDtoList(List<Location> locations) {
+    private List<LocationDto> mapToLocationDtoList(List<Location> locations, SearchCriteria criteria) {
         List<LocationDto> locationDtoList = new ArrayList<>();
         for (Location location : locations) {
             for (Address address : location.getAddresses()) {
-                LocationDto locationDto = new LocationDto(
-                        location.getId(),
-                        location.getLocationName(),
-                        address.getAddress()
-                );
-                locationDtoList.add(locationDto);
+                if (criteria == null || (isEmpty(criteria.getAddress()) || criteria.getAddress().equals(address.getAddress()))) {
+                    LocationDto locationDto = new LocationDto(
+                            location.getId(),
+                            location.getLocationName(),
+                            address.getAddress()
+                    );
+                    locationDtoList.add(locationDto);
+                }
             }
         }
         return locationDtoList;

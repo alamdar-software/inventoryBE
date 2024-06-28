@@ -87,4 +87,23 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findMtoByDescriptionContaining(@Param("description") String description);
 
 
+    @Query("SELECT m FROM Mto m JOIN m.description d WHERE d LIKE %:description% AND m.locationName = :locationName AND m.status = :status")
+    List<Mto> findMtoByDescriptionAndLocationAndStatus(
+            @Param("description") String description,
+            @Param("locationName") String locationName,
+            @Param("status") String status);
+    @Query("SELECT m FROM Mto m JOIN m.description d WHERE d LIKE %:description% AND m.locationName = :locationName AND m.transferDate = :transferDate AND m.status = :status")
+    List<Mto> findMtoByDescriptionAndLocationAndTransferDateAndStatus(
+            @Param("description") String description,
+            @Param("locationName") String locationName,
+            @Param("transferDate") LocalDate transferDate,
+            @Param("status") String status);
+    List<Mto> findMtoByStatus(String status);
+
+    @Query("SELECT m FROM Mto m WHERE m.locationName = :locationName AND m.status = :status")
+    List<Mto> findMtoByLocationAndStatus(
+            @Param("locationName") String locationName,
+            @Param("status") String status);
+
+    List<Mto> findByReferenceNoContaining(String referenceNo);
 }

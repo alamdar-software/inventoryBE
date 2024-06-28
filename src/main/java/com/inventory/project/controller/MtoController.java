@@ -83,48 +83,37 @@ public class MtoController {
                 .orElse(ResponseEntity.notFound().build());
     }
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/search")
     public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
-        if (criteria == null) {
+        if (criteria == null || (criteria.getDescription().isEmpty()
+                && criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() == null
+                && criteria.getStatus().isEmpty()
+                && criteria.getReferenceNumber().isEmpty())) {
             List<Mto> allMto = mtoService.getAllMto();
             return ResponseEntity.ok(allMto);
         }
 
         List<Mto> mtoList = new ArrayList<>();
 
-        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-            // Assuming mtoService.getMtoByDescription can handle description without quantity
-            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
-
-            if (mtoList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
-
-            if (mtoList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+            mtoList = mtoService.getMtoByDescriptionAndLocationAndStatus(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getStatus());
         } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null) {
-            mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDate(
-                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
-
-            if (mtoList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
-                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            mtoList = mtoService.getMtoByDescriptionAndLocation(
-                    criteria.getDescription(), criteria.getLocationName());
-        } else if (criteria.getTransferDate() != null) {
-            mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
-
-            if (mtoList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
+                && criteria.getTransferDate() != null
+                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+            mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDateAndStatus(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+            mtoList = mtoService.getMtoByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
+        } else if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+            mtoList = mtoService.getMtoByStatus(criteria.getStatus());
+        } else if (criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+            mtoList = mtoService.getMtoByReferenceNo(criteria.getReferenceNumber());
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -135,7 +124,6 @@ public class MtoController {
 
         return ResponseEntity.ok(mtoList);
     }
-
 
 //    @PostMapping("/search")
 //    public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {

@@ -103,4 +103,8 @@ public class LocationService {
     public List<Location> searchByLocationNameAndAddress(String locationName, String address) {
         return locationRepository.findByLocationNameAndAddresses_Address(locationName, address);
     }
+    public List<Location> searchByExactLocationNameAndAddress(String locationName, String address) {
+        return locationRepository.findByLocationNameAndAddresses_Address(locationName, address);
+    }
+
 }

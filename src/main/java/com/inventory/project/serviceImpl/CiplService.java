@@ -162,7 +162,7 @@ public class CiplService {
     }
 
     public List<Cipl> getCiplByItem(String item) {
-        return ciplRepository.findByItem(item);
+        return ciplRepository.findCiplByDescriptionContaining(item);
     }
 
     public List<Cipl> getCiplByLocation(String locationName) {
