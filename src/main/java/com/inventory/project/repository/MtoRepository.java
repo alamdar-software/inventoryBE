@@ -5,6 +5,7 @@ import com.inventory.project.model.IncomingStock;
 import com.inventory.project.model.Mto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -81,6 +82,9 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByStatus(String created);
 
     List<Mto> findByIncomingStockId(Long incomingStockId);
+
+    @Query("SELECT m FROM Mto m JOIN m.description d WHERE d LIKE %:description%")
+    List<Mto> findMtoByDescriptionContaining(@Param("description") String description);
 
 
 }

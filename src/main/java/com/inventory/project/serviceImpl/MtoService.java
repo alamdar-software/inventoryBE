@@ -253,7 +253,7 @@ public Mto createMto(Mto mto) {
     }
 
     public List<Mto> getMtoByDescription(String description) {
-        return mtoRepository.findByDescription(description);
+        return mtoRepository.findMtoByDescriptionContaining(description);
     }
 
     public List<Mto> getMtoByLocation(String locationName) {

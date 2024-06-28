@@ -246,16 +246,20 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
     }
 
     private List<LocationDto> mapToLocationDtoList(List<Location> locations) {
-        return locations.stream()
-                .map(location -> new LocationDto(
+        List<LocationDto> locationDtoList = new ArrayList<>();
+        for (Location location : locations) {
+            for (Address address : location.getAddresses()) {
+                LocationDto locationDto = new LocationDto(
                         location.getId(),
                         location.getLocationName(),
-                        location.getAddresses().stream()
-                                .map(Address::getAddress)
-                                .collect(Collectors.joining(", "))
-                ))
-                .collect(Collectors.toList());
+                        address.getAddress()
+                );
+                locationDtoList.add(locationDto);
+            }
+        }
+        return locationDtoList;
     }
+
 
     //    @PostMapping("/search")
 //    public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required = false) SearchCriteria criteria) {

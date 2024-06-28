@@ -93,7 +93,14 @@ public class MtoController {
 
         List<Mto> mtoList = new ArrayList<>();
 
-        if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            // Assuming mtoService.getMtoByDescription can handle description without quantity
+            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
+
+            if (mtoList.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
             mtoList = mtoService.getMtoByLocation(criteria.getLocationName());
 
             if (mtoList.isEmpty()) {
@@ -112,8 +119,6 @@ public class MtoController {
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
             mtoList = mtoService.getMtoByDescriptionAndLocation(
                     criteria.getDescription(), criteria.getLocationName());
-        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
         } else if (criteria.getTransferDate() != null) {
             mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
 
@@ -130,6 +135,7 @@ public class MtoController {
 
         return ResponseEntity.ok(mtoList);
     }
+
 
 //    @PostMapping("/search")
 //    public ResponseEntity<List<Mto>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
