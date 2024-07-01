@@ -216,7 +216,7 @@ IncomingStockRepo incomingStockRepo;
         stockView.setStoreNo(Collections.singletonList(incomingStockRequest.getStoreNo()));
         stockView.setImpaCode(Collections.singletonList(incomingStockRequest.getImpaCode()));
         stockView.setDescription(Collections.singletonList(incomingStockRequest.getItemDescription()));
-
+        stockView.setStatus(incomingStockRequest.getStatus());
         return stockView;
     }
 
@@ -245,6 +245,7 @@ IncomingStockRepo incomingStockRepo;
         stockView.setStoreNo(bulkStock.getStoreNo());
         stockView.setImpaCode(bulkStock.getImpaCode());
         stockView.setDescription(bulkStock.getDescription());
+        stockView.setStatus(bulkStock.getStatus());
 
         return stockView;
     }
