@@ -73,34 +73,27 @@ public class InternalTransferService {
         String locationName = internalTransfer.getLocationName();
 
         int referenceNumber;
+        // Get the next available reference number for the given locationName
         if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, get the current max reference number and increment by 1
-            int maxReference = locationReferenceMap.values().stream().max(Integer::compare).orElse(0);
-            referenceNumber = maxReference + 1;
+            referenceNumber = getNextAvailableReferenceNumber();
+            locationReferenceMap.put(locationName, referenceNumber);
         } else {
-            // If it's an existing locationName, keep the existing reference number
-            referenceNumber = locationReferenceMap.get(locationName);
+            referenceNumber = getNextAvailableReferenceNumber();
+            locationReferenceMap.put(locationName, referenceNumber);
         }
 
+        // Generate and set the formatted reference number
         String formattedReferenceNumber = generateReferenceNumber(locationName, referenceNumber);
         internalTransfer.setReferenceNo(formattedReferenceNumber);
 
-        if (!locationReferenceMap.containsKey(locationName)) {
-            // If it's a new locationName, add it to the map with its reference number
-            locationReferenceMap.put(locationName, referenceNumber);
-        }
         List<Inventory> inventories = inventoryRepository.findByLocationName(locationName);
 
         // Iterate over the inventories to update quantities
         for (Inventory inventory : inventories) {
-            // Find matching item in Mto
             for (int i = 0; i < internalTransfer.getQuantity().size(); i++) {
-                // Convert String to int
                 int mtoQuantity = Integer.parseInt(internalTransfer.getQuantity().get(i));
-                // Update inventory quantity if there is a match
                 if (inventory.getQuantity() == mtoQuantity) {
                     int newQuantity = inventory.getQuantity() - mtoQuantity;
-                    // If remaining quantity is zero or less, remove the item
                     if (newQuantity <= 0) {
                         inventoryRepository.delete(inventory);
                     } else {
@@ -108,18 +101,14 @@ public class InternalTransferService {
                         inventoryRepository.save(inventory);
                     }
                 } else {
-                    // If quantity in Mto is less than inventory, create a new inventory item
                     int remainingQuantity = inventory.getQuantity() - mtoQuantity;
                     if (remainingQuantity > 0) {
-                        // Update quantity of existing inventory item
                         inventory.setQuantity(remainingQuantity);
                         inventoryRepository.save(inventory);
                     } else {
-                        // If quantity in Mto is more than inventory, add to existing inventory item
                         int additionalQuantity = mtoQuantity - inventory.getQuantity();
                         inventory.setQuantity(mtoQuantity);
                         inventoryRepository.save(inventory);
-                        // If there is a destination sublocation, find the inventory and add quantity
                         if (internalTransfer.getDestination() != null && !internalTransfer.getDestination().isEmpty()) {
                             List<String> destinationSublocations = Collections.singletonList(internalTransfer.getDestination());
                             String destinationSublocation = destinationSublocations.get(i);
@@ -133,7 +122,6 @@ public class InternalTransferService {
                 }
             }
         }
-
 
         return internalTransferRepository.save(internalTransfer);
     }
@@ -151,14 +139,14 @@ public class InternalTransferService {
         });
     }
 
-
     public int getNextReferenceNumber(String locationName) {
         return locationReferenceMap.getOrDefault(locationName, 1);
     }
 
     public String generateReferenceNumber(String locationName, int referenceNumber) {
         int year = LocalDate.now().getYear();
-        return String.format("%s_%d_%04d", locationName, year, referenceNumber);
+        String entityName = "IT"; // Assuming entity name is "mto"
+        return String.format("%s_%s_%d_%04d", entityName, locationName, year, referenceNumber);
     }
 
     private void initializeLocationReferenceMap() {
@@ -187,12 +175,13 @@ public class InternalTransferService {
         return 0;
     }
 
+
     public List<InternalTransfer> getMtoByDescriptionAndLocation(String description, String locationName) {
         return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
     }
 
     public List<InternalTransfer> getMtoByDescription(String description) {
-        return internalTransferRepository.findByDescription(description);
+        return internalTransferRepository.findITByDescriptionContaining(description);
     }
 
     public List<InternalTransfer> getMtoByLocation(String locationName) {
@@ -376,5 +365,26 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
     public List<InternalTransfer> searchByLocationNameAndDescription(String description, String locationName) {
        return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);}
 
+
+    public List<InternalTransfer> getInternalTransferByDescriptionAndLocationAndTransferDateAndStatus(String description, String locationName, LocalDate transferDate, String status) {
+        return internalTransferRepository.findITByDescriptionAndLocationNameAndTransferDateAndStatus(description, locationName, transferDate, status);
+    }
+
+
+    public List<InternalTransfer> getInternalTransferByLocationAndStatus(String locationName, String status) {
+        return internalTransferRepository.findITByLocationNameAndStatus(locationName, status);
+    }
+
+    public List<InternalTransfer> getInternalTransferByStatus(String status) {
+        return internalTransferRepository.findITByStatus(status);
+    }
+
+
+    public List<InternalTransfer> getInternalTransferByReferenceNo(String referenceNumber) {
+        return internalTransferRepository.findITByReferenceNo(referenceNumber);
+    }
+    public List<InternalTransfer> getInternalTransferByDescriptionAndLocationAndStatus(String description, String locationName, String status) {
+        return internalTransferRepository.findITByDescriptionAndLocationNameAndStatus(description, locationName, status);
+    }
 
 }

@@ -88,33 +88,59 @@ public class InternalTransferController {
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @PostMapping("/search")
-    public ResponseEntity<List<InternalTransfer>> searchMtoByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
+    public ResponseEntity<List<InternalTransfer>> searchInternalTransferByCriteria(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
-            List<InternalTransfer> allMto = internalTransferService.getAllInternalTransfers();
-            return ResponseEntity.ok(allMto);
+            List<InternalTransfer> allInternalTransfers = internalTransferService.getAllInternalTransfers();
+            return ResponseEntity.ok(allInternalTransfers);
         }
 
-        List<InternalTransfer> mtoList;
+        List<InternalTransfer> internalTransferList = new ArrayList<>();
 
-        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-            mtoList = internalTransferService.getMtoByDescription(criteria.getDescription());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null) {
-            mtoList = internalTransferService.getMtoByLocationAndTransferDate(
-                    criteria.getLocationName(), criteria.getTransferDate());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            mtoList = internalTransferService.getMtoByLocation(criteria.getLocationName());
-        } else if (criteria.getTransferDate() != null) {
-            mtoList = internalTransferService.getMtoByTransferDate(criteria.getTransferDate());
+        // Check each criteria field individually for null and empty values
+        if (isEmpty(criteria.getDescription())
+                && isEmpty(criteria.getLocationName())
+                && criteria.getTransferDate() == null
+                && isEmpty(criteria.getStatus())
+                && isEmpty(criteria.getReferenceNumber())) {
+            // If all fields are null or empty, return all internal transfers
+            List<InternalTransfer> allInternalTransfers = internalTransferService.getAllInternalTransfers();
+            return ResponseEntity.ok(allInternalTransfers);
+        }
+
+        // Handle each specific combination of criteria
+        if (!isEmpty(criteria.getDescription())
+                && !isEmpty(criteria.getLocationName())
+                && !isEmpty(criteria.getStatus())) {
+            internalTransferList = internalTransferService.getInternalTransferByDescriptionAndLocationAndStatus(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getDescription())
+                && !isEmpty(criteria.getLocationName())
+                && criteria.getTransferDate() != null
+                && !isEmpty(criteria.getStatus())) {
+            internalTransferList = internalTransferService.getInternalTransferByDescriptionAndLocationAndTransferDateAndStatus(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getLocationName())
+                && !isEmpty(criteria.getStatus())) {
+            internalTransferList = internalTransferService.getInternalTransferByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getStatus())) {
+            internalTransferList = internalTransferService.getInternalTransferByStatus(criteria.getStatus());
+        } else if (!isEmpty(criteria.getReferenceNumber())) {
+            internalTransferList = internalTransferService.getInternalTransferByReferenceNo(criteria.getReferenceNumber());
         } else {
+            // If no valid combination matches, return bad request
             return ResponseEntity.badRequest().build();
         }
 
-        if (mtoList.isEmpty()) {
+        if (internalTransferList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(mtoList);
+        return ResponseEntity.ok(internalTransferList);
+    }
+
+    // Helper method to check if a string is null or empty
+    private boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
