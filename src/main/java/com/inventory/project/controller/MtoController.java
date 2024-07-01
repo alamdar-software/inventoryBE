@@ -96,24 +96,24 @@ public class MtoController {
 
         List<Mto> mtoList = new ArrayList<>();
 
-        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
-                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        if (nonEmpty(criteria.getDescription()) && nonEmpty(criteria.getLocationName()) && nonEmpty(criteria.getStatus())) {
             mtoList = mtoService.getMtoByDescriptionAndLocationAndStatus(
                     criteria.getDescription(), criteria.getLocationName(), criteria.getStatus());
-        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
-                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getTransferDate() != null
-                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        } else if (nonEmpty(criteria.getDescription()) && nonEmpty(criteria.getLocationName()) && criteria.getTransferDate() != null && nonEmpty(criteria.getStatus())) {
             mtoList = mtoService.getMtoByDescriptionAndLocationAndTransferDateAndStatus(
                     criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
-        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
-                && criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        } else if (nonEmpty(criteria.getLocationName()) && nonEmpty(criteria.getStatus())) {
             mtoList = mtoService.getMtoByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
-        } else if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+        } else if (nonEmpty(criteria.getStatus())) {
             mtoList = mtoService.getMtoByStatus(criteria.getStatus());
-        } else if (criteria.getReferenceNumber() != null && !criteria.getReferenceNumber().isEmpty()) {
+        } else if (nonEmpty(criteria.getReferenceNumber())) {
             mtoList = mtoService.getMtoByReferenceNo(criteria.getReferenceNumber());
+        } else if (nonEmpty(criteria.getDescription())) {
+            mtoList = mtoService.getMtoByDescription(criteria.getDescription());
+        } else if (nonEmpty(criteria.getLocationName())) {
+            mtoList = mtoService.getMtoByLocationName(criteria.getLocationName());
+        } else if (criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByTransferDate(criteria.getTransferDate());
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -123,6 +123,10 @@ public class MtoController {
         }
 
         return ResponseEntity.ok(mtoList);
+    }
+
+    private boolean nonEmpty(String value) {
+        return value != null && !value.isEmpty();
     }
 
 //    @PostMapping("/search")

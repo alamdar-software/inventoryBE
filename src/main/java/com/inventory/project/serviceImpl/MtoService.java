@@ -569,4 +569,7 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         return String.format("%s_%s_%d_%04d", entityName, locationName, year, referenceNumber);
     }
 
+    public List<Mto> getMtoByLocationName(String locationName) {
+        return mtoRepository.findByLocationName(locationName);
+    }
 }
