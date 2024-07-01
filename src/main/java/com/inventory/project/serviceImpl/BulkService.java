@@ -3,6 +3,7 @@ package com.inventory.project.serviceImpl;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.BulkStockRepo;
 import com.inventory.project.repository.CiplRepository;
+import com.inventory.project.repository.IncomingStockRepo;
 import com.inventory.project.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class BulkService {
     private final BulkStockRepo bulkStockRepo;
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private IncomingStockRepo incomingStockRepo;
     @Autowired
     public BulkService(BulkStockRepo bulkStockRepo) {
         this.bulkStockRepo = bulkStockRepo;
@@ -94,44 +100,100 @@ public class BulkService {
         return bulkStockRepo.save(existingBulk);
     }
 
-    public List<BulkStock> searchBySingleField(SearchCriteria searchRequest) {
+    public List<Object> searchBySingleField(SearchCriteria searchRequest) {
+        List<Object> results = Stream.of(
+                        searchBulkStockBySingleField(searchRequest),
+                        searchIncomingStockBySingleField(searchRequest))
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        return results.isEmpty() ? Collections.emptyList() : results;
+    }
+
+    private List<BulkStock> searchBulkStockBySingleField(SearchCriteria searchRequest) {
+        if (isEmptyCriteria(searchRequest)) {
+            return bulkStockRepo.findAll(); // Fetch all bulk stocks if criteria is empty
+        } if (nonEmpty(searchRequest.getStatus())) {
+            return bulkStockRepo.findByStatus(searchRequest.getStatus());
+        }
         if (isAllFieldsSpecified(searchRequest)) {
-            return bulkStockRepo.findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrder(
+            return bulkStockRepo.findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrderAndStatus(
                     searchRequest.getDescription(),
                     searchRequest.getLocationName(),
                     searchRequest.getDate(),
                     searchRequest.getEntityName(),
-                    searchRequest.getPurchaseOrder()
+                    searchRequest.getPurchaseOrder(),
+                    searchRequest.getStatus()
             );
         } else if (atLeastTwoFieldsSpecified(searchRequest)) {
-            // Add more checks here if needed
             if (nonEmpty(searchRequest.getDescription()) && nonEmpty(searchRequest.getLocationName())) {
-                return bulkStockRepo.findByDescriptionAndLocationName(
-                        searchRequest.getDescription(), searchRequest.getLocationName());
+                return bulkStockRepo.findByDescriptionAndLocationNameAndStatus(
+                        searchRequest.getDescription(), searchRequest.getLocationName(), searchRequest.getStatus());
             } else if (nonEmpty(searchRequest.getDescription()) && searchRequest.getDate() != null) {
-                return bulkStockRepo.findByDescriptionAndDate(
-                        searchRequest.getDescription(), searchRequest.getDate());
+                return bulkStockRepo.findByDescriptionAndDateAndStatus(
+                        searchRequest.getDescription(), searchRequest.getDate(), searchRequest.getStatus());
             } else if (nonEmpty(searchRequest.getLocationName()) && searchRequest.getDate() != null) {
-                return bulkStockRepo.findByLocationNameAndDate(
-                        searchRequest.getLocationName(), searchRequest.getDate());
+                return bulkStockRepo.findByLocationNameAndDateAndStatus(
+                        searchRequest.getLocationName(), searchRequest.getDate(), searchRequest.getStatus());
             }
-            // Add more combinations based on your requirements
         } else if (isSingleFieldSpecified(searchRequest)) {
             if (nonEmpty(searchRequest.getDescription())) {
-                return bulkStockRepo.findByDescription(searchRequest.getDescription());
+                return bulkStockRepo.findByDescriptionAndStatus(searchRequest.getDescription(), searchRequest.getStatus());
             } else if (nonEmpty(searchRequest.getLocationName())) {
-                return bulkStockRepo.findByLocationName(searchRequest.getLocationName());
+                return bulkStockRepo.findByLocationNameAndStatus(searchRequest.getLocationName(), searchRequest.getStatus());
             } else if (searchRequest.getDate() != null) {
-                return bulkStockRepo.findByDate(searchRequest.getDate());
+                return bulkStockRepo.findByDateAndStatus(searchRequest.getDate(), searchRequest.getStatus());
             } else if (nonEmpty(searchRequest.getPurchaseOrder())) {
-                return bulkStockRepo.findByPurchaseOrder(searchRequest.getPurchaseOrder());
+                return bulkStockRepo.findByPurchaseOrderAndStatus(searchRequest.getPurchaseOrder(), searchRequest.getStatus());
             } else if (nonEmpty(searchRequest.getEntityName())) {
-                return bulkStockRepo.findByEntityName(searchRequest.getEntityName());
+                return bulkStockRepo.findByEntityNameAndStatus(searchRequest.getEntityName(), searchRequest.getStatus());
             }
         }
         return Collections.emptyList();
     }
 
+    private List<IncomingStock> searchIncomingStockBySingleField(SearchCriteria searchRequest) {
+        if (isEmptyCriteria(searchRequest)) {
+            return incomingStockRepo.findAll(); // Fetch all incoming stocks if criteria is empty
+        }
+        if (nonEmpty(searchRequest.getStatus())) {
+            return incomingStockRepo.findByStatus(searchRequest.getStatus());
+        }
+        if (isAllFieldsSpecified(searchRequest)) {
+            return incomingStockRepo.findByItemDescriptionAndLocation_LocationNameAndDateAndEntity_EntityNameAndPurchaseOrderAndStatus(
+                    searchRequest.getDescription(),
+                    searchRequest.getLocationName(),
+                    searchRequest.getDate(),
+                    searchRequest.getEntityName(),
+                    searchRequest.getPurchaseOrder(),
+                    searchRequest.getStatus()
+            );
+        } else if (atLeastTwoFieldsSpecified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription()) && nonEmpty(searchRequest.getLocationName())) {
+                return incomingStockRepo.findByItemDescriptionAndLocation_LocationNameAndStatus(
+                        searchRequest.getDescription(), searchRequest.getLocationName(), searchRequest.getStatus());
+            } else if (nonEmpty(searchRequest.getDescription()) && searchRequest.getDate() != null) {
+                return incomingStockRepo.findByItemDescriptionAndDateAndStatus(
+                        searchRequest.getDescription(), searchRequest.getDate(), searchRequest.getStatus());
+            } else if (nonEmpty(searchRequest.getLocationName()) && searchRequest.getDate() != null) {
+                return incomingStockRepo.findByLocation_LocationNameAndDateAndStatus(
+                        searchRequest.getLocationName(), searchRequest.getDate(), searchRequest.getStatus());
+            }
+        } else if (isSingleFieldSpecified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription())) {
+                return incomingStockRepo.findByItemDescriptionAndStatus(searchRequest.getDescription(), searchRequest.getStatus());
+            } else if (nonEmpty(searchRequest.getLocationName())) {
+                return incomingStockRepo.findByLocation_LocationNameAndStatus(searchRequest.getLocationName(), searchRequest.getStatus());
+            } else if (searchRequest.getDate() != null) {
+                return incomingStockRepo.findByDateAndStatus(searchRequest.getDate(), searchRequest.getStatus());
+            } else if (nonEmpty(searchRequest.getPurchaseOrder())) {
+                return incomingStockRepo.findByPurchaseOrderAndStatus(searchRequest.getPurchaseOrder(), searchRequest.getStatus());
+            } else if (nonEmpty(searchRequest.getEntityName())) {
+                return incomingStockRepo.findByEntity_EntityNameAndStatus(searchRequest.getEntityName(), searchRequest.getStatus());
+            }
+        }
+        return Collections.emptyList();
+    }
 
     private boolean nonEmpty(String value) {
         return value != null && !value.isEmpty();
@@ -142,28 +204,31 @@ public class BulkService {
                 && nonEmpty(searchRequest.getLocationName())
                 && searchRequest.getDate() != null
                 && nonEmpty(searchRequest.getPurchaseOrder())
-                && nonEmpty(searchRequest.getEntityName());
+                && nonEmpty(searchRequest.getEntityName())
+                && nonEmpty(searchRequest.getStatus());
     }
 
     private boolean isSingleFieldSpecified(SearchCriteria searchRequest) {
         int count = 0;
-        if (searchRequest.getDescription() != null && !searchRequest.getDescription().isEmpty()) {
+        if (nonEmpty(searchRequest.getDescription())) {
             count++;
         }
-        if (searchRequest.getLocationName() != null && !searchRequest.getLocationName().isEmpty()) {
+        if (nonEmpty(searchRequest.getLocationName())) {
             count++;
         }
         if (searchRequest.getDate() != null) {
             count++;
         }
-        if (searchRequest.getPurchaseOrder() != null && !searchRequest.getPurchaseOrder().isEmpty()) {
+        if (nonEmpty(searchRequest.getPurchaseOrder())) {
             count++;
         }
-        if (searchRequest.getEntityName() != null && !searchRequest.getEntityName().isEmpty()) {
+        if (nonEmpty(searchRequest.getEntityName())) {
             count++;
         }
-
-        return count >= 1 && count <= 2; // At least one and at most two fields specified
+        if (nonEmpty(searchRequest.getStatus())) {
+            count++;
+        }
+        return count >= 1 && count <= 2;
     }
 
     private boolean atLeastTwoFieldsSpecified(SearchCriteria searchRequest) {
@@ -183,9 +248,19 @@ public class BulkService {
         if (nonEmpty(searchRequest.getEntityName())) {
             count++;
         }
-
-        return count >= 2; // At least two fields specified
+        if (nonEmpty(searchRequest.getStatus())) {
+            count++;
+        }
+        return count >= 2;
     }
 
+    private boolean isEmptyCriteria(SearchCriteria searchRequest) {
+        return !nonEmpty(searchRequest.getDescription())
+                && !nonEmpty(searchRequest.getLocationName())
+                && searchRequest.getDate() == null
+                && !nonEmpty(searchRequest.getPurchaseOrder())
+                && !nonEmpty(searchRequest.getEntityName())
+                && !nonEmpty(searchRequest.getStatus());
+    }
 
 }

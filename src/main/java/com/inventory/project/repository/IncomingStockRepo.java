@@ -90,4 +90,44 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
 
 
     List<IncomingStock> findByItemAndAddress(Item item, Address address);
+
+
+
+
+    List<IncomingStock> findByDate(LocalDate date);
+
+    List<IncomingStock> findByPurchaseOrder(String purchaseOrder);
+
+    // Adjusted query method for entity name
+
+    // Adjusted query method for item description and location name
+    List<IncomingStock> findByItemDescriptionAndLocation_LocationName(String itemDescription, String locationName);
+
+    // Adjusted query method for item description and date
+    List<IncomingStock> findByItemDescriptionAndDate(String itemDescription, LocalDate date);
+
+    // Adjusted query method for location name and date
+    List<IncomingStock> findByLocation_LocationNameAndDate(String locationName, LocalDate date);
+
+    // Adjusted query method for item description, location name, date, entity name, and purchase order
+    List<IncomingStock> findByItemDescriptionAndLocation_LocationNameAndDateAndEntity_EntityNameAndPurchaseOrder(
+            String itemDescription, String locationName, LocalDate date, String entityName, String purchaseOrder);
+
+    List<IncomingStock> findByEntity_EntityNameAndStatus(String entityName, String status);
+
+    List<IncomingStock> findByPurchaseOrderAndStatus(String purchaseOrder, String status);
+
+    List<IncomingStock> findByDateAndStatus(LocalDate date, String status);
+
+    List<IncomingStock> findByLocation_LocationNameAndStatus(String locationName, String status);
+
+    List<IncomingStock> findByItemDescriptionAndStatus(String description, String status);
+
+    List<IncomingStock> findByLocation_LocationNameAndDateAndStatus(String locationName, LocalDate date, String status);
+
+    List<IncomingStock> findByItemDescriptionAndDateAndStatus(String description, LocalDate date, String status);
+
+    List<IncomingStock> findByItemDescriptionAndLocation_LocationNameAndStatus(String description, String locationName, String status);
+
+    List<IncomingStock> findByItemDescriptionAndLocation_LocationNameAndDateAndEntity_EntityNameAndPurchaseOrderAndStatus(String description, String locationName, LocalDate date, String entityName, String purchaseOrder, String status);
 }

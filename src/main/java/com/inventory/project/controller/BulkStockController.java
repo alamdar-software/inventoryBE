@@ -250,14 +250,14 @@ IncomingStockRepo incomingStockRepo;
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<BulkStock>> searchBulk(@RequestBody SearchCriteria searchRequest) {
-        List<BulkStock> result = bulkStockService.searchBySingleField(searchRequest);
+    public ResponseEntity<List<?>> searchStocks(@RequestBody SearchCriteria searchCriteria) {
+        List<?> results = bulkStockService.searchBySingleField(searchCriteria);
 
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build(); // No records found
+        if (!results.isEmpty()) {
+            return ResponseEntity.ok(results);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(result);
     }
 
 //    @PutMapping("/status/{id}")

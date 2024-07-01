@@ -63,6 +63,24 @@ public interface BulkStockRepo extends JpaRepository<BulkStock,Long> {
     List<BulkStock> findByStatusIgnoreCase(String created);
 
     Integer countByQuantityGreaterThan(int quantity);
+    List<BulkStock> findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrderAndStatus(
+            String description, String locationName, LocalDate date, String entityName, String purchaseOrder, String status);
+
+    List<BulkStock> findByDescriptionAndLocationNameAndStatus(String description, String locationName, String status);
+
+    List<BulkStock> findByDescriptionAndDateAndStatus(String description, LocalDate date, String status);
+
+    List<BulkStock> findByLocationNameAndDateAndStatus(String locationName, LocalDate date, String status);
+
+    List<BulkStock> findByDescriptionAndStatus(String description, String status);
+
+    List<BulkStock> findByLocationNameAndStatus(String locationName, String status);
+
+    List<BulkStock> findByDateAndStatus(LocalDate date, String status);
+
+    List<BulkStock> findByPurchaseOrderAndStatus(String purchaseOrder, String status);
+
+    List<BulkStock> findByEntityNameAndStatus(String entityName, String status);
 
 
 }
