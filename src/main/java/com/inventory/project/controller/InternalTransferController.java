@@ -126,6 +126,12 @@ public class InternalTransferController {
             internalTransferList = internalTransferService.getInternalTransferByStatus(criteria.getStatus());
         } else if (!isEmpty(criteria.getReferenceNumber())) {
             internalTransferList = internalTransferService.getInternalTransferByReferenceNo(criteria.getReferenceNumber());
+        } else if (!isEmpty(criteria.getDescription())) {
+            internalTransferList = internalTransferService.getInternalTransferByDescription(criteria.getDescription());
+        } else if (!isEmpty(criteria.getLocationName())) {
+            internalTransferList = internalTransferService.getInternalTransferByLocationName(criteria.getLocationName());
+        } else if (criteria.getTransferDate() != null) {
+            internalTransferList = internalTransferService.getInternalTransferByTransferDate(criteria.getTransferDate());
         } else {
             // If no valid combination matches, return bad request
             return ResponseEntity.badRequest().build();
@@ -142,6 +148,7 @@ public class InternalTransferController {
     private boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 

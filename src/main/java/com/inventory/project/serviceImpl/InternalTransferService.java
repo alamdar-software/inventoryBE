@@ -386,5 +386,14 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
     public List<InternalTransfer> getInternalTransferByDescriptionAndLocationAndStatus(String description, String locationName, String status) {
         return internalTransferRepository.findITByDescriptionAndLocationNameAndStatus(description, locationName, status);
     }
+    public List<InternalTransfer> getInternalTransferByDescription(String description) {
+        return internalTransferRepository.findByDescription(description);
+    }
 
-}
+    public List<InternalTransfer> getInternalTransferByTransferDate(LocalDate transferDate) {
+        return internalTransferRepository.findByTransferDate(transferDate);
+    }
+
+    public List<InternalTransfer> getInternalTransferByLocationName(String locationName) {
+        return internalTransferRepository.findByLocationName(locationName);
+    }}

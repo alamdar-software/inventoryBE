@@ -59,7 +59,7 @@ public class IncomingStock {
     @Column(name = "item_description")
     private String itemDescription;
     @ManyToOne
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
     @Column(name="remarks")
@@ -107,7 +107,13 @@ public class IncomingStock {
 private Mto  mto;
     public IncomingStock() {
     }
-
+    public IncomingStock(String itemDescription, Location location, LocalDate date, Entity entity, String purchaseOrder) {
+        this.itemDescription = itemDescription;
+        this.location = location;
+        this.date = date;
+        this.entity = entity;
+        this.purchaseOrder = purchaseOrder;
+    }
     public Long getId() {
         return id;
     }
