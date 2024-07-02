@@ -260,23 +260,30 @@ private ConsumeService consumeService;
 
         List<ConsumedItem> ciplList = new ArrayList<>();
 
-        // Handle combinations of multiple fields
+        // Handle searches for combinations of fields
         if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getLocationName()) && criteria.getTransferDate() != null && !isEmpty(criteria.getStatus())) {
             ciplList = consumeService.getCiplByItemAndLocationAndTransferDateAndStatus(criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getLocationName()) && criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByItemAndLocationAndTransferDate(criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
         } else if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getLocationName()) && !isEmpty(criteria.getStatus())) {
             ciplList = consumeService.getCiplByItemAndLocationAndStatus(criteria.getItem(), criteria.getLocationName(), criteria.getStatus());
-        } else if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getStatus())) {
-            ciplList = consumeService.getCiplByItemAndStatus(criteria.getItem(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getItem()) && criteria.getTransferDate() != null && !isEmpty(criteria.getStatus())) {
+            ciplList = consumeService.getCiplByItemAndTransferDateAndStatus(criteria.getItem(), criteria.getTransferDate(), criteria.getStatus());
         } else if (!isEmpty(criteria.getLocationName()) && criteria.getTransferDate() != null && !isEmpty(criteria.getStatus())) {
             ciplList = consumeService.getCiplByLocationAndTransferDateAndStatus(criteria.getLocationName(), criteria.getTransferDate(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getLocationName())) {
+            ciplList = consumeService.getCiplByItemAndLocation(criteria.getItem(), criteria.getLocationName());
+        } else if (!isEmpty(criteria.getItem()) && criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByItemAndTransferDate(criteria.getItem(), criteria.getTransferDate());
+        } else if (!isEmpty(criteria.getItem()) && !isEmpty(criteria.getStatus())) {
+            ciplList = consumeService.getCiplByItemAndStatus(criteria.getItem(), criteria.getStatus());
+        } else if (!isEmpty(criteria.getLocationName()) && criteria.getTransferDate() != null) {
+            ciplList = consumeService.getCiplByLocationAndTransferDate(criteria.getLocationName(), criteria.getTransferDate());
         } else if (!isEmpty(criteria.getLocationName()) && !isEmpty(criteria.getStatus())) {
             ciplList = consumeService.getCiplByLocationAndStatus(criteria.getLocationName(), criteria.getStatus());
         } else if (criteria.getTransferDate() != null && !isEmpty(criteria.getStatus())) {
             ciplList = consumeService.getCiplByTransferDateAndStatus(criteria.getTransferDate(), criteria.getStatus());
-        }
-
-        // Handle single field searches
-        else if (!isEmpty(criteria.getItem())) {
+        } else if (!isEmpty(criteria.getItem())) {
             ciplList = consumeService.getCiplByItem(criteria.getItem());
         } else if (!isEmpty(criteria.getLocationName())) {
             ciplList = consumeService.getCiplByLocation(criteria.getLocationName());

@@ -203,4 +203,11 @@ public class ConsumeService {
     public List<ConsumedItem> getCiplByItemAndLocationAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status) {
         return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);
     }
+    public List<ConsumedItem> getCiplByItemAndTransferDate(String item, LocalDate transferDate) {
+        return consumedItemRepo.findByItemAndTransferDate(item, transferDate);
+    }
+
+    public List<ConsumedItem> getCiplByItemAndTransferDateAndStatus(String item, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByItemAndTransferDateAndStatus(item, transferDate, status);
+    }
 }

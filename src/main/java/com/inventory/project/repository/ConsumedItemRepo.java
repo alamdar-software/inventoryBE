@@ -59,4 +59,8 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
     List<ConsumedItem> findByItemAndLocationNameAndStatus(String item, String locationName, String status);
 
     List<ConsumedItem> findByItemAndLocationNameAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status);
+
+    List<ConsumedItem> findByItemAndTransferDate(String item, LocalDate transferDate);
+
+    List<ConsumedItem> findByItemAndTransferDateAndStatus(String item, LocalDate transferDate, String status);
 }
