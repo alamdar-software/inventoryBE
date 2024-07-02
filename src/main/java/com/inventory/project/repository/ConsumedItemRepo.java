@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -46,4 +47,16 @@ public interface ConsumedItemRepo extends JpaRepository<ConsumedItem,Long> {
 
     @Query("SELECT COALESCE(SUM(ci.quantity), 0) FROM ConsumedItem ci WHERE ci.items.id = :itemId")
     int sumQuantityByItemId(Long itemId);
+
+    List<ConsumedItem> findByLocationNameAndTransferDateAndStatus(String locationName, LocalDate transferDate, String status);
+
+    List<ConsumedItem> findByLocationNameAndStatus(String locationName, String status);
+
+    List<ConsumedItem> findByTransferDateAndStatus(LocalDate transferDate, String status);
+
+    List<ConsumedItem> findByItemAndStatus(String item, String status);
+
+    List<ConsumedItem> findByItemAndLocationNameAndStatus(String item, String locationName, String status);
+
+    List<ConsumedItem> findByItemAndLocationNameAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status);
 }

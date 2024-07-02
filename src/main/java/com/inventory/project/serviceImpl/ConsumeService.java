@@ -170,5 +170,37 @@ public class ConsumeService {
         return Collections.emptyList();
     }
 
+//    public List<ConsumedItem> getCiplByItemAndLocationAndTransferDateAndStatus(String item, String locationName, Date transferDate, String status) {
+//        return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);
+//    }
 
+    
+    public List<ConsumedItem> getCiplByItemAndLocationAndStatus(String item, String locationName, String status) {
+        return consumedItemRepo.findByItemAndLocationNameAndStatus(item, locationName, status);
+    }
+
+    
+    public List<ConsumedItem> getCiplByItemAndStatus(String item, String status) {
+        return consumedItemRepo.findByItemAndStatus(item, status);
+    }
+
+    public List<ConsumedItem> getCiplByLocationAndTransferDateAndStatus(String locationName, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, status);
+    }
+
+    public List<ConsumedItem> getCiplByLocationAndStatus(String locationName, String status) {
+        return consumedItemRepo.findByLocationNameAndStatus(locationName, status);
+    }
+
+    public List<ConsumedItem> getCiplByTransferDateAndStatus(LocalDate transferDate, String status) {
+        return consumedItemRepo.findByTransferDateAndStatus(transferDate, status);
+    }
+
+    public List<ConsumedItem> getCiplByStatus(String status) {
+        return consumedItemRepo.findByStatus(status);
+    }
+
+    public List<ConsumedItem> getCiplByItemAndLocationAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);
+    }
 }
