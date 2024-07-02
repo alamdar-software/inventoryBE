@@ -122,27 +122,23 @@ private ItemRepository itemRepository;
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<LocationDto> getLocationById(@PathVariable("id") Long locationId) {
+    public ResponseEntity<List<LocationDto>> getLocationById(@PathVariable("id") Long locationId) {
         Optional<Location> locationOptional = locationRepo.findById(locationId);
 
         if (locationOptional.isPresent()) {
             Location location = locationOptional.get();
 
-            // Create a LocationDto with the retrieved information
-            String concatenatedAddress = location.getAddresses().stream()
-                    .map(Address::getAddress)
-                    .collect(Collectors.joining(", "));
-            LocationDto locationDto = new LocationDto(
-                    location.getId(),
-                    location.getLocationName(),
-                    concatenatedAddress
-            );
+            // Create a list of LocationDto with the retrieved information
+            List<LocationDto> locationDtos = location.getAddresses().stream()
+                    .map(address -> new LocationDto(location.getId(), location.getLocationName(), address.getAddress()))
+                    .collect(Collectors.toList());
 
-            return new ResponseEntity<>(locationDto, HttpStatus.OK);
+            return new ResponseEntity<>(locationDtos, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
