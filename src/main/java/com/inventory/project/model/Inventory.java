@@ -30,7 +30,7 @@ public class Inventory {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @JsonIgnore
     private Item item;

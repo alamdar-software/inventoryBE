@@ -197,7 +197,6 @@ public void createInventories(Item item) {
         }
     }
 }
-
     @GetMapping("/viewInventories/{itemId}")
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long itemId) {
         Map<String, Object> response = new HashMap<>();
@@ -207,15 +206,23 @@ public void createInventories(Item item) {
                 Item item = optionalItem.get();
 
                 List<Inventory> inventories = inventoryRepository.findByItem(item);
-                response.put("description", item.getDescription()); // Keep the description as it is
+                response.put("description", item.getDescription());
 
                 List<Map<String, Object>> inventoryList = new ArrayList<>();
                 for (Inventory inventory : inventories) {
                     Map<String, Object> inventoryDetails = new HashMap<>();
                     inventoryDetails.put("id", inventory.getId());
                     inventoryDetails.put("quantity", inventory.getQuantity());
-                    inventoryDetails.put("locationName", inventory.getLocationName());
-                    inventoryDetails.put("address", inventory.getAddress().getAddress());
+                    inventoryDetails.put("locationName", inventory.getLocation().getLocationName());
+
+                    // Check if the address list is not empty before accessing it
+                    List<Address> addressList = inventory.getLocation().getAddresses();
+                    if (addressList != null && !addressList.isEmpty()) {
+                        inventoryDetails.put("address", addressList.get(0).getAddress());
+                    } else {
+                        inventoryDetails.put("address", "No address available");
+                    }
+
                     inventoryDetails.put("description", inventory.getDescription());
                     inventoryDetails.put("consumedItem", inventory.getConsumedItem());
                     inventoryDetails.put("scrappedItem", inventory.getScrappedItem());
@@ -235,11 +242,11 @@ public void createInventories(Item item) {
                 return ResponseEntity.ok(response);
             } else {
                 response.put("error", "Item not found for ID: " + itemId);
-                return ResponseEntity.ok(response); // Return 200 with response
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             response.put("error", "Error retrieving item details: " + e.getMessage());
-            return ResponseEntity.ok(response); // Return 200 with error response
+            return ResponseEntity.ok(response);
         }
     }
 

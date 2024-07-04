@@ -5,6 +5,7 @@ import com.inventory.project.repository.AddressRepository;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import com.inventory.project.repository.LocationRepository;
+import com.inventory.project.serviceImpl.InventoryService;
 import com.inventory.project.serviceImpl.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +41,8 @@ private ItemRepository itemRepository;
 
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private InventoryService inventoryService;
 
 
 //    @PostMapping("/add")
@@ -376,4 +379,73 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
         String addressString = location.getAddresses().isEmpty() ? "" : location.getAddresses().get(0).getAddress(); // Assuming only one address per location for simplicity
         return new LocationDto(location.getId(), location.getLocationName(), addressString);
     }
+
+    @PostMapping("/searchInventory")
+    public ResponseEntity<List<Map<String, Object>>> searchLocations(
+            @RequestParam(value = "locationName", required = false) String locationName,
+            @RequestParam(value = "address", required = false) String address) {
+
+        List<Location> locations = locationRepo.findByLocationNameContainingAndAddresses_AddressContaining(
+                locationName != null ? locationName : "",
+                address != null ? address : ""
+        );
+
+        List<Map<String, Object>> responseList = new ArrayList<>();
+        for (Location location : locations) {
+            Map<String, Object> locationDetails = new HashMap<>();
+            locationDetails.put("id", location.getId());
+            locationDetails.put("locationName", location.getLocationName());
+
+            // Retrieve inventories for the location by locationName
+            List<Map<String, Object>> inventoryList = new ArrayList<>();
+            List<Inventory> inventories = inventoryRepository.findByLocationName(location.getLocationName());
+            for (Inventory inventory : inventories) {
+                Map<String, Object> inventoryDetails = new HashMap<>();
+                inventoryDetails.put("itemId", inventory.getItem().getId());
+                inventoryDetails.put("itemName", inventory.getItem().getName());
+                inventoryDetails.put("quantity", inventory.getQuantity());
+                inventoryDetails.put("description", inventory.getDescription());
+                inventoryList.add(inventoryDetails);
+            }
+
+            locationDetails.put("inventories", inventoryList);
+            responseList.add(locationDetails);
+        }
+
+        return ResponseEntity.ok(responseList);
+    }
+    @GetMapping("/searchInventory")
+    public ResponseEntity<List<Inventory>> searchInventorysByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null) {
+            List<Inventory> allInventory = inventoryService.getAllInventory();
+            return ResponseEntity.ok(allInventory);
+        }
+
+        List<Inventory> inventoryList;
+
+        if ((criteria.getDescription() == null || criteria.getDescription().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())) {
+            // If both description and locationName are empty, fetch all data
+            inventoryList = inventoryService.getAllInventory();
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            // Search by both description and locationName
+            inventoryList = inventoryService.getMtoByDescriptionAndLocation(
+                    criteria.getDescription(), criteria.getLocationName());
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            // Search by locationName only
+            inventoryList = inventoryService.getMtoByLocation(criteria.getLocationName());
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            // Search by description only
+            inventoryList = inventoryService.getMtoByDescription(criteria.getDescription());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        System.out.println("Received search criteria: " + criteria);
+        System.out.println("Returning inventory list: " + inventoryList);
+
+        return ResponseEntity.ok(inventoryList);
+    }
+
 }

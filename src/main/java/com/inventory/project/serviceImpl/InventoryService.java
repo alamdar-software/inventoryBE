@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
@@ -58,10 +59,28 @@ public class InventoryService {
     }
 
     public List<ItemInventoryDto> searchItemsByDescription(String description) {
-        Item item = itemRepository.findByDescription(description);
-        List<Item> items = (item != null) ? Collections.singletonList(item) : Collections.emptyList();
-        return mapItemsToItemInventoryDtoFromItem(items);
+        List<Item> items = itemRepository.findItemByDescription(description);
+        return mapItemsToItemInventoryDto(items);
     }
+
+    private List<ItemInventoryDto> mapItemsToItemInventoryDto(List<Item> items) {
+        return items.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private ItemInventoryDto convertToDto(Item item) {
+        int incomingStockQuantity = item.getIncomingStock() != null ? item.getIncomingStock().getQuantity() : 0;
+
+        return new ItemInventoryDto(
+                item.getName(),
+                item.getMinimumStock(),
+                item.getItemName(),
+                incomingStockQuantity,
+                item.getDescription()
+        );
+    }
+
 
     private List<ItemInventoryDto> mapItemsToItemInventoryDtoFromInventory(List<Inventory> inventories) {
         List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
@@ -106,5 +125,39 @@ public class InventoryService {
 
 
 
+    public List<ItemInventoryDto> getAllItems() {
+        List<Inventory> inventories = inventoryRepository.findAll();
+        List<ItemInventoryDto> itemInventoryDtos = new ArrayList<>();
 
+        // Convert Inventory entities to ItemInventoryDto objects
+        for (Inventory inventory : inventories) {
+            ItemInventoryDto itemDto = new ItemInventoryDto();
+            itemDto.setId(inventory.getId()); // Assuming you have an ID in your DTO
+            itemDto.setDescription(inventory.getDescription());
+
+            // Check if the item is null
+            if (inventory.getItem() != null) {
+                itemDto.setName(inventory.getItem().getName()); // Assuming item is associated with Inventory
+                itemDto.setItemName(inventory.getItem().getItemName()); // Set itemName from Item entity
+                itemDto.setMinimumStock(inventory.getItem().getMinimumStock()); // Access only if item is not null
+
+                // Adding category name if available in the associated Item entity
+                if (inventory.getItem().getCategory() != null) {
+                    itemDto.setName(inventory.getItem().getCategory().getName());
+                }
+            } else {
+                // Handle case where item is null (optional)
+                itemDto.setName("No Item Associated");
+                itemDto.setItemName("No Item Name");
+                // itemDto.setMinimumStock(null); // Handle minimum stock as needed
+                // itemDto.setCategoryName("No Category");
+            }
+
+            // Add more mappings as needed
+
+            itemInventoryDtos.add(itemDto);
+        }
+
+        return itemInventoryDtos;
+    }
 }

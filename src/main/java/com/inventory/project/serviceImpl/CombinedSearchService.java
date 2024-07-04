@@ -1,6 +1,8 @@
 package com.inventory.project.serviceImpl;
 
 import com.inventory.project.model.*;
+import com.inventory.project.repository.CiplRepository;
+import com.inventory.project.repository.InternalTransferRepo;
 import com.inventory.project.repository.MtoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +15,14 @@ public class CombinedSearchService {
     private final InternalTransferService internalTransferService;
     private final MtoService mtoService;
 
+    @Autowired
     private MtoRepository mtoRepository;
     private final CiplService ciplService;
+
+    @Autowired
+    private InternalTransferRepo internalTransferRepo;
+    @Autowired
+    private CiplRepository ciplRepository;
 
 
     @Autowired
@@ -83,7 +91,16 @@ public class CombinedSearchService {
 
 
     public List<Object> searchBoth(SearchCriteria searchCriteria) {
-        if (searchCriteria.isRepairService()) {
+        // Check if all search fields are empty strings or null
+        boolean areAllFieldsEmpty = isAllFieldsEmpty(searchCriteria);
+
+        if (areAllFieldsEmpty) {
+            // Return all data from InternalTransfer, Mto, and Cipl
+            List<InternalTransfer> internalTransferResults = getAllInternalTransfers();
+            List<Mto> mtoResults = getAllMto();
+            List<Cipl> ciplResults = getAllCipl();
+            return combineResults(internalTransferResults, mtoResults, ciplResults);
+        } else if (searchCriteria.isRepairService()) {
             // Search only Mto with repairService as true
             List<Mto> mtoResults = searchMtoWithRepairService(true);
             return combineMtoResultsWithDataType(mtoResults, "Mto");
@@ -91,14 +108,31 @@ public class CombinedSearchService {
             // Search all InternalTransfer and Mto within the specified date range
             List<InternalTransfer> internalTransferResults = searchInternalTransfer(searchCriteria);
             List<Mto> mtoResults = searchMto(searchCriteria);
-            List<Cipl>ciplResults=searchCipl(searchCriteria);
+            List<Cipl> ciplResults = searchCipl(searchCriteria);
             // Combine and return the results
-            List<Object> combinedResults = combineResults(internalTransferResults, mtoResults,ciplResults);
-            return combinedResults;
+            return combineResults(internalTransferResults, mtoResults, ciplResults);
         } else {
             // Handle other cases or return an empty list as needed
             return Collections.emptyList();
         }
+    }
+
+    // Helper method to check if all search fields are empty strings or null
+    private boolean isAllFieldsEmpty(SearchCriteria searchCriteria) {
+        return (searchCriteria.getStartDate() == null) &&
+                (searchCriteria.getEndDate() == null) &&
+                !searchCriteria.isRepairService();  // assuming isRepairService is a boolean
+    }
+    private List<InternalTransfer> getAllInternalTransfers() {
+        return internalTransferRepo.findAll();
+    }
+
+    private List<Mto> getAllMto() {
+        return mtoRepository.findAll();
+    }
+
+    private List<Cipl> getAllCipl() {
+        return ciplRepository.findAll();
     }
 
 

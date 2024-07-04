@@ -210,7 +210,8 @@ public class IncomingStockService {
         stockView.setStoreNo(Collections.singletonList(incomingStockRequest.getStoreNo()));
         stockView.setImpaCode(Collections.singletonList(incomingStockRequest.getImpaCode()));
         stockView.setDescription(Collections.singletonList(incomingStockRequest.getItemDescription()));
-
+        stockView.setStatus(incomingStockRequest.getStatus());
+        stockView.setCurrencyName(incomingStockRequest.getCurrency().getCurrencyName());
         return stockView;
     }
 
@@ -238,23 +239,36 @@ public class IncomingStockService {
         stockView.setStoreNo(bulkStock.getStoreNo());
         stockView.setImpaCode(bulkStock.getImpaCode());
         stockView.setDescription(bulkStock.getDescription());
+        stockView.setStatus(bulkStock.getStatus());
+
 
         return stockView;
     }
 
 
     public List<StockViewDto> searchMasterIncomingStock(SearchCriteria searchCriteria) {
-        List<IncomingStock> incomingStocks = Collections.emptyList();
-        List<BulkStock> bulkStocks = Collections.emptyList();
+        List<IncomingStock> incomingStocks;
+        List<BulkStock> bulkStocks;
 
         if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
             incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
             bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
-        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) && StringUtils.isNotEmpty(searchCriteria.getLocationName()) && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) &&
+                StringUtils.isNotEmpty(searchCriteria.getLocationName()) &&
+                searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             // Search by entityName, locationName, and date range for both incoming and bulk data
             if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
-                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
-                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(), searchCriteria.getEntityName(), searchCriteria.getStartDate(), searchCriteria.getEndDate());
+                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate());
+                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate());
+            } else {
+                incomingStocks = Collections.emptyList();
+                bulkStocks = Collections.emptyList();
             }
         } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
             incomingStocks = searchByEntityName(searchCriteria.getEntityName());
@@ -264,13 +278,20 @@ public class IncomingStockService {
             if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
                 incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
                 bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            } else {
+                incomingStocks = Collections.emptyList();
+                bulkStocks = Collections.emptyList();
             }
         } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
             incomingStocks = searchByLocation(searchCriteria.getLocationName());
             bulkStocks = searchBulkByLocation(searchCriteria.getLocationName());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getStatus())) {
+            incomingStocks = searchByStatus(searchCriteria.getStatus());
+            bulkStocks = searchBulkByStatus(searchCriteria.getStatus());
         } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
-            return Collections.emptyList();
+            // Return all data when no valid criteria provided
+            incomingStocks = getAllIncomingStocks();
+            bulkStocks = getAllBulkStocks();
         }
 
         List<StockViewDto> stockViewList = new ArrayList<>();
@@ -290,7 +311,22 @@ public class IncomingStockService {
         return stockViewList;
     }
 
+    // Example methods for searching by status
+    private List<IncomingStock> searchByStatus(String status) {
+        return incomingStockRepo.findByStatus(status);
+    }
 
+    private List<BulkStock> searchBulkByStatus(String status) {
+        return bulkStockRepo.findByStatus(status);
+    }
+
+    private List<IncomingStock> getAllIncomingStocks() {
+        return incomingStockRepo.findAll();
+    }
+
+    private List<BulkStock> getAllBulkStocks() {
+        return bulkStockRepo.findAll();
+    }
 
 
     private List<IncomingStock> searchByLocationAndEntityNameAndDateRange(String locationName, String entityName, LocalDate startDate, LocalDate endDate) {

@@ -338,7 +338,6 @@ public class InventoryController {
 //        return ResponseEntity.ok(result);
 //    }
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
 @PostMapping("/searchItem")
 public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCriteria searchRequest) {
     List<ItemInventoryDto> result;
@@ -346,31 +345,35 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
     String name = searchRequest.getName();
     String description = searchRequest.getDescription();
 
+    // Check if both name and description are null or empty
     if ((name == null || name.isEmpty()) && (description == null || description.isEmpty())) {
-        // Both name and description are empty, return bad request
-        return ResponseEntity.badRequest().build();
-    }
-
-    if (name != null && !name.isEmpty() && description != null && !description.isEmpty()) {
-        // Both name and description are provided
-        result = inventoryService.searchItemsByDescriptionAndName(description, name);
-    } else if (name != null && !name.isEmpty()) {
-        // Only name is provided
-        result = inventoryService.searchItemsByName(name);
-    } else if (description != null && !description.isEmpty()) {
-        // Only description is provided
-        result = inventoryService.searchItemsByDescription(description);
+        // Both name and description are null or empty, return all data
+        result = inventoryService.getAllItems(); // Implement this method in your service
     } else {
-        // Invalid search request, return bad request
-        return ResponseEntity.badRequest().build();
+        // Process the search based on provided criteria
+        if (name != null && !name.isEmpty() && description != null && !description.isEmpty()) {
+            // Both name and description are provided and not empty strings
+            result = inventoryService.searchItemsByDescriptionAndName(description, name);
+        } else if (name != null && !name.isEmpty()) {
+            // Only name is provided and not an empty string
+            result = inventoryService.searchItemsByName(name);
+        } else if (description != null && !description.isEmpty()) {
+            // Only description is provided and not an empty string
+            result = inventoryService.searchItemsByDescription(description);
+        } else {
+            // Invalid search request, return bad request
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+    // Check if result is empty
     if (result.isEmpty()) {
         return ResponseEntity.notFound().build();
     } else {
         return ResponseEntity.ok(result);
     }
 }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 

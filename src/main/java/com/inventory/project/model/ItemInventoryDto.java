@@ -2,6 +2,7 @@ package com.inventory.project.model;
 
 public class ItemInventoryDto {
 
+    private Long id;
     private String name;
     private String minimumStock;
     private String itemName;
@@ -21,6 +22,14 @@ public class ItemInventoryDto {
 
     public String getMinimumStock() {
         return minimumStock;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setMinimumStock(String minimumStock) {

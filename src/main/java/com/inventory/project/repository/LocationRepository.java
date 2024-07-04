@@ -55,6 +55,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     @Query("SELECT DISTINCT l FROM Location l LEFT JOIN FETCH l.addresses a WHERE LOWER(a.address) = LOWER(:address)")
     List<Location> findByAddressesAddressIgnoreCase(@Param("address") String address);
 
+    List<Location> findByLocationNameContainingAndAddresses_AddressContaining(String locationName, String address);
 
 
 //    List<Location> findByLocationNameAndStartDateBeforeAndEndDateAfter(String locationName, LocalDate startDate, LocalDate endDate);
