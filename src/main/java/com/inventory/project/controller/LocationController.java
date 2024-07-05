@@ -415,7 +415,7 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/searchInventory")
+    @PostMapping("/searchByInventory")
     public ResponseEntity<List<Inventory>> searchLocationsByInventory(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
             List<Inventory> allInventory = inventoryService.getAllInventory();
