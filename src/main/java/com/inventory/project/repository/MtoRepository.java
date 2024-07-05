@@ -106,4 +106,32 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
             @Param("status") String status);
 
     List<Mto> findByReferenceNoContaining(String referenceNo);
+
+    List<Mto> findByDescriptionAndLocationNameAndRepairServiceAndStatus(String description, String locationName, boolean repairService, String status);
+
+    List<Mto> findByLocationNameAndRepairServiceAndStatus(String locationName, boolean repairService, String status);
+
+    List<Mto> findByDescriptionAndRepairServiceAndStatus(String description, boolean repairService, String status);
+
+    List<Mto> findByDescriptionAndLocationNameAndStatus(String description, String locationName, String status);
+
+    List<Mto> findByLocationNameAndStatus(String locationName, String status);
+
+    List<Mto> findByRepairServiceAndStatus(boolean repairService, String status);
+
+    List<Mto> findByDescriptionAndStatus(String description, String status);
+
+    List<Mto> findByRepairServiceAndStatusAndTransferDateBetween(boolean repairService, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByLocationNameAndStatusAndTransferDateBetween(String locationName, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndStatusAndTransferDateBetween(String description, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndLocationNameAndStatusAndTransferDateBetween(String description, String locationName, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByLocationNameAndRepairServiceAndStatusAndTransferDateBetween(String locationName, boolean repairService, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndLocationNameAndRepairServiceAndStatusAndTransferDateBetween(String description, String locationName, boolean repairService, String status, LocalDate startDate, LocalDate endDate);
+
+    List<Mto> findByDescriptionAndRepairServiceAndStatusAndTransferDateBetween(String description, boolean repairService, String status, LocalDate startDate, LocalDate endDate);
 }

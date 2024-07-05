@@ -276,141 +276,130 @@ public Mto createMto(Mto mto) {
 
 
 //
-public List<Mto> getMtoByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate, boolean repairService) {
+public List<Mto> getMtoByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate, boolean repairService, String status) {
     if (startDate == null || endDate == null) {
         return Collections.emptyList(); // If any required parameter is null, return an empty list
     }
 
-    List<Mto> ciplList;
+    List<Mto> resultList;
 
-    if ((StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService)) {
-        // If either description, locationName, or repairService is provided, filter by the provided criteria
-        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService) {
-            // If description, locationName, and repairService are provided, filter by all
-            ciplList = mtoRepository.findByDescriptionAndLocationNameAndRepairServiceAndTransferDateBetween(
-                    description, locationName, repairService, startDate, endDate);
-        } else if (StringUtils.isNotEmpty(description) && repairService) {
-            // If description and repairService are provided, filter by description and repairService
-            ciplList = mtoRepository.findByDescriptionAndRepairServiceAndTransferDateBetween(
-                    description, repairService, startDate, endDate);
-        } else if (StringUtils.isNotEmpty(locationName) && repairService) {
-            // If locationName and repairService are provided, filter by locationName and repairService
-            ciplList = mtoRepository.findByLocationNameAndRepairServiceAndTransferDateBetween(
-                    locationName, repairService, startDate, endDate);
+    if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService || StringUtils.isNotEmpty(status)) {
+        // If any of description, locationName, repairService, or status is provided, filter by the provided criteria
+        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService && StringUtils.isNotEmpty(status)) {
+            // Filter by description, locationName, repairService, and status
+            resultList = mtoRepository.findByDescriptionAndLocationNameAndRepairServiceAndStatusAndTransferDateBetween(
+                    description, locationName, repairService, status, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description) && repairService && StringUtils.isNotEmpty(status)) {
+            // Filter by description, repairService, and status
+            resultList = mtoRepository.findByDescriptionAndRepairServiceAndStatusAndTransferDateBetween(
+                    description, repairService, status, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(locationName) && repairService && StringUtils.isNotEmpty(status)) {
+            // Filter by locationName, repairService, and status
+            resultList = mtoRepository.findByLocationNameAndRepairServiceAndStatusAndTransferDateBetween(
+                    locationName, repairService, status, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            // Filter by description, locationName, and status
+            resultList = mtoRepository.findByDescriptionAndLocationNameAndStatusAndTransferDateBetween(
+                    description, locationName, status, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(status)) {
+            // Filter by description and status
+            resultList = mtoRepository.findByDescriptionAndStatusAndTransferDateBetween(
+                    description, status, startDate, endDate);
+        } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            // Filter by locationName and status
+            resultList = mtoRepository.findByLocationNameAndStatusAndTransferDateBetween(
+                    locationName, status, startDate, endDate);
+        } else if (repairService && StringUtils.isNotEmpty(status)) {
+            // Filter by repairService and status
+            resultList = mtoRepository.findByRepairServiceAndStatusAndTransferDateBetween(
+                    repairService, status, startDate, endDate);
         } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
-            // If description and locationName are provided, filter by description and locationName
-            ciplList = mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+            // Filter by description and locationName
+            resultList = mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
                     description, locationName, startDate, endDate);
         } else if (StringUtils.isNotEmpty(description)) {
-            // If only description is provided, filter by description
-            ciplList = mtoRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
+            // Filter by description
+            resultList = mtoRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
         } else if (StringUtils.isNotEmpty(locationName)) {
-            // If only locationName is provided, filter by locationName
-            ciplList = mtoRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+            // Filter by locationName
+            resultList = mtoRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
         } else if (repairService) {
-            // If only repairService is provided, filter by repairService
-            ciplList = mtoRepository.findByRepairServiceAndTransferDateBetween(repairService, startDate, endDate);
-
-            // Check if records were found with the specified repairService
-            if (ciplList.isEmpty()) {
-                return Collections.emptyList();
-            }
+            // Filter by repairService
+            resultList = mtoRepository.findByRepairServiceAndTransferDateBetween(repairService, startDate, endDate);
         } else {
-            // If neither description, locationName, nor repairService is provided, filter by date range only
-            ciplList = mtoRepository.findByTransferDateBetween(startDate, endDate);
+            // Filter by date range only
+            resultList = mtoRepository.findByTransferDateBetween(startDate, endDate);
         }
     } else {
-        // If neither description, locationName, nor repairService is provided, filter by date range only
-        ciplList = mtoRepository.findByTransferDateBetween(startDate, endDate);
+        // If no valid criteria provided, filter by date range only
+        resultList = mtoRepository.findByTransferDateBetween(startDate, endDate);
     }
 
-    if (ciplList.isEmpty()) {
+    if (resultList.isEmpty()) {
         return Collections.emptyList(); // No matching records found for the provided criteria
     }
 
-    return ciplList; // Return the matching records
+    return resultList; // Return the matching records
 }
 
-    public List<Mto> getConsumedByItemAndLocation(String description, String locationName, boolean repairService) {
-        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService) {
-            // If either description, locationName, or repairService is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService) {
-                // If description, locationName, and repairService are provided, filter by all
-                List<Mto> result = mtoRepository.findByDescriptionAndLocationNameAndRepairService(
-                        description, locationName, repairService);
+    public List<Mto> getConsumedByItemAndLocation(String description, String locationName, boolean repairService, String status) {
+        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName) || repairService || StringUtils.isNotEmpty(status)) {
+            // If any of description, locationName, repairService, or status is provided, filter by the provided criteria
+            List<Mto> resultList;
 
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
-            } else if (StringUtils.isNotEmpty(description) && repairService) {
-                // If description and repairService are provided, filter by description and repairService
-                List<Mto> result = mtoRepository.findByDescriptionAndRepairService(description, repairService);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
-            } else if (StringUtils.isNotEmpty(locationName) && repairService) {
-                // If locationName and repairService are provided, filter by locationName and repairService
-                List<Mto> result = mtoRepository.findByLocationNameAndRepairService(locationName, repairService);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
+            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && repairService && StringUtils.isNotEmpty(status)) {
+                // Filter by description, locationName, repairService, and status
+                resultList = mtoRepository.findByDescriptionAndLocationNameAndRepairServiceAndStatus(
+                        description, locationName, repairService, status);
+            } else if (StringUtils.isNotEmpty(description) && repairService && StringUtils.isNotEmpty(status)) {
+                // Filter by description, repairService, and status
+                resultList = mtoRepository.findByDescriptionAndRepairServiceAndStatus(
+                        description, repairService, status);
+            } else if (StringUtils.isNotEmpty(locationName) && repairService && StringUtils.isNotEmpty(status)) {
+                // Filter by locationName, repairService, and status
+                resultList = mtoRepository.findByLocationNameAndRepairServiceAndStatus(
+                        locationName, repairService, status);
+            } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // Filter by description, locationName, and status
+                resultList = mtoRepository.findByDescriptionAndLocationNameAndStatus(
+                        description, locationName, status);
+            } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(status)) {
+                // Filter by description and status
+                resultList = mtoRepository.findByDescriptionAndStatus(description, status);
+            } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // Filter by locationName and status
+                resultList = mtoRepository.findByLocationNameAndStatus(locationName, status);
+            } else if (repairService && StringUtils.isNotEmpty(status)) {
+                // Filter by repairService and status
+                resultList = mtoRepository.findByRepairServiceAndStatus(repairService, status);
             } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
-                // If description and locationName are provided, filter by description and locationName
-                List<Mto> result = mtoRepository.findByDescriptionAndLocationName(description, locationName);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
+                // Filter by description and locationName
+                resultList = mtoRepository.findByDescriptionAndLocationName(description, locationName);
             } else if (StringUtils.isNotEmpty(description)) {
-                // If only description is provided, filter by description
-                List<Mto> result = mtoRepository.findByDescription(description);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
+                // Filter by description
+                resultList = mtoRepository.findByDescription(description);
             } else if (StringUtils.isNotEmpty(locationName)) {
-                // If only locationName is provided, filter by locationName
-                List<Mto> result = mtoRepository.findByLocationName(locationName);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
+                // Filter by locationName
+                resultList = mtoRepository.findByLocationName(locationName);
             } else if (repairService) {
-                // If only repairService is provided, filter by repairService
-                List<Mto> result = mtoRepository.findByRepairService(repairService);
-
-                // Check if records were found with the specified repairService
-                if (result.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return result;
+                // Filter by repairService
+                resultList = mtoRepository.findByRepairService(repairService);
+            } else {
+                // If no valid criteria provided, return an empty list
+                return Collections.emptyList();
             }
+
+            if (resultList.isEmpty()) {
+                return Collections.emptyList(); // No matching records found for the provided criteria
+            }
+
+            return resultList; // Return the matching records
         }
 
         // If no valid criteria provided, return an empty list
         return Collections.emptyList();
     }
+
 
     public List<Mto> getMtoByDateRangeOnly(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
@@ -422,16 +411,16 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
 
     // Add this method in your service
     public List<Mto> getMtoByRepairService(boolean repairService) {
-        // Always filter by repairService, regardless of its value (true or false)
-        List<Mto> result = mtoRepository.findByRepairService(repairService);
-
-        // Check if records were found with the specified repairService
-        if (result.isEmpty()) {
-            return Collections.emptyList();
+        if (repairService) {
+            // If repairService is true, filter by repairService
+            return mtoRepository.findByRepairService(true);
+        } else {
+            // If repairService is false or not provided, return all Mto entities
+            return mtoRepository.findAll();
         }
-
-        return result;
     }
+
+
     public List<Mto> searchByLocationAndDescriptionAndDateRange(String locationName, String description, LocalDate startDate, LocalDate endDate) {
         return mtoRepository.findByDescriptionAndLocationNameAndTransferDateBetween(locationName, description, startDate, endDate);
     }
@@ -556,6 +545,7 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         return mtoRepository.findMtoByStatus(status);
     }
 
+
     public List<Mto> getMtoByLocationAndStatus(String locationName, String status) {
         return mtoRepository.findMtoByLocationAndStatus(locationName, status);
     }
@@ -572,4 +562,31 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
     public List<Mto> getMtoByLocationName(String locationName) {
         return mtoRepository.findByLocationName(locationName);
     }
+
+    public List<Mto> getMtoByCriteria(String description, String locationName, boolean repairService, String status) {
+        // Implement your logic here to search based on the provided criteria
+        // This could involve creating dynamic queries based on the non-empty criteria
+        // For example:
+        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            return mtoRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, status);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+            return mtoRepository.findByDescriptionAndLocationName(description, locationName);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(status)) {
+            return mtoRepository.findByDescriptionAndStatus(description, status);
+        } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            return mtoRepository.findByLocationNameAndStatus(locationName, status);
+        } else if (StringUtils.isNotEmpty(description)) {
+            return mtoRepository.findMtoByDescriptionContaining(description);
+        } else if (StringUtils.isNotEmpty(locationName)) {
+            return mtoRepository.findByLocationName(locationName);
+        } else if (StringUtils.isNotEmpty(status)) {
+            return mtoRepository.findByStatus(status);
+        } else if (repairService) {
+            return mtoRepository.findByRepairService(repairService);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
 }
+

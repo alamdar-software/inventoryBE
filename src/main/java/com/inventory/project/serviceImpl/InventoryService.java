@@ -1,10 +1,7 @@
 package com.inventory.project.serviceImpl;
 
-import com.inventory.project.model.Inventory;
+import com.inventory.project.model.*;
 
-import com.inventory.project.model.Item;
-import com.inventory.project.model.ItemInventoryDto;
-import com.inventory.project.model.SearchCriteria;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
 import org.hibernate.Hibernate;
@@ -160,4 +157,21 @@ public class InventoryService {
 
         return itemInventoryDtos;
     }
+    public List<Inventory> getInventoryByAddressAndLocationName(String address, String locationName) {
+        return inventoryRepository.findByAddressAndLocationName(address, locationName);
+    }
+
+
+    public List<Inventory> getInventoryByLocationName(String locationName) {
+        return inventoryRepository.findByLocationName(locationName);
+    }
+
+
+    public List<Inventory> getInventoryByAddress(String address) {
+        return inventoryRepository.findByAddressString(address);
+    }
+
+
+
+
 }

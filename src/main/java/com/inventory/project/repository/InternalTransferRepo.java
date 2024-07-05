@@ -55,6 +55,11 @@ public interface InternalTransferRepo extends JpaRepository<InternalTransfer,Lon
 
     List<InternalTransfer> findITByDescriptionAndLocationNameAndStatus(String description, String locationName, String status);
 
+    List<InternalTransfer> findByDescriptionAndStatus(String description, String status);
+
+    List<InternalTransfer> findByDescriptionAndLocationNameAndStatus(String description, String locationName, String status);
+
+
     ;
 
 }

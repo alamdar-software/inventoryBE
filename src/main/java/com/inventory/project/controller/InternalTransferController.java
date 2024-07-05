@@ -158,27 +158,19 @@ public class InternalTransferController {
 
         if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
             // Search by date range
-            if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-                // Search by date range along with other criteria
-                result = internalTransferService.getItByDateRange(
-                        criteria.getDescription(),
-                        criteria.getLocationName(),
-                        criteria.getStartDate(),
-                        criteria.getEndDate()
-                );
-            } else {
-                // Search by date range only
-                result = internalTransferService.getItByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
-            }
-        } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by either description or locationName
-            result = internalTransferService.getConsumedByItemAndLocation(
+            result = internalTransferService.getItByDateRange(
                     criteria.getDescription(),
-                    criteria.getLocationName()
+                    criteria.getLocationName(),
+                    criteria.getStartDate(),
+                    criteria.getEndDate()
             );
         } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
-            return ResponseEntity.badRequest().build();
+            // Search by other criteria combinations
+            result = internalTransferService.getItByCriteria(
+                    criteria.getDescription(),
+                    criteria.getLocationName(),
+                    criteria.getStatus()
+            );
         }
 
         if (result.isEmpty()) {

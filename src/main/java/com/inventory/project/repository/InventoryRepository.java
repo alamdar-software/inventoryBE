@@ -61,6 +61,7 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 //    Integer findQuantityByItemAndLocation(@Param("item") Item item, @Param("location") String location);
 
     List<Inventory> findByDescriptionContains(String description);
+
     List<Inventory> findByLocationNameAndDescriptionContaining(String locationName, String description);
 
 
@@ -69,10 +70,17 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     List<Inventory> findAllByDescriptionOrLocationName(String description, String locationName);
 
     Inventory findTopByOrderByIdDesc();
+
     Inventory findByLocationNameAndItem_Id(String locationName, Long itemId);
 
     List<Inventory> findAllByDescriptionAndLocationName(String description, String locationName);
 
     Inventory findByLocationNameAndAddress_Address(String locationName, String destinationSublocation);
 
+    @Query("SELECT i FROM Inventory i WHERE i.address.address = :address AND i.locationName = :locationName")
+    List<Inventory> findByAddressAndLocationName(@Param("address") String address, @Param("locationName") String locationName);
+
+    // Custom query to find inventory items by address only
+    @Query("SELECT i FROM Inventory i WHERE i.address.address = :address")
+    List<Inventory> findByAddressString(@Param("address") String address);
 }

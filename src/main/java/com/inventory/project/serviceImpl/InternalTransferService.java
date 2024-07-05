@@ -288,7 +288,7 @@ public class InternalTransferService {
                 return result;
             } else if (StringUtils.isNotEmpty(description)) {
                 // If only description is provided, filter by description
-                List<InternalTransfer> result = internalTransferRepository.findByDescription(description);
+                List<InternalTransfer> result = internalTransferRepository.findITByDescriptionContaining(description);
 
                 // Check if records were found
                 if (result.isEmpty()) {
@@ -396,4 +396,25 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
 
     public List<InternalTransfer> getInternalTransferByLocationName(String locationName) {
         return internalTransferRepository.findByLocationName(locationName);
-    }}
+    }
+    public List<InternalTransfer> getItByCriteria(String description, String locationName, String status) {
+        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            return internalTransferRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, status);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+            return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
+        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(status)) {
+            return internalTransferRepository.findByDescriptionAndStatus(description, status);
+        } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+            return internalTransferRepository.findITByLocationNameAndStatus(locationName, status);
+        } else if (StringUtils.isNotEmpty(description)) {
+            return internalTransferRepository.findITByDescriptionContaining(description);
+        } else if (StringUtils.isNotEmpty(locationName)) {
+            return internalTransferRepository.findByLocationName(locationName);
+        } else if (StringUtils.isNotEmpty(status)) {
+            return internalTransferRepository.findByStatus(status);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+}

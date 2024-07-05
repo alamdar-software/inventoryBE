@@ -414,8 +414,9 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
 
         return ResponseEntity.ok(responseList);
     }
+
     @GetMapping("/searchInventory")
-    public ResponseEntity<List<Inventory>> searchInventorysByLocationAndDescription(@RequestBody(required = false) SearchCriteria criteria) {
+    public ResponseEntity<List<Inventory>> searchLocationsByInventory(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null) {
             List<Inventory> allInventory = inventoryService.getAllInventory();
             return ResponseEntity.ok(allInventory);
@@ -423,27 +424,24 @@ public ResponseEntity<List<LocationDto>> searchLocations(@RequestBody(required =
 
         List<Inventory> inventoryList;
 
-        if ((criteria.getDescription() == null || criteria.getDescription().isEmpty())
+        if ((criteria.getAddress() == null || criteria.getAddress().isEmpty())
                 && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())) {
-            // If both description and locationName are empty, fetch all data
+            // If both address and locationName are empty, fetch all data
             inventoryList = inventoryService.getAllInventory();
-        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+        } else if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()
                 && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
-            // Search by both description and locationName
-            inventoryList = inventoryService.getMtoByDescriptionAndLocation(
-                    criteria.getDescription(), criteria.getLocationName());
+            // Search by both address and locationName
+            inventoryList = inventoryService.getInventoryByAddressAndLocationName(
+                    criteria.getAddress(), criteria.getLocationName());
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
             // Search by locationName only
-            inventoryList = inventoryService.getMtoByLocation(criteria.getLocationName());
-        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-            // Search by description only
-            inventoryList = inventoryService.getMtoByDescription(criteria.getDescription());
+            inventoryList = inventoryService.getInventoryByLocationName(criteria.getLocationName());
+        } else if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+            // Search by address only
+            inventoryList = inventoryService.getInventoryByAddress(criteria.getAddress());
         } else {
             return ResponseEntity.badRequest().build();
         }
-
-        System.out.println("Received search criteria: " + criteria);
-        System.out.println("Returning inventory list: " + inventoryList);
 
         return ResponseEntity.ok(inventoryList);
     }

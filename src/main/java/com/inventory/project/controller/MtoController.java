@@ -233,39 +233,57 @@ public class MtoController {
 //        }
 //    }
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
 @PostMapping("/searchReport")
 public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
     List<Mto> result;
 
-    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+    // Check if all search criteria are empty or null
+    if (StringUtils.isEmpty(criteria.getDescription()) &&
+            StringUtils.isEmpty(criteria.getLocationName()) &&
+            StringUtils.isEmpty(criteria.getStatus()) &&
+            criteria.getStartDate() == null &&
+            criteria.getEndDate() == null &&
+            !criteria.isRepairService()) {
+        // Return all data if all search criteria are empty or null
+        result = mtoService.getAllMto();
+    } else if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
         // Search by date range
-        if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+        if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService() || StringUtils.isNotEmpty(criteria.getStatus())) {
             // Search by date range along with other criteria
             result = mtoService.getMtoByDateRange(
                     criteria.getDescription(),
                     criteria.getLocationName(),
                     criteria.getStartDate(),
                     criteria.getEndDate(),
-                    criteria.isRepairService()
+                    criteria.isRepairService(),
+                    criteria.getStatus()
             );
         } else {
             // Search by date range only
             result = mtoService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
         }
-    } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-        // Search by either description or locationName
+    } else if (StringUtils.isNotEmpty(criteria.getDescription()) || StringUtils.isNotEmpty(criteria.getLocationName()) || criteria.isRepairService()) {
+        // Search by either description, locationName, or repairService
         result = mtoService.getConsumedByItemAndLocation(
                 criteria.getDescription(),
                 criteria.getLocationName(),
-                criteria.isRepairService()
+                criteria.isRepairService(),
+                criteria.getStatus()
         );
+    } else if (StringUtils.isNotEmpty(criteria.getStatus())) {
+        // Search by status only
+        result = mtoService.getMtoByStatus(criteria.getStatus());
     } else if (criteria.isRepairService()) {
         // Search by repairService only
         result = mtoService.getMtoByRepairService(criteria.isRepairService());
-    } else {
-        // No valid criteria provided, return an empty list or handle it based on your requirement
-        return ResponseEntity.badRequest().build();
+    }  else {
+        // Search by other criteria combinations
+        result = mtoService.getMtoByCriteria(
+                criteria.getDescription(),
+                criteria.getLocationName(),
+                criteria.isRepairService(),
+                criteria.getStatus()
+        );
     }
 
     if (result.isEmpty()) {
@@ -274,6 +292,8 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
         return ResponseEntity.ok(result);
     }
 }
+
+
 
     @PutMapping("/status/{id}")
     public ResponseEntity<Mto> updateMto(@PathVariable Long id, @RequestBody Mto updatedMto, @RequestParam(required = false) String action) {
