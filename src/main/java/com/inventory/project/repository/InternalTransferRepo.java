@@ -42,7 +42,7 @@ public interface InternalTransferRepo extends JpaRepository<InternalTransfer,Lon
     List<InternalTransfer> findByLocationNameAndDescription(String locationName, String description);
 
     List<InternalTransfer> findByStatus(String created);
-    @Query("SELECT it FROM InternalTransfer it JOIN it.description d WHERE d LIKE %:description%")
+    @Query("SELECT it FROM InternalTransfer it WHERE it.description LIKE %:description%")
     List<InternalTransfer> findITByDescriptionContaining(@Param("description") String description);
 
     List<InternalTransfer> findITByDescriptionAndLocationNameAndTransferDateAndStatus(String description, String locationName, LocalDate transferDate, String status);
@@ -60,6 +60,14 @@ public interface InternalTransferRepo extends JpaRepository<InternalTransfer,Lon
     List<InternalTransfer> findByDescriptionAndLocationNameAndStatus(String description, String locationName, String status);
 
 
-    ;
+//    
+
+   
+
+    List<InternalTransfer> findByLocationNameAndStatus(String locationName, String status);
+
+    List<InternalTransfer> findByDescriptionContaining(String description);
+
+
 
 }

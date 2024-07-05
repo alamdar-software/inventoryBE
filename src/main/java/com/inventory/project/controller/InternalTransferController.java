@@ -151,13 +151,19 @@ public class InternalTransferController {
 
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/searchReport")
     public ResponseEntity<List<InternalTransfer>> searchITReportByCriteria(@RequestBody SearchCriteria criteria) {
         List<InternalTransfer> result;
 
-        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            // Search by date range
+        boolean isDateRangeProvided = criteria.getStartDate() != null && criteria.getEndDate() != null;
+        boolean areAllFieldsEmpty = StringUtils.isBlank(criteria.getDescription())
+                && StringUtils.isBlank(criteria.getLocationName())
+                && StringUtils.isBlank(criteria.getStatus())
+                && !isDateRangeProvided;
+
+        if (areAllFieldsEmpty) {
+            result = internalTransferService.getItByCriteria(null, null, null);
+        } else if (isDateRangeProvided) {
             result = internalTransferService.getItByDateRange(
                     criteria.getDescription(),
                     criteria.getLocationName(),
@@ -165,7 +171,6 @@ public class InternalTransferController {
                     criteria.getEndDate()
             );
         } else {
-            // Search by other criteria combinations
             result = internalTransferService.getItByCriteria(
                     criteria.getDescription(),
                     criteria.getLocationName(),
@@ -173,13 +178,8 @@ public class InternalTransferController {
             );
         }
 
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(result);
-        }
+        return result.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(result);
     }
-
     @PutMapping("/status/{id}")
     public ResponseEntity<InternalTransfer> updateInternalTransferStatus(@PathVariable Long id, @RequestBody InternalTransfer updatedInternalTransfer, @RequestParam(required = false) String action) {
         Optional<InternalTransfer> existingInternalTransferOptional = internalTransferService.getInternalTransferById(id);

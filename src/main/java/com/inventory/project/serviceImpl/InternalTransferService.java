@@ -229,40 +229,40 @@ public class InternalTransferService {
 
 //
 
-    public List<InternalTransfer> getItByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate) {
-        if (startDate == null || endDate == null) {
-            return Collections.emptyList(); // If any required parameter is null, return an empty list
-        }
-
-        List<InternalTransfer> itList;
-
-        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName)) {
-            // If either description or locationName is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
-                // If both description and locationName are provided, filter by both
-                itList = internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
-                        description, locationName, startDate, endDate);
-            } else if (StringUtils.isNotEmpty(description)) {
-                // If only description is provided, filter by description
-                itList = internalTransferRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
-            } else if (StringUtils.isNotEmpty(locationName)) {
-                // If only locationName is provided, filter by locationName
-                itList = internalTransferRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
-            } else {
-                // If neither description nor locationName is provided, filter by date range only
-                itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
-            }
-        } else {
-            // If neither description nor locationName is provided, filter by date range only
-            itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
-        }
-
-        if (itList.isEmpty()) {
-            return Collections.emptyList(); // No matching records found for the provided criteria
-        }
-
-        return itList; // Return the matching records
-    }
+//    public List<InternalTransfer> getItByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate) {
+//        if (startDate == null || endDate == null) {
+//            return Collections.emptyList(); // If any required parameter is null, return an empty list
+//        }
+//
+//        List<InternalTransfer> itList;
+//
+//        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName)) {
+//            // If either description or locationName is provided, filter by the provided criteria
+//            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+//                // If both description and locationName are provided, filter by both
+//                itList = internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+//                        description, locationName, startDate, endDate);
+//            } else if (StringUtils.isNotEmpty(description)) {
+//                // If only description is provided, filter by description
+//                itList = internalTransferRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
+//            } else if (StringUtils.isNotEmpty(locationName)) {
+//                // If only locationName is provided, filter by locationName
+//                itList = internalTransferRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+//            } else {
+//                // If neither description nor locationName is provided, filter by date range only
+//                itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+//            }
+//        } else {
+//            // If neither description nor locationName is provided, filter by date range only
+//            itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+//        }
+//
+//        if (itList.isEmpty()) {
+//            return Collections.emptyList(); // No matching records found for the provided criteria
+//        }
+//
+//        return itList; // Return the matching records
+//    }
 
     public List<InternalTransfer> getItByDateRangeOnly(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
@@ -398,23 +398,74 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
         return internalTransferRepository.findByLocationName(locationName);
     }
     public List<InternalTransfer> getItByCriteria(String description, String locationName, String status) {
-        if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+        // Logging inputs
+        System.out.println("Searching by Criteria:");
+        System.out.println("Description: " + description);
+        System.out.println("Location Name: " + locationName);
+        System.out.println("Status: " + status);
+
+        if (StringUtils.isBlank(description) && StringUtils.isBlank(locationName) && StringUtils.isBlank(status)) {
+            return internalTransferRepository.findAll(); // Return all data when no criteria are specified
+        }
+
+        if (StringUtils.isNotBlank(description) && StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
             return internalTransferRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, status);
-        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+        } else if (StringUtils.isNotBlank(description) && StringUtils.isNotBlank(locationName)) {
             return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
-        } else if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(status)) {
+        } else if (StringUtils.isNotBlank(description) && StringUtils.isNotBlank(status)) {
             return internalTransferRepository.findByDescriptionAndStatus(description, status);
-        } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
-            return internalTransferRepository.findITByLocationNameAndStatus(locationName, status);
-        } else if (StringUtils.isNotEmpty(description)) {
+        } else if (StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
+            return internalTransferRepository.findByLocationNameAndStatus(locationName, status);
+        } else if (StringUtils.isNotBlank(description)) {
             return internalTransferRepository.findITByDescriptionContaining(description);
-        } else if (StringUtils.isNotEmpty(locationName)) {
+        } else if (StringUtils.isNotBlank(locationName)) {
             return internalTransferRepository.findByLocationName(locationName);
-        } else if (StringUtils.isNotEmpty(status)) {
+        } else if (StringUtils.isNotBlank(status)) {
             return internalTransferRepository.findByStatus(status);
         } else {
-            return new ArrayList<>();
+            return internalTransferRepository.findAll(); // Return all data when no criteria are specified
         }
     }
 
+    public List<InternalTransfer> getItByDateRange(String description, String locationName, LocalDate startDate, LocalDate endDate) {
+        // Logging inputs
+        System.out.println("Searching by Date Range:");
+        System.out.println("Description: " + description);
+        System.out.println("Location Name: " + locationName);
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
+
+        if (startDate == null || endDate == null) {
+            return Collections.emptyList(); // If any required parameter is null, return an empty list
+        }
+
+        List<InternalTransfer> itList;
+
+        if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(locationName)) {
+            // If either description or locationName is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(description) && StringUtils.isNotEmpty(locationName)) {
+                // If both description and locationName are provided, filter by both
+                itList = internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateBetween(
+                        description, locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(description)) {
+                // If only description is provided, filter by description
+                itList = internalTransferRepository.findByDescriptionAndTransferDateBetween(description, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(locationName)) {
+                // If only locationName is provided, filter by locationName
+                itList = internalTransferRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+            } else {
+                // If neither description nor locationName is provided, filter by date range only
+                itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+            }
+        } else {
+            // If neither description nor locationName is provided, filter by date range only
+            itList = internalTransferRepository.findByTransferDateBetween(startDate, endDate);
+        }
+
+        if (itList.isEmpty()) {
+            return Collections.emptyList(); // No matching records found for the provided criteria
+        }
+
+        return itList; // Return the matching records
+    }
 }
