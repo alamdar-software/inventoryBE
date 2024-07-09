@@ -327,33 +327,27 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
     }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/searchReport")
     public ResponseEntity<List<Cipl>> searchMtoReportByCriteria(@RequestBody SearchCriteria criteria) {
         List<Cipl> result;
 
-        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName()) || criteria.isRepairService()) {
-                result = ciplService.getMtoByDateRange(
-                        criteria.getItem(),
-                        criteria.getShipperName(),
-                        criteria.getConsigneeName(),
-                        criteria.getStartDate(),
-                        criteria.getEndDate(),
-                        criteria.isRepairService()
-                );
+        // Treat empty strings as null
+        String item = StringUtils.isNotEmpty(criteria.getItem()) ? criteria.getItem() : null;
+        String shipperName = StringUtils.isNotEmpty(criteria.getShipperName()) ? criteria.getShipperName() : null;
+        String consigneeName = StringUtils.isNotEmpty(criteria.getConsigneeName()) ? criteria.getConsigneeName() : null;
+        String status = StringUtils.isNotEmpty(criteria.getStatus()) ? criteria.getStatus() : null;
+        LocalDate startDate = criteria.getStartDate();
+        LocalDate endDate = criteria.getEndDate();
+        boolean repairService = criteria.isRepairService();
+
+        if (startDate != null && endDate != null) {
+            if (item != null || shipperName != null || consigneeName != null || repairService || status != null) {
+                result = ciplService.getMtoByDateRange(item, shipperName, consigneeName, startDate, endDate, repairService, status);
             } else {
-                result = ciplService.getMtoByDateRangeOnly(criteria.getStartDate(), criteria.getEndDate());
+                result = ciplService.getMtoByDateRangeOnly(startDate, endDate);
             }
-        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getConsigneeName()) || StringUtils.isNotEmpty(criteria.getShipperName())) {
-            result = ciplService.getConsumedByItemAndLocation(
-                    criteria.getItem(),
-                    criteria.getShipperName(),
-                    criteria.getConsigneeName(),
-                    criteria.isRepairService()
-            );
-        } else if (criteria.isRepairService()) {
-            result = ciplService.getMtoByRepairService(criteria.isRepairService());
+        } else if (item != null || shipperName != null || consigneeName != null || status != null || repairService) {
+            result = ciplService.getConsumedByItemAndLocation(item, shipperName, consigneeName, repairService, status);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -364,6 +358,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
             return ResponseEntity.ok(result);
         }
     }
+
+
     @PutMapping("/status/{id}")
     public ResponseEntity<Cipl> updateCipl(@PathVariable Long id, @RequestBody Cipl updatedCipl, @RequestParam(required = false) String action) {
         Optional<Cipl> existingCiplOptional = ciplService.getCiplById(id);

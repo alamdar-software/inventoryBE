@@ -413,7 +413,7 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
         } else if (StringUtils.isNotBlank(description) && StringUtils.isNotBlank(locationName)) {
             return internalTransferRepository.findByDescriptionAndLocationName(description, locationName);
         } else if (StringUtils.isNotBlank(description) && StringUtils.isNotBlank(status)) {
-            return internalTransferRepository.findByDescriptionAndStatus(description, status);
+            return internalTransferRepository.findByDescriptionContainingAndStatus(description, status);
         } else if (StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
             return internalTransferRepository.findByLocationNameAndStatus(locationName, status);
         } else if (StringUtils.isNotBlank(description)) {
