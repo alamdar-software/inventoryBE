@@ -4,6 +4,7 @@ import com.inventory.project.model.*;
 import com.inventory.project.repository.CiplRepository;
 import com.inventory.project.repository.InternalTransferRepo;
 import com.inventory.project.repository.MtoRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -370,37 +371,54 @@ public List<InternalTransfer> searchInternalTransferEntities(SearchCriteria sear
             return ciplService.getAllCipl();
         }
     }
-
+    public List<Object> getAllEntities() {
+        List<Object> allEntities = new ArrayList<>();
+        allEntities.addAll(internalTransferRepo.findAll());
+        allEntities.addAll(mtoRepository.findAll());
+        allEntities.addAll(ciplRepository.findAll());
+        return allEntities;
+    }
     public List<Object> searchAllEntities(SearchCriteria searchCriteria) {
-        if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+        if (isEmptyCriteria(searchCriteria)) {
+            // If all fields in criteria are empty or null, return all data
+            return getAllEntities();
+        } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             // If only date range is provided
-            if (searchCriteria.getLocationName() != null && !searchCriteria.getLocationName().isEmpty()) {
+            if (StringUtils.isNotBlank(searchCriteria.getLocationName())) {
                 // If locationName is provided along with date range, filter by locationName and date range
                 return filterByLocationNameAndDateRange(searchCriteria);
-            } else if (searchCriteria.getDescription() != null && !searchCriteria.getDescription().isEmpty()) {
+            } else if (StringUtils.isNotBlank(searchCriteria.getDescription())) {
                 // If description is provided along with date range, filter by description and date range
                 return filterByDescriptionAndDateRange(searchCriteria);
             } else {
                 // If only date range is provided, filter by date range
                 return filterByDateRange(searchCriteria);
             }
-        } else if (searchCriteria.getLocationName() != null && !searchCriteria.getLocationName().isEmpty()) {
+        } else if (StringUtils.isNotBlank(searchCriteria.getLocationName())) {
             // If only locationName is provided, filter by locationName
             return filterByLocationName(searchCriteria);
-        } else if (searchCriteria.getDescription() != null && !searchCriteria.getDescription().isEmpty()) {
+        } else if (StringUtils.isNotBlank(searchCriteria.getDescription())) {
             // If only description is provided, filter by description
             return filterByDescription(searchCriteria);
-        } else if (searchCriteria.getLocationName() != null && searchCriteria.getDescription() != null) {
+        } else if (StringUtils.isNotBlank(searchCriteria.getLocationName()) && StringUtils.isNotBlank(searchCriteria.getDescription())) {
             // If locationName and description are provided, filter by description and locationName
             return filterByLocationNameAndDescription(searchCriteria);
-        } else if (searchCriteria.getLocationName() != null && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+        } else if (StringUtils.isNotBlank(searchCriteria.getLocationName()) && searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             // If locationName, startDate, and endDate are provided, filter by all criteria
             return filterByAllCriteria(searchCriteria);
         } else {
-            // If either description or locationName is missing, return empty list
+            // If criteria do not match any specific case, return empty list
             return Collections.emptyList();
         }
     }
+
+    private boolean isEmptyCriteria(SearchCriteria searchCriteria) {
+        return StringUtils.isBlank(searchCriteria.getLocationName()) &&
+                StringUtils.isBlank(searchCriteria.getDescription()) &&
+                searchCriteria.getStartDate() == null &&
+                searchCriteria.getEndDate() == null;
+    }
+
 
 
     private List<Object> filterByAllCriteria(SearchCriteria searchCriteria) {
