@@ -106,35 +106,43 @@ public class ConsumeService {
 //    }
 //
 
-    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+    public List<ConsumedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate, String status) {
         if (startDate == null || endDate == null) {
             return Collections.emptyList(); // If any required parameter is null, return an empty list
         }
 
-        List<ConsumedItem> ciplList;
+        List<ConsumedItem> ciplList = Collections.emptyList(); // Initialize ciplList
 
-        if ((StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName))) {
-            // If either item or locationName is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-                // If both item and locationName are provided, filter by both
+        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName) || StringUtils.isNotEmpty(status)) {
+            // If any of item, locationName, or status is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // If item, locationName, and status are all provided, filter by all three
+                ciplList = consumedItemRepo.findByItemAndLocationNameAndStatusAndTransferDateBetween(item, locationName, status, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If item and locationName are provided, filter by both
                 ciplList = consumedItemRepo.findByItemAndLocationNameAndTransferDateBetween(item, locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(status)) {
+                // If item and status are provided, filter by both
+                ciplList = consumedItemRepo.findByItemAndStatusAndTransferDateBetween(item, status, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // If locationName and status are provided, filter by both
+                ciplList = consumedItemRepo.findByLocationNameAndStatusAndTransferDateBetween(locationName, status, startDate, endDate);
             } else if (StringUtils.isNotEmpty(item)) {
                 // If only item is provided, filter by item
                 ciplList = consumedItemRepo.findByItemAndTransferDateBetween(item, startDate, endDate);
-            } else {
+            } else if (StringUtils.isNotEmpty(locationName)) {
                 // If only locationName is provided, filter by locationName
                 ciplList = consumedItemRepo.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+            } else if (StringUtils.isNotEmpty(status)) {
+                // If only status is provided, filter by status
+                ciplList = consumedItemRepo.findByStatusAndTransferDateBetween(status, startDate, endDate);
             }
         } else {
-            // If neither item nor locationName is provided, filter by date range only
+            // If neither item nor locationName nor status is provided, filter by date range only
             ciplList = consumedItemRepo.findByTransferDateBetween(startDate, endDate);
         }
 
-        if (ciplList.isEmpty()) {
-            return Collections.emptyList(); // No matching records found for the provided criteria
-        }
-
-        return ciplList; // Return the matching records
+        return ciplList; // Return the matching records, could be an empty list
     }
 
 //
@@ -151,24 +159,37 @@ public class ConsumeService {
 
 
 
-    public List<ConsumedItem> getConsumedByItemAndLocation(String item, String locationName) {
-        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName)) {
-            // If either item or locationName is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-                // If both item and locationName are provided, filter by both
+    public List<ConsumedItem> getConsumedByItemAndLocation(String item, String locationName, String status) {
+        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName) || StringUtils.isNotEmpty(status)) {
+            // If any of item, locationName, or status is provided, filter by the provided criteria
+            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // If item, locationName, and status are all provided, filter by all three
+                return consumedItemRepo.findByItemAndLocationNameAndStatus(item, locationName, status);
+            } else if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
+                // If item and locationName are provided, filter by both
                 return consumedItemRepo.findByItemAndLocationName(item, locationName);
+            } else if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(status)) {
+                // If item and status are provided, filter by both
+                return consumedItemRepo.findByItemAndStatus(item, status);
+            } else if (StringUtils.isNotEmpty(locationName) && StringUtils.isNotEmpty(status)) {
+                // If locationName and status are provided, filter by both
+                return consumedItemRepo.findByLocationNameAndStatus(locationName, status);
             } else if (StringUtils.isNotEmpty(item)) {
                 // If only item is provided, filter by item
                 return consumedItemRepo.findByItem(item);
             } else if (StringUtils.isNotEmpty(locationName)) {
                 // If only locationName is provided, filter by locationName
                 return consumedItemRepo.findByLocationName(locationName);
+            } else if (StringUtils.isNotEmpty(status)) {
+                // If only status is provided, filter by status
+                return consumedItemRepo.findByStatus(status);
             }
         }
 
         // If no valid criteria provided, return an empty list
         return Collections.emptyList();
     }
+
 
 //    public List<ConsumedItem> getCiplByItemAndLocationAndTransferDateAndStatus(String item, String locationName, Date transferDate, String status) {
 //        return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);

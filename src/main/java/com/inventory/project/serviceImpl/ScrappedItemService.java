@@ -98,56 +98,76 @@ public class ScrappedItemService {
 //    }
 
 
-    public List<ScrappedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate) {
+    public List<ScrappedItem> getCiplByDateRange(String item, String locationName, LocalDate startDate, LocalDate endDate, String status) {
         if (startDate == null || endDate == null) {
             return Collections.emptyList(); // If any required parameter is null, return an empty list
         }
 
-        List<ScrappedItem> ciplList;
+        List<ScrappedItem> ciplList = Collections.emptyList(); // Initialize ciplList
 
-        if ((StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName))) {
-            // If either item or locationName is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-                // If both item and locationName are provided, filter by both
+        if (StringUtils.isNotBlank(item) || StringUtils.isNotBlank(locationName) || StringUtils.isNotBlank(status)) {
+            // If any of item, locationName, or status is provided, filter by the provided criteria
+            if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
+                // If item, locationName, and status are all provided, filter by all three
+                ciplList = scrappedItemRepository.findByItemAndLocationNameAndStatusAndTransferDateBetween(item, locationName, status, startDate, endDate);
+            } else if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(locationName)) {
+                // If item and locationName are provided, filter by both
                 ciplList = scrappedItemRepository.findByItemAndLocationNameAndTransferDateBetween(item, locationName, startDate, endDate);
-            } else if (StringUtils.isNotEmpty(item)) {
+            } else if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(status)) {
+                // If item and status are provided, filter by both
+                ciplList = scrappedItemRepository.findByItemAndStatusAndTransferDateBetween(item, status, startDate, endDate);
+            } else if (StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
+                // If locationName and status are provided, filter by both
+                ciplList = scrappedItemRepository.findByLocationNameAndStatusAndTransferDateBetween(locationName, status, startDate, endDate);
+            } else if (StringUtils.isNotBlank(item)) {
                 // If only item is provided, filter by item
                 ciplList = scrappedItemRepository.findByItemAndTransferDateBetween(item, startDate, endDate);
-            } else {
+            } else if (StringUtils.isNotBlank(locationName)) {
                 // If only locationName is provided, filter by locationName
                 ciplList = scrappedItemRepository.findByLocationNameAndTransferDateBetween(locationName, startDate, endDate);
+            } else if (StringUtils.isNotBlank(status)) {
+                // If only status is provided, filter by status
+                ciplList = scrappedItemRepository.findByStatusAndTransferDateBetween(status, startDate, endDate);
             }
         } else {
-            // If neither item nor locationName is provided, filter by date range only
+            // If neither item nor locationName nor status is provided, filter by date range only
             ciplList = scrappedItemRepository.findByTransferDateBetween(startDate, endDate);
         }
 
-        if (ciplList.isEmpty()) {
-            return Collections.emptyList(); // No matching records found for the provided criteria
-        }
-
-        return ciplList; // Return the matching records
+        return ciplList; // Return the matching records, could be an empty list
     }
 
-    public List<ScrappedItem> getConsumedByItemAndLocation(String item, String locationName) {
-        if (StringUtils.isNotEmpty(item) || StringUtils.isNotEmpty(locationName)) {
-            // If either item or locationName is provided, filter by the provided criteria
-            if (StringUtils.isNotEmpty(item) && StringUtils.isNotEmpty(locationName)) {
-                // If both item and locationName are provided, filter by both
-                return scrappedItemRepository.findByItemAndLocationName(item, locationName);
-            } else if (StringUtils.isNotEmpty(item)) {
+    public List<ScrappedItem> getConsumedByItemAndLocation(String item, String locationName, String status) {
+        List<ScrappedItem> ciplList = Collections.emptyList(); // Initialize ciplList
+
+        if (StringUtils.isNotBlank(item) || StringUtils.isNotBlank(locationName) || StringUtils.isNotBlank(status)) {
+            // If any of item, locationName, or status is provided, filter by the provided criteria
+            if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
+                // If item, locationName, and status are all provided, filter by all three
+                ciplList = scrappedItemRepository.findByItemAndLocationNameAndStatus(item, locationName, status);
+            } else if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(locationName)) {
+                // If item and locationName are provided, filter by both
+                ciplList = scrappedItemRepository.findByItemAndLocationName(item, locationName);
+            } else if (StringUtils.isNotBlank(item) && StringUtils.isNotBlank(status)) {
+                // If item and status are provided, filter by both
+                ciplList = scrappedItemRepository.findByItemAndStatus(item, status);
+            } else if (StringUtils.isNotBlank(locationName) && StringUtils.isNotBlank(status)) {
+                // If locationName and status are provided, filter by both
+                ciplList = scrappedItemRepository.findByLocationNameAndStatus(locationName, status);
+            } else if (StringUtils.isNotBlank(item)) {
                 // If only item is provided, filter by item
-                return scrappedItemRepository.findByItem(item);
-            } else if (StringUtils.isNotEmpty(locationName)) {
+                ciplList = scrappedItemRepository.findByItem(item);
+            } else if (StringUtils.isNotBlank(locationName)) {
                 // If only locationName is provided, filter by locationName
-                return scrappedItemRepository.findByLocationName(locationName);
+                ciplList = scrappedItemRepository.findByLocationName(locationName);
+            } else if (StringUtils.isNotBlank(status)) {
+                // If only status is provided, filter by status
+                ciplList = scrappedItemRepository.findByStatus(status);
             }
         }
 
-        // If no valid criteria provided, return an empty list
-        return Collections.emptyList();
+        return ciplList; // Return the matching records, could be an empty list
     }
-
     public List<ScrappedItem> getCiplByItemAndLocationAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status) {
         return scrappedItemRepository.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);
     }

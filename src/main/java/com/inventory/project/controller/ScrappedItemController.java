@@ -233,26 +233,27 @@ public class ScrappedItemController {
 //        return ResponseEntity.ok(ciplList);
 //    }
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
-
     @PostMapping("/searchReport")
     public ResponseEntity<List<ScrappedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
         List<ScrappedItem> result;
 
-        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+        LocalDate startDate = criteria.getStartDate();
+        LocalDate endDate = criteria.getEndDate();
+        String item = StringUtils.isNotBlank(criteria.getItem()) ? criteria.getItem() : null;
+        String locationName = StringUtils.isNotBlank(criteria.getLocationName()) ? criteria.getLocationName() : null;
+        String status = StringUtils.isNotBlank(criteria.getStatus()) ? criteria.getStatus() : null;
+
+        if (startDate != null && endDate != null) {
             // Search by date range
-            result = scrappedItemService.getCiplByDateRange(
-                    criteria.getItem(),
-                    criteria.getLocationName(),
-                    criteria.getStartDate(),
-                    criteria.getEndDate()
-            );
-        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by either item or locationName
-            result = scrappedItemService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName());
-        } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
-            return ResponseEntity.badRequest().build();
+            result = scrappedItemService.getCiplByDateRange(item, locationName, startDate, endDate, status);
+        } else if (item != null || locationName != null || status != null) {
+            // Search by either item, locationName, or status
+            result = scrappedItemService.getConsumedByItemAndLocation(item, locationName, status);
+        }  else {
+            // If all fields are empty strings, return all items
+            result = scrappedItemRepository.findAll();
         }
+
 
         if (result.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -260,6 +261,7 @@ public class ScrappedItemController {
             return ResponseEntity.ok(result);
         }
     }
+
 
     @PutMapping("/status/{id}")
     public ResponseEntity<ScrappedItem> updateScrappedItemByIdStatus(@PathVariable("id") Long id, @RequestBody ScrappedItem request) {

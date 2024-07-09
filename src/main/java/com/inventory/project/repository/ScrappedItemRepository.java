@@ -44,5 +44,12 @@ public interface ScrappedItemRepository extends JpaRepository<ScrappedItem,Long>
     List<ScrappedItem> findByLocationNameAndStatus(String locationName, String status);
     List<ScrappedItem> findByTransferDateAndStatus(LocalDate transferDate, String status);
 
+    List<ScrappedItem> findByStatusAndTransferDateBetween(String status, LocalDate startDate, LocalDate endDate);
+
+    List<ScrappedItem> findByLocationNameAndStatusAndTransferDateBetween(String locationName, String status, LocalDate startDate, LocalDate endDate);
+
+    List<ScrappedItem> findByItemAndStatusAndTransferDateBetween(String item, String status, LocalDate startDate, LocalDate endDate);
+
+    List<ScrappedItem> findByItemAndLocationNameAndStatusAndTransferDateBetween(String item, String locationName, String status, LocalDate startDate, LocalDate endDate);
 }
 

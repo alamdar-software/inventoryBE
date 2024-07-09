@@ -344,32 +344,34 @@ private ConsumeService consumeService;
 //}
 @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
-    @PostMapping("/searchReport")
-    public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
-        List<ConsumedItem> result;
+@PostMapping("/searchReport")
+public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody SearchCriteria criteria) {
+    List<ConsumedItem> result;
 
-        if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-            // Search by date range
-            result = consumeService.getCiplByDateRange(
-                    criteria.getItem(),
-                    criteria.getLocationName(),
-                    criteria.getStartDate(),
-                    criteria.getEndDate()
-            );
-        } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName())) {
-            // Search by either item or locationName
-            result = consumeService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName());
-        } else {
-            // No valid criteria provided, return an empty list or handle it based on your requirement
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(result);
-        }
+    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+        // Search by date range
+        result = consumeService.getCiplByDateRange(
+                criteria.getItem(),
+                criteria.getLocationName(),
+                criteria.getStartDate(),
+                criteria.getEndDate(),
+                criteria.getStatus()
+        );
+    } else if (StringUtils.isNotEmpty(criteria.getItem()) || StringUtils.isNotEmpty(criteria.getLocationName()) || StringUtils.isNotEmpty(criteria.getStatus())) {
+        // Search by either item, locationName, or status
+        result = consumeService.getConsumedByItemAndLocation(criteria.getItem(), criteria.getLocationName(), criteria.getStatus());
+    } else {
+        // No valid criteria provided, return all data
+        result = consumeService.getAll(); // Adjust this to match your implementation
     }
+
+    if (result.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    } else {
+        return ResponseEntity.ok(result);
+    }
+}
+
     @PutMapping("/status/{id}")
     public ResponseEntity<?> updateConsumedItemStatus(
             @PathVariable Long id,
