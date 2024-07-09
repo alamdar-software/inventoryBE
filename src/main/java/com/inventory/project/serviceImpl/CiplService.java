@@ -196,12 +196,19 @@ public class CiplService {
 
 //
 public List<Cipl> getMtoByDateRange(String item, String shipperName, String consigneeName, LocalDate startDate, LocalDate endDate, boolean repairService, String status) {
+    // Treat empty strings as null
     item = StringUtils.isNotEmpty(item) ? item : null;
     shipperName = StringUtils.isNotEmpty(shipperName) ? shipperName : null;
     consigneeName = StringUtils.isNotEmpty(consigneeName) ? consigneeName : null;
     status = StringUtils.isNotEmpty(status) ? status : null;
 
-    if (item != null || shipperName != null || consigneeName != null || repairService || status != null) {
+    // If all fields are null or empty and repairService is false, return all data
+    if (item == null && shipperName == null && consigneeName == null && startDate == null && endDate == null && !repairService && status == null) {
+        return ciplRepository.findAll();
+    }
+
+    // Handle case when either startDate or endDate is provided
+    if (startDate != null || endDate != null) {
         if (item != null && shipperName != null && consigneeName != null && repairService && status != null) {
             return ciplRepository.findByItemAndShipperNameAndConsigneeNameAndRepairServiceAndStatusAndTransferDateBetween(
                     item, shipperName, consigneeName, repairService, status, startDate, endDate);
@@ -209,26 +216,26 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
             return ciplRepository.findByItemAndShipperNameAndConsigneeNameAndRepairServiceAndTransferDateBetween(
                     item, shipperName, consigneeName, repairService, startDate, endDate);
         } else if (item != null && repairService && status != null) {
-            return ciplRepository.findByItemAndRepairServiceAndTransferDateBetween(
-                    item, repairService, startDate, endDate);
+            return ciplRepository.findByItemAndRepairServiceAndStatusAndTransferDateBetween(
+                    item, repairService, status, startDate, endDate);
         } else if (shipperName != null && repairService && status != null) {
-            return ciplRepository.findByShipperNameAndRepairServiceAndTransferDateBetween(
-                    shipperName, repairService, startDate, endDate);
+            return ciplRepository.findByShipperNameAndRepairServiceAndStatusAndTransferDateBetween(
+                    shipperName, repairService, status, startDate, endDate);
         } else if (item != null && shipperName != null && status != null) {
-            return ciplRepository.findByItemAndShipperNameAndTransferDateBetween(
-                    item, shipperName, startDate, endDate);
+            return ciplRepository.findByItemAndShipperNameAndStatusAndTransferDateBetween(
+                    item, shipperName, status, startDate, endDate);
         } else if (item != null && status != null) {
-            return ciplRepository.findByItemAndTransferDateBetween(
-                    item, startDate, endDate);
+            return ciplRepository.findByItemAndStatusAndTransferDateBetween(
+                    item, status, startDate, endDate);
         } else if (shipperName != null && status != null) {
-            return ciplRepository.findByShipperNameAndTransferDateBetween(
-                    shipperName, startDate, endDate);
+            return ciplRepository.findByShipperNameAndStatusAndTransferDateBetween(
+                    shipperName, status, startDate, endDate);
         } else if (consigneeName != null && status != null) {
-            return ciplRepository.findByConsigneeNameAndTransferDateBetween(
-                    consigneeName, startDate, endDate);
+            return ciplRepository.findByConsigneeNameAndStatusAndTransferDateBetween(
+                    consigneeName, status, startDate, endDate);
         } else if (repairService && status != null) {
-            return ciplRepository.findByRepairServiceAndTransferDateBetween(
-                    repairService, startDate, endDate);
+            return ciplRepository.findByRepairServiceAndStatusAndTransferDateBetween(
+                    repairService, status, startDate, endDate);
         } else if (status != null) {
             return ciplRepository.findByStatusAndTransferDateBetween(
                     status, startDate, endDate);
@@ -243,8 +250,50 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         }
     }
 
-    return Collections.emptyList();
+    // Handle case when no date range is provided, but other criteria may be present
+    if (item != null || shipperName != null || consigneeName != null || repairService || status != null) {
+        if (item != null && shipperName != null && consigneeName != null && repairService && status != null) {
+            return ciplRepository.findByItemAndShipperNameAndConsigneeNameAndRepairServiceAndStatus(
+                    item, shipperName, consigneeName, repairService, status);
+        } else if (item != null && repairService && status != null) {
+            return ciplRepository.findByItemAndRepairServiceAndStatus(
+                    item, repairService, status);
+        } else if (shipperName != null && repairService && status != null) {
+            return ciplRepository.findByShipperNameAndRepairServiceAndStatus(
+                    shipperName, repairService, status);
+        } else if (item != null && shipperName != null && status != null) {
+            return ciplRepository.findByItemAndShipperNameAndStatus(
+                    item, shipperName, status);
+        } else if (item != null && status != null) {
+            return ciplRepository.findByItemAndStatus(
+                    item, status);
+        } else if (shipperName != null && status != null) {
+            return ciplRepository.findByShipperNameAndStatus(
+                    shipperName, status);
+        } else if (consigneeName != null && status != null) {
+            return ciplRepository.findByConsigneeNameAndStatus(
+                    consigneeName, status);
+        } else if (repairService && status != null) {
+            return ciplRepository.findByRepairServiceAndStatus(
+                    repairService, status);
+        } else if (status != null) {
+            return ciplRepository.findByStatus(status);
+        } else if (item != null) {
+            return ciplRepository.findCiplByDescriptionContaining(item);
+        } else if (shipperName != null) {
+            return ciplRepository.findByShipperName(shipperName);
+        } else if (consigneeName != null) {
+            return ciplRepository.findByConsigneeName(consigneeName);
+        } else if (repairService) {
+            return ciplRepository.findByRepairService(repairService);
+        }
+    }
+
+    // Default to returning all data if no criteria provided
+    return ciplRepository.findAll();
 }
+
+
     public List<Cipl> getConsumedByItemAndLocation(String item, String shipperName, String consigneeName, boolean repairService, String status) {
         // Treat empty strings as null
         item = StringUtils.isNotEmpty(item) ? item : null;
