@@ -440,6 +440,16 @@ public ResponseEntity<List<ItemInventoryDto>> searchItems(@RequestBody SearchCri
 //        return dto;
 //    }
 
+    @PostMapping("/createInventories")
+    public ResponseEntity<String> createInventoriesForLocations() {
+        try {
+            inventoryService.createInventoriesForAllLocations();
+            return ResponseEntity.ok("Inventories created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error occurred while creating inventories: " + e.getMessage());
+        }
+    }
+
 }
 
 

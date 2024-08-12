@@ -1,5 +1,6 @@
 package com.inventory.project.serviceImpl;
 
+import com.inventory.project.exception.InsufficientQuantityException;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.MtoRepository;
@@ -588,5 +589,32 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
         }
     }
 
+    @Transactional
+    public Mto updateMto(Long mtoId, Mto updatedMto) {
+        Mto existingMto = mtoRepository.findById(mtoId)
+                .orElseThrow(() -> new InsufficientQuantityException("Mto not found with id: " + mtoId));
+
+        // Check if the existing Mto status is "Created"
+        if (!"Created".equals(existingMto.getStatus())) {
+            throw new IllegalArgumentException("Mto status must be 'Created' to update");
+        }
+
+        // Update fields as necessary
+        existingMto.setLocationName(updatedMto.getLocationName());
+        existingMto.setTransferDate(updatedMto.getTransferDate());
+        existingMto.setConsigneeName(updatedMto.getConsigneeName());
+        existingMto.setRepairService(updatedMto.isRepairService());
+        existingMto.setQuantity(updatedMto.getQuantity());
+        existingMto.setPurchase(updatedMto.getPurchase());
+        existingMto.setPn(updatedMto.getPn());
+        existingMto.setSn(updatedMto.getSn());
+        existingMto.setDescription(updatedMto.getDescription());
+        existingMto.setSubLocation(updatedMto.getSubLocation());
+        existingMto.setRemarks(updatedMto.getRemarks());
+        existingMto.setDestinationSublocation(updatedMto.getDestinationSublocation());
+        // Add any other fields you want to update
+
+        return mtoRepository.save(existingMto);
+    }
 }
 

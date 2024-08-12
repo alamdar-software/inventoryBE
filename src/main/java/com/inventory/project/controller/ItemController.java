@@ -12,12 +12,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Logger;
 
 @RequestMapping("/item")
 @RestController
@@ -31,7 +34,8 @@ public class ItemController {
 
     @Autowired
     private UnitRepository unitRepository;
-
+    @Autowired
+    private Helper helper;
     @Autowired
     private LocationRepository locationRepository;
     @Autowired
@@ -43,6 +47,8 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+    private static final Logger logger = Logger.getLogger(LocationController.class.getName());
 
 
     @GetMapping("/add")
@@ -132,6 +138,13 @@ public ResponseEntity<Map<String, Object>> addItem(@RequestBody Item itemRequest
     Map<String, Object> response = new HashMap<>();
 
     try {
+        // Check if an item with the same description already exists
+        Item existingItem = itemRepository.findByDescription(itemRequest.getDescription());
+        if (existingItem != null) {
+            response.put("error", "Item with the description '" + itemRequest.getDescription() + "' already exists.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
         Item item = new Item();
         item.setItemName(itemRequest.getItemName());
         item.setMinimumStock(itemRequest.getMinimumStock());
@@ -403,7 +416,7 @@ public void createInventories(Item item) {
             // Create the response map including the list of items and total count
             Map<String, Object> response = new HashMap<>();
             response.put("items", items);
-            response.put("totalCount", items.size());
+            response.put("totalCount", itemRepository.findCount());
 
             if (!items.isEmpty()) {
                 return ResponseEntity.ok(response);
@@ -415,44 +428,240 @@ public void createInventories(Item item) {
         }
     }
 
-    @PostMapping("/location/upload")
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
-        if (Helper.checkExcelFormat(file)) {
-            //true
-            this.itemService.save(file);
-            return ResponseEntity.ok(Map.of("message", "File is uploaded and data is saved to db"));
+    @PostMapping("/upload/location")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> uploadLocations(@RequestParam("file") MultipartFile file) {
+        if (helper.checkExcelFormat(file)) {
+            try {
+                List<Location> locations = helper.convertExcelToLocations(file.getInputStream());
+                if (locations.size() > 16783) {
+                    locations = locations.subList(0, 16783);
+                }
+                for (Location location : locations) {
+                    logger.info("Saving location: " + location.getLocationName());
+                    Location savedLocation = saveLocationWithUniqueAddresses(location);
+
+                    if (savedLocation != null) {
+                        // Log addresses of the location
+                        for (Address address : savedLocation.getAddresses()) {
+                            logger.info("Address for location: " + address.getAddress());
+                        }
+
+                        createInventoriesForLocation(savedLocation); // Create inventories for the location
+                    } else {
+                        logger.info("Location with name '" + location.getLocationName() + "' already exists with the same addresses. Skipping...");
+                    }
+                }
+                return ResponseEntity.ok("File is uploaded and data up to 526th row is saved to the database");
+            } catch (IOException e) {
+                logger.severe("Failed to parse Excel file: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse Excel file");
+            }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload an Excel file");
     }
 
+    @Transactional
+    public Location saveLocationWithUniqueAddresses(Location location) {
+        Location existingLocation = locationRepository.findByLocationName(location.getLocationName());
+
+        if (existingLocation != null) {
+            // Check if addresses already exist for this location
+            if (addressesExist(existingLocation, location.getAddresses())) {
+                // Addresses already exist for this location
+                return null;
+            } else {
+                // Add new unique addresses to the existing location
+                for (Address newAddress : location.getAddresses()) {
+                    newAddress.setLocation(existingLocation); // Set the location for the new address
+                    existingLocation.getAddresses().add(newAddress); // Add the new address to the existing location's list
+                }
+                locationRepository.save(existingLocation);
+                return existingLocation;
+            }
+        } else {
+            // Location doesn't exist, create new location with addresses
+            Location newLocation = new Location();
+            newLocation.setLocationName(location.getLocationName());
+
+            for (Address newAddress : location.getAddresses()) {
+                newAddress.setLocation(newLocation); // Set the location for the new address
+                newLocation.getAddresses().add(newAddress); // Add the new address to the new location's list
+            }
+
+            locationRepository.save(newLocation);
+            return newLocation;
+        }
+    }
+
+    private boolean addressesExist(Location location, List<Address> newAddresses) {
+        for (Address newAddress : newAddresses) {
+            if (newAddress.getAddress() != null) {
+                boolean addressExists = location.getAddresses().stream()
+                        .anyMatch(existingAddress -> {
+                            String existingAddressValue = existingAddress.getAddress();
+                            return existingAddressValue != null && existingAddressValue.equalsIgnoreCase(newAddress.getAddress());
+                        });
+                if (addressExists) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @DeleteMapping("/deleteLast347")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> deleteLast347Locations() {
+        try {
+            List<Location> locations = locationRepository.findLast456ByOrderByIdDesc();
+            if (locations.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No locations found to delete");
+            }
+
+            locationRepository.deleteAll(locations);
+            logger.info("Deleted last 401 locations");
+
+            return ResponseEntity.ok("Last 401 locations have been deleted");
+        } catch (Exception e) {
+            logger.severe("Failed to delete locations: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete locations");
+        }
+    }
+    @Transactional
+    public void createInventoriesForLocation(Location location) {
+        logger.info("Creating inventories for location: " + location.getLocationName());
+        List<Item> itemList = itemRepository.findAll();
+        if (itemList.isEmpty()) {
+            logger.warning("Item list is empty, no inventories to create.");
+            return;
+        }
+        for (Item item : itemList) {
+            String locationName = location.getLocationName();
+            List<Address> addresses = location.getAddresses();
+            for (Address address : addresses) {
+                logger.info("Processing address: " + address.getAddress());
+                Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
+                if (inventory == null) {
+                    inventory = new Inventory();
+                    inventory.setLocation(location);
+                    inventory.setItem(item);
+                    inventory.setQuantity(0);
+                    inventory.setConsumedItem("0");
+                    inventory.setScrappedItem("0");
+                    inventory.setLocationName(locationName);
+                    inventory.setDescription(item.getDescription());
+                    inventory.setAddress(address);
+                    logger.info("Creating new inventory for item: " + item.getName() + " at address: " + address.getAddress());
+                } else {
+                    logger.info("Updating existing inventory for item: " + item.getName() + " at address: " + address.getAddress());
+                }
+                inventoryRepository.save(inventory);
+                logger.info("Inventory saved for item: " + item.getName() + " at address: " + address.getAddress());
+            }
+        }
+    }
 
     @GetMapping("/location")
     public List<Location> getAllLocations() {
         return this.itemService.getAllLocations();
     }
     @PostMapping("/upload/category")
-    public ResponseEntity<String> uploadCategoryFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Please upload a file");
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> uploadCategories(@RequestParam("file") MultipartFile file) {
+        if (helper.checkExcelFormat(file)) {
+            try {
+                List<Category> categories = helper.convertExcelToCategories(file.getInputStream());
+                if (categories.size() > 12541) {
+                    categories = categories.subList(0, 12541);
+                }
+                for (Category category : categories) {
+                    // Check if category with the same name already exists
+                    Category existingCategory = categoryRepository.findByName(category.getName());
+                    if (existingCategory == null) {
+                        logger.info("Saving category: " + category.getName());
+                        categoryRepository.save(category); // Save category if it doesn't exist
+                    } else {
+                        logger.info("Category with name " + category.getName() + " already exists, skipping.");
+                    }
+                }
+                return ResponseEntity.ok("File is uploaded and data up to 526th row is saved to the database");
+            } catch (IOException e) {
+                logger.severe("Failed to parse Excel file: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse Excel file");
+            }
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload an Excel file");
+    }
 
+    @DeleteMapping("/deleteLast3544")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> deleteLast3544Categories() {
         try {
-            itemService.saveCategory(file);
-            return ResponseEntity.ok().body("Category data uploaded successfully");
+            List<Category> categories = categoryRepository.findLast3544ByOrderByIdDesc();
+            if (categories.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No categories found to delete");
+            }
+
+            categoryRepository.deleteAll(categories);
+            logger.info("Deleted last 3544 categories");
+
+            return ResponseEntity.ok("Last 3544 categories have been deleted");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to upload category data: " + e.getMessage());
+            logger.severe("Failed to delete categories: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete categories");
         }
     }
+
     @PostMapping("/upload/unit")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Please upload a file");
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> uploadUnits(@RequestParam("file") MultipartFile file) {
+        if (helper.checkExcelFormat(file)) {
+            try {
+                List<Unit> units = helper.convertExcelToUnits(file.getInputStream());
+                if (units.size() > 13823) {
+                    units = units.subList(0, 13823);
+                }
+                for (Unit unit : units) {
+                    // Check if unit with the same name already exists
+                    Unit existingUnit = unitRepository.findByUnitName(unit.getUnitName());
+                    if (existingUnit == null) {
+                        logger.info("Saving unit: " + unit.getUnitName());
+                        unitRepository.save(unit); // Save unit if it doesn't exist
+                    } else {
+                        logger.info("Unit with name " + unit.getUnitName() + " already exists, skipping.");
+                    }
+                }
+                return ResponseEntity.ok("File is uploaded and data up to 126th row is saved to the database");
+            } catch (IOException e) {
+                logger.severe("Failed to parse Excel file: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to parse Excel file");
+            }
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload an Excel file");
+    }
+
+
+    @DeleteMapping("/delete/last450Units")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<String> deleteLast450Units() {
         try {
-            itemService.saveUnit(file);
-            return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
+            List<Unit> unitsToDelete = unitRepository.findLast120UnitsByIdDesc();
+            if (unitsToDelete.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No units found to delete");
+            }
+
+            unitRepository.deleteAll(unitsToDelete);
+            return ResponseEntity.ok("Last 450 units have been deleted");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to upload file: " + file.getOriginalFilename());
+            // Log the exception for debugging purposes
+            logger.info("Error occurred while deleting units: " + e.getMessage());
+
+            // Optionally, mark the transaction for rollback and rethrow the exception
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete last 450 units: " + e.getMessage());
         }
     }
     @PostMapping("/upload/item")
@@ -461,7 +670,7 @@ public void createInventories(Item item) {
             return ResponseEntity.badRequest().body("Please upload an Excel file.");
         }
 
-        if (!Helper.checkExcelFormat(file)) {
+        if (!helper.checkExcelFormat(file)) {
             return ResponseEntity.badRequest().body("Invalid file format. Please upload an Excel file.");
         }
 
@@ -470,7 +679,94 @@ public void createInventories(Item item) {
             return ResponseEntity.ok("Items uploaded successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("An error occurred while processing the file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the file.");
+        }
+    }
+    @PostMapping("/upload/items")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Map<String, Object>> uploadItem(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (!Helper.checkExcelFormat(file)) {
+            response.put("error", "Please upload an Excel file");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        try {
+            List<Item> items = helper.convertExcelToItem(file.getInputStream());
+            if (items.size() > 14296) {
+                items = items.subList(0, 14296);
+            }
+
+            List<Item> itemsToSave = new ArrayList<>();
+            Set<String> existingDescriptions = new HashSet<>();
+
+            for (Item item : items) {
+                // Check for existing item by description
+                Optional<Item> existingItemOpt = itemRepository.findFirstByDescription(item.getDescription());
+                if (existingItemOpt.isPresent()) {
+                    logger.warning("Item with description '" + item.getDescription() + "' already exists in the database. Skipping this item.");
+                    continue;
+                }
+
+                if (existingDescriptions.contains(item.getDescription())) {
+                    logger.warning("Item with description '" + item.getDescription() + "' already exists in this batch. Skipping this item.");
+                    continue;
+                }
+
+
+                // Initialize and fetch Category
+                Category category = categoryRepository.findByName(item.getName());
+                if (category != null) {
+                    item.setCategory(category);
+                } else {
+                    logger.warning("No category found for name: " + item.getName());
+                    continue;
+                }
+
+                // Initialize and fetch Unit
+                Unit unit = unitRepository.findByUnitName(item.getUnitName());
+                if (unit != null) {
+                    item.setUnit(unit);
+                } else {
+                    logger.warning("No unit found for name: " + item.getUnitName());
+                    continue;
+                }
+
+                itemsToSave.add(item);
+                existingDescriptions.add(item.getDescription());
+            }
+
+            itemRepository.saveAll(itemsToSave);
+
+            // Create inventories for each location
+//            List<Location> locations = locationRepository.findAll();
+//            for (Location location : locations) {
+//                createInventoriesForLocation(location);
+//            }
+
+            response.put("success", "File is uploaded and data up to 1288 rows is saved to the database");
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            logger.severe("Failed to parse Excel file: " + e.getMessage());
+            response.put("error", "Failed to parse Excel file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @DeleteMapping("/deleteLast412/item")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> deleteLast412Items() {
+        try {
+            // Fetch the last 412 items based on ID
+            List<Item> itemsToDelete = itemRepository.findTop450ByOrderByIdDesc();
+
+            // Delete the fetched items
+            itemRepository.deleteAll(itemsToDelete);
+
+            return ResponseEntity.ok("Successfully deleted the last 412 items.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete items: " + e.getMessage());
         }
     }
     @PostMapping("/upload/brand")
@@ -479,12 +775,19 @@ public void createInventories(Item item) {
             return ResponseEntity.badRequest().body("Please upload an Excel file.");
         }
 
-        if (!Helper.checkExcelFormat(file)) {
-            return ResponseEntity.badRequest().body("Please upload a valid Excel file.");
+        if (!helper.checkExcelFormat(file)) {
+            return ResponseEntity.badRequest().body("Invalid file format. Please upload an Excel file.");
         }
 
-        itemService.saveBrandsFromExcel(file);
-        return ResponseEntity.ok("Brands uploaded successfully.");
+        try {
+            itemService.saveBrandsFromExcel(file);
+            return ResponseEntity.ok("Brands uploaded successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the file.");
+        }
     }
+
+
 }
 

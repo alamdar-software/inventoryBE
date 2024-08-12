@@ -4,6 +4,7 @@ import com.inventory.project.model.*;
 
 import com.inventory.project.repository.InventoryRepository;
 import com.inventory.project.repository.ItemRepository;
+import com.inventory.project.repository.LocationRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,19 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
+    private static final Logger logger = Logger.getLogger(InventoryService.class.getName());
+
     @Autowired
     private InventoryRepository inventoryRepository;
 
 
+    @Autowired
+    private LocationRepository locationRepository;
     @Autowired
     private ItemRepository itemRepository;
     public List<Inventory> getAllInventory() {
@@ -173,5 +179,47 @@ public class InventoryService {
 
 
 
+
+
+    public void createInventoriesForAllLocations() {
+        List<Location> locations = locationRepository.findAll();
+        logger.info("Total locations found: " + locations.size());
+        for (Location location : locations) {
+            createInventoriesForLocation(location);
+        }
+    }
+
+    public void createInventoriesForLocation(Location location) {
+        List<Item> itemList = itemRepository.findAll();
+        logger.info("Total items found: " + itemList.size() + " for location: " + location.getLocationName());
+        if (!itemList.isEmpty()) {
+            for (Item item : itemList) {
+                String locationName = location.getLocationName();
+                List<Address> addresses = location.getAddresses();
+                logger.info("Total addresses found: " + addresses.size() + " for location: " + locationName);
+
+                for (Address address : addresses) {
+                    // Check if an inventory with the same description already exists
+                    boolean inventoryExists = inventoryRepository.existsByDescriptionAndLocationName(item.getDescription(), locationName);
+
+                    if (!inventoryExists) {
+                        Inventory inventory = new Inventory();
+                        inventory.setLocation(location);
+                        inventory.setItem(item);
+                        inventory.setQuantity(0); // Set initial quantity
+                        inventory.setConsumedItem("0");
+                        inventory.setScrappedItem("0");
+                        inventory.setLocationName(locationName);
+                        inventory.setDescription(item.getDescription());
+                        inventory.setAddress(address);
+
+                        logger.info("Creating inventory for item: " + item.getItemName() + ", location: " + locationName + ", address: " + address.getAddress());
+                        inventoryRepository.save(inventory);
+                    } else {
+                        logger.info("Inventory already exists for item: " + item.getItemName() + ", description: " + item.getDescription());
+                    }
+                }
+            }
+        }}
 
 }

@@ -8,6 +8,7 @@ import com.inventory.project.repository.AddressRepository;
 import com.inventory.project.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,19 +58,28 @@ public class LocationService {
 //        }
 //    }
 
+    @Transactional
     public Location addAddressToLocation(String locationName, String addressValue) {
         Location existingLocation = locationRepository.findByLocationName(locationName);
 
         if (existingLocation != null) {
-            Address newAddress = new Address();
-            newAddress.setAddress(addressValue);
-            newAddress.setLocation(existingLocation); // Set the location for the new address
+            // Check if address already exists for this location
+            if (addressExists(existingLocation, addressValue)) {
+                // Address already exists for this location, return null or handle accordingly
+                return null; // or throw an exception, return existingLocation, etc.
+            } else {
+                // Address does not exist, add new address to existing location
+                Address newAddress = new Address();
+                newAddress.setAddress(addressValue);
+                newAddress.setLocation(existingLocation); // Set the location for the new address
 
-            existingLocation.getAddresses().add(newAddress); // Add the new address to the existing location's list
+                existingLocation.getAddresses().add(newAddress); // Add the new address to the existing location's list
 
-            locationRepository.save(existingLocation);
-            return existingLocation;
+                locationRepository.save(existingLocation);
+                return existingLocation;
+            }
         } else {
+            // Location doesn't exist, create new location with address
             Location newLocation = new Location();
             newLocation.setLocationName(locationName);
 
@@ -82,6 +92,11 @@ public class LocationService {
             locationRepository.save(newLocation);
             return newLocation;
         }
+    }
+
+    private boolean addressExists(Location location, String addressValue) {
+        return location.getAddresses().stream()
+                .anyMatch(existingAddress -> existingAddress.getAddress() != null && existingAddress.getAddress().equalsIgnoreCase(addressValue));
     }
 
     public List<Location> searchByAddress(String address) {

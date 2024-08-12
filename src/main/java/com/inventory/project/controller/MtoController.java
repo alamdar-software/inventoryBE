@@ -1,5 +1,6 @@
 package com.inventory.project.controller;
 
+import com.inventory.project.exception.InsufficientQuantityException;
 import com.inventory.project.model.*;
 import com.inventory.project.repository.ConsigneeRepository;
 import com.inventory.project.repository.LocationRepository;
@@ -11,6 +12,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -66,7 +69,39 @@ public class MtoController {
         Mto newMto = mtoService.createMto(mto);
         return new ResponseEntity<>(newMto, HttpStatus.CREATED);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Mto> updateMto(
+            @PathVariable Long id,
+            @RequestBody Mto updatedMto,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        // Check if the user has the role PREPARER
+        boolean isRolePreparer = userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_PREPARER"));
 
+        if (!isRolePreparer) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            Optional<Mto> existingMto = mtoService.getMtoById(id);
+
+            if (!"Created".equals(existingMto.get())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // Update logic here
+            Mto updated = mtoService.updateMto(id, updatedMto);
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+
+        } catch (InsufficientQuantityException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @PreAuthorize("hasRole('SUPERADMIN')")
 
     @DeleteMapping("/delete/{id}")

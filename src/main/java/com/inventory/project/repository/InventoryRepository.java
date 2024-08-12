@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory,Long> {
@@ -83,4 +84,9 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
     // Custom query to find inventory items by address only
     @Query("SELECT i FROM Inventory i WHERE i.address.address = :address")
     List<Inventory> findByAddressString(@Param("address") String address);
+
+    boolean existsByDescription(String description);
+    boolean existsByDescriptionAndLocationName(String description, String locationName);
+
+    boolean existsByDescriptionAndLocationNameAndAddress(String description, String locationName, Address address);
 }

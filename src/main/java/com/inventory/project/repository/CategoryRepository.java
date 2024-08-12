@@ -22,4 +22,7 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
     @Query("SELECT c.name FROM Category c")
     List<String> findAllNames();
     List<Category> findByNameIgnoreCase(String categoryName);
+    @Query(value = "SELECT c FROM Category c ORDER BY c.id DESC")
+    List<Category> findLast3544ByOrderByIdDesc();
+
 }

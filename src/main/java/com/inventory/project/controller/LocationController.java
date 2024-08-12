@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -67,7 +68,12 @@ private ItemRepository itemRepository;
 //        }
 //    }
     @PostMapping("/add")
-    public ResponseEntity<Location> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> addLocation(@RequestBody LocationAddressDto locationAddressDTO) {
+        if (locationAddressDTO.getLocationName() == null || locationAddressDTO.getAddress() == null) {
+            return new ResponseEntity<>("Location name and address cannot be null", HttpStatus.BAD_REQUEST);
+        }
+
         Location addedLocation = locationService.addAddressToLocation(
                 locationAddressDTO.getLocationName(),
                 locationAddressDTO.getAddress()
@@ -79,10 +85,11 @@ private ItemRepository itemRepository;
 
             return new ResponseEntity<>(addedLocation, HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Address already exists for this location", HttpStatus.BAD_REQUEST);
         }
     }
 
+    @Transactional
     public void createInventoriesForLocation(Location location) {
         List<Item> itemList = itemRepository.findAll(); // Assuming itemRepository is injected or available
         if (!itemList.isEmpty()) {
@@ -110,7 +117,6 @@ private ItemRepository itemRepository;
             }
         }
     }
-
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/getAll")

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UnitRepository extends JpaRepository<Unit,Long> {
@@ -19,5 +20,9 @@ public interface UnitRepository extends JpaRepository<Unit,Long> {
 
     List<String> findAllUnitNames();
     List<Unit> findByUnitNameIgnoreCase(String unitName);
+    @Query(value = "SELECT * FROM unit ORDER BY id DESC LIMIT 120", nativeQuery = true)
+    List<Unit> findLast120UnitsByIdDesc();
+
+    Optional<Unit> findUnitByUnitName(String unitName);
 
 }

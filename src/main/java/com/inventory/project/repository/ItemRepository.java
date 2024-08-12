@@ -31,7 +31,7 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     // Find items by name
     List<Item> findByName(String name);
 
-    Item findFirstByDescription(String description);
+    Optional<Item> findFirstByDescription(String description);
 
 
     // Find items by description
@@ -40,4 +40,8 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 Optional<Item> findItemByItemName(String itemName);
     List<Item> findItemByDescription(String description);
 
+    @Query("SELECT COUNT(*) FROM Item")
+    int findCount();
+
+    List<Item> findTop450ByOrderByIdDesc();
 }

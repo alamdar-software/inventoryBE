@@ -18,7 +18,7 @@ public class Item {
     @Column(name="minimum_stock")
     String minimumStock;
 
-    @Column(name="description")
+    @Column(name="description", length = 2000)
     String description;
 
 

@@ -56,7 +56,8 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findByAddressesAddressIgnoreCase(@Param("address") String address);
 
     List<Location> findByLocationNameContainingAndAddresses_AddressContaining(String locationName, String address);
-
+    @Query(value = "SELECT * FROM location ORDER BY id DESC LIMIT 456", nativeQuery = true)
+    List<Location> findLast456ByOrderByIdDesc();
 
 //    List<Location> findByLocationNameAndStartDateBeforeAndEndDateAfter(String locationName, LocalDate startDate, LocalDate endDate);
 }

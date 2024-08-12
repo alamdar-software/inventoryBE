@@ -27,7 +27,8 @@ public class Inventory {
     private Address address;
 
 
-    @Column(name = "description")
+    @Column(name = "description",length = 255)
+
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
