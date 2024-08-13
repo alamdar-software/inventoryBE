@@ -69,7 +69,7 @@ public class MtoController {
         Mto newMto = mtoService.createMto(mto);
         return new ResponseEntity<>(newMto, HttpStatus.CREATED);
     }
-    @PutMapping("/{id}")
+    @PutMapping("/updateMto/{id}")
     public ResponseEntity<Mto> updateMto(
             @PathVariable Long id,
             @RequestBody Mto updatedMto,

@@ -60,4 +60,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findLast456ByOrderByIdDesc();
 
 //    List<Location> findByLocationNameAndStartDateBeforeAndEndDateAfter(String locationName, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT a.address FROM Location l JOIN l.addresses a")
+    List<String> findAllAddresses();
 }

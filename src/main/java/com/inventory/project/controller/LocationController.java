@@ -100,23 +100,27 @@ private ItemRepository itemRepository;
                     // Retrieve inventory for the given item, location, and address
                     Inventory inventory = inventoryRepository.findByItemAndLocationAndAddress(item, location, address);
                     if (inventory == null) {
-                        inventory = new Inventory();
-                        inventory.setLocation(location);
-                        inventory.setItem(item);
-                        inventory.setQuantity(0); // Set initial quantity
-                        inventory.setConsumedItem("0");
-                        inventory.setScrappedItem("0");
-                        inventory.setLocationName(locationName);
-                        inventory.setDescription(item.getDescription());
-                        inventory.setAddress(address);
-                    }
+                        int initialQuantity = 0; // Set default initial quantity
+                        if (initialQuantity > 0) { // Only create inventory if the initial quantity is greater than 0
+                            inventory = new Inventory();
+                            inventory.setLocation(location);
+                            inventory.setItem(item);
+                            inventory.setQuantity(initialQuantity); // Set initial quantity
+                            inventory.setConsumedItem("0");
+                            inventory.setScrappedItem("0");
+                            inventory.setLocationName(locationName);
+                            inventory.setDescription(item.getDescription());
+                            inventory.setAddress(address);
 
-                    // Save or update the inventory
-                    inventoryRepository.save(inventory);
+                            // Save the inventory
+                            inventoryRepository.save(inventory);
+                        }
+                    }
                 }
             }
         }
     }
+
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/getAll")
@@ -128,6 +132,14 @@ private ItemRepository itemRepository;
         return ResponseEntity.ok(locations);
     }
 
+    @GetMapping("/getAllAddresses")
+    public ResponseEntity<List<String>> getAllAddresses() {
+        List<String> addresses = locationRepo.findAllAddresses();
+        if (addresses.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(addresses);
+    }
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
 
     @GetMapping("/get/{id}")
