@@ -32,6 +32,33 @@ public class CiplService {
         initializeLocationReferenceMap();
 
     }
+    public List<Cipl> getCiplByItemLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        return ciplRepository.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, "created");
+    }
+
+    public List<Cipl> getCiplByItemAndLocationCreated(String item, String locationName) {
+        return ciplRepository.findByItemAndLocationNameAndStatus(item, locationName, "created");
+    }
+
+    public List<Cipl> getCiplByItemAndTransferDate(String item, LocalDate transferDate) {
+        return ciplRepository.findByItemAndTransferDateAndStatus(item, transferDate, "created");
+    }
+
+    public List<Cipl> getCiplByLocationAndTransferDateCreated(String locationName, LocalDate transferDate) {
+        return ciplRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "created");
+    }
+
+    public List<Cipl> getCiplByCreatedItem(String item) {
+        return ciplRepository.findByItemAndStatus(item, "created");
+    }
+
+    public List<Cipl> getCiplByLocationCreated(String locationName) {
+        return ciplRepository.findByLocationNameAndStatus(locationName, "created");
+    }
+
+    public List<Cipl> getCiplByTransferDateCreated(LocalDate transferDate) {
+        return ciplRepository.findByTransferDateAndStatus(transferDate, "created");
+    }
 
     public List<Cipl> getAllCipl() {
         return ciplRepository.findAll();
