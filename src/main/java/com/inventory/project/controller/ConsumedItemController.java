@@ -574,4 +574,58 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
         }
     }
 
+    @PostMapping("/createdComsumedSearch")
+    public ResponseEntity<List<ConsumedItem>> searchConsumedByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all ConsumedItems with status "created"
+            List<ConsumedItem> allCreatedConsumedItems = consumeService.getAllConsumedItemsByStatus("created");
+            return ResponseEntity.ok(allCreatedConsumedItems);
+        }
+
+        List<ConsumedItem> consumedItemList = new ArrayList<>();
+
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByItemLocationAndTransferDate(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByItemAndLocationCreated(criteria.getItem(), criteria.getLocationName());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByItemAndTransferDateCreated(criteria.getItem(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByLocationAndTransferDateCreated(criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByCreatedItem(criteria.getItem());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByLocationCreated(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByTransferDateCreated(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (consumedItemList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(consumedItemList);
+    }
+
+    private boolean isCriteriaEmpty(SearchCriteria criteria) {
+        return (criteria.getItem() == null || criteria.getItem().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
+                && criteria.getTransferDate() == null;
+    }
+
 }

@@ -231,4 +231,36 @@ public class ConsumeService {
     public List<ConsumedItem> getCiplByItemAndTransferDateAndStatus(String item, LocalDate transferDate, String status) {
         return consumedItemRepo.findByItemAndTransferDateAndStatus(item, transferDate, status);
     }
+
+    public List<ConsumedItem> getAllConsumedItemsByStatus(String status) {
+        return consumedItemRepo.findByStatus(status);
+    }
+
+    public List<ConsumedItem> getConsumedByItemLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByItemAndLocationCreated(String item, String locationName) {
+        return consumedItemRepo.findByItemAndLocationNameAndStatus(item, locationName, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByItemAndTransferDateCreated(String item, LocalDate transferDate) {
+        return consumedItemRepo.findByItemAndTransferDateAndStatus(item, transferDate, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByLocationAndTransferDateCreated(String locationName, LocalDate transferDate) {
+        return consumedItemRepo.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByCreatedItem(String item) {
+        return consumedItemRepo.findByItemAndStatus(item, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByLocationCreated(String locationName) {
+        return consumedItemRepo.findByLocationNameAndStatus(locationName, "created");
+    }
+
+    public List<ConsumedItem> getConsumedByTransferDateCreated(LocalDate transferDate) {
+        return consumedItemRepo.findByTransferDateAndStatus(transferDate, "created");
+    }
 }

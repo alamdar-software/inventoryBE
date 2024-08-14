@@ -212,4 +212,36 @@ public class ScrappedItemService {
         return scrappedItemRepository.findByStatus(status);
     }
 
+
+    public List<ScrappedItem> getAllScrappedItemsByStatus(String status) {
+        return scrappedItemRepository.findByStatus(status);
+    }
+
+    public List<ScrappedItem> getScrappedByItemLocationAndTransferDate(String item, String locationName, LocalDate transferDate) {
+        return scrappedItemRepository.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByItemAndLocationCreated(String item, String locationName) {
+        return scrappedItemRepository.findByItemAndLocationNameAndStatus(item, locationName, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByItemAndTransferDateCreated(String item, LocalDate transferDate) {
+        return scrappedItemRepository.findByItemAndTransferDateAndStatus(item, transferDate, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByLocationAndTransferDateCreated(String locationName, LocalDate transferDate) {
+        return scrappedItemRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByCreatedItem(String item) {
+        return scrappedItemRepository.findByItemAndStatus(item, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByLocationCreated(String locationName) {
+        return scrappedItemRepository.findByLocationNameAndStatus(locationName, "created");
+    }
+
+    public List<ScrappedItem> getScrappedByTransferDateCreated(LocalDate transferDate) {
+        return scrappedItemRepository.findByTransferDateAndStatus(transferDate, "created");
+    }
 }

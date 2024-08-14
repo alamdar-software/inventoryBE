@@ -469,4 +469,36 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
         return itList; // Return the matching records
     }
 
+
+    public List<InternalTransfer> getInternalTransferByDescriptionLocationAndTransferDate(String description, String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateAndStatus(description, locationName, transferDate, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByDescriptionAndLocationCreated(String description, String locationName) {
+        return internalTransferRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByDescriptionAndTransferDateCreated(String description, LocalDate transferDate) {
+        return internalTransferRepository.findByDescriptionAndTransferDateAndStatus(description, transferDate, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByLocationAndTransferDateCreated(String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByCreatedDescription(String description) {
+        return internalTransferRepository.findByDescriptionAndStatus(description, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByLocationCreated(String locationName) {
+        return internalTransferRepository.findByLocationNameAndStatus(locationName, "created");
+    }
+
+    public List<InternalTransfer> getInternalTransferByTransferDateCreated(LocalDate transferDate) {
+        return internalTransferRepository.findByTransferDateAndStatus(transferDate, "created");
+    }
+
+    public List<InternalTransfer> getAllInternalTransferByStatus(String status) {
+        return internalTransferRepository.findByStatus(status);
+    }
 }

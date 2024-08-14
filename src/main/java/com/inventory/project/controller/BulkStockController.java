@@ -950,4 +950,16 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/searchCreatedPurchase")
+    public ResponseEntity<List<?>> searchStocksCreated(@RequestBody SearchCriteria searchCriteria) {
+        List<?> results = bulkStockService.searchBySingleFieldCreated(searchCriteria);
+
+        if (!results.isEmpty()) {
+            return ResponseEntity.ok(results);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

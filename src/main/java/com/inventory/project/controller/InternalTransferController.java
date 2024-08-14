@@ -363,4 +363,61 @@ public class InternalTransferController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/searchInternalCreated")
+    public ResponseEntity<List<InternalTransfer>> searchInternalTransferByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all InternalTransfers with status "created"
+            List<InternalTransfer> allCreatedTransfers = internalTransferService.getAllInternalTransferByStatus("created");
+            return ResponseEntity.ok(allCreatedTransfers);
+        }
+
+        List<InternalTransfer> transferList = new ArrayList<>();
+
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByDescriptionLocationAndTransferDate(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByDescriptionAndLocationCreated(
+                    criteria.getDescription(), criteria.getLocationName());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByDescriptionAndTransferDateCreated(
+                    criteria.getDescription(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByLocationAndTransferDateCreated(
+                    criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByCreatedDescription(criteria.getDescription());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByLocationCreated(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByTransferDateCreated(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (transferList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(transferList);
+    }
+
+    private boolean isCriteriaEmpty(SearchCriteria criteria) {
+        return (criteria.getDescription() == null || criteria.getDescription().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
+                && criteria.getTransferDate() == null;
+    }
 }

@@ -450,4 +450,59 @@ public class ScrappedItemController {
         }
     }
 
+    @PostMapping("/scrappedCreatedSearch")
+    public ResponseEntity<List<ScrappedItem>> searchScrappedByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all ScrappedItems with status "created"
+            List<ScrappedItem> allCreatedScrappedItems = scrappedItemService.getAllScrappedItemsByStatus("created");
+            return ResponseEntity.ok(allCreatedScrappedItems);
+        }
+
+        List<ScrappedItem> scrappedItemList = new ArrayList<>();
+
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByItemLocationAndTransferDate(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByItemAndLocationCreated(criteria.getItem(), criteria.getLocationName());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getTransferDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByItemAndTransferDateCreated(criteria.getItem(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByLocationAndTransferDateCreated(criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByCreatedItem(criteria.getItem());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByLocationCreated(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByTransferDateCreated(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (scrappedItemList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(scrappedItemList);
+    }
+
+    private boolean isCriteriaEmpty(SearchCriteria criteria) {
+        return (criteria.getItem() == null || criteria.getItem().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
+                && criteria.getTransferDate() == null;
+    }
+
+
 }
