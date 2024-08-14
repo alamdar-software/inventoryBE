@@ -522,6 +522,58 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @PostMapping("/mtoCreatedSearch")
+    public ResponseEntity<List<Mto>> searchMtoByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all Mto with status "created"
+            List<Mto> allCreatedMto = mtoService.getAllMtoByStatus("created");
+            return ResponseEntity.ok(allCreatedMto);
+        }
 
+        List<Mto> mtoList = new ArrayList<>();
+
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByDescriptionLocationAndTransferDate(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            mtoList = mtoService.getMtoByDescriptionAndLocationCreated(criteria.getDescription(), criteria.getLocationName());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByDescriptionAndTransferDateCreated(criteria.getDescription(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByLocationAndTransferDateCreated(criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            mtoList = mtoService.getMtoByCreatedDescription(criteria.getDescription());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            mtoList = mtoService.getMtoByLocationCreated(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByTransferDateCreated(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (mtoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(mtoList);
+    }
+
+    private boolean isCriteriaEmpty(SearchCriteria criteria) {
+        return (criteria.getDescription() == null || criteria.getDescription().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
+                && criteria.getTransferDate() == null;
+    }
 
 }

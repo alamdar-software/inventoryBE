@@ -616,5 +616,38 @@ public List<Mto> getMtoByDateRange(String description, String locationName, Loca
 
         return mtoRepository.save(existingMto);
     }
+
+    public List<Mto> getMtoByDescriptionLocationAndTransferDate(String description, String locationName, LocalDate transferDate) {
+        return mtoRepository.findByDescriptionAndLocationNameAndTransferDateAndStatus(description, locationName, transferDate, "created");
+    }
+
+    public List<Mto> getMtoByDescriptionAndLocationCreated(String description, String locationName) {
+        return mtoRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, "created");
+    }
+
+    public List<Mto> getMtoByDescriptionAndTransferDateCreated(String description, LocalDate transferDate) {
+        return mtoRepository.findByDescriptionAndTransferDateAndStatus(description, transferDate, "created");
+    }
+
+    public List<Mto> getMtoByLocationAndTransferDateCreated(String locationName, LocalDate transferDate) {
+        return mtoRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "created");
+    }
+
+    public List<Mto> getMtoByCreatedDescription(String description) {
+        return mtoRepository.findByDescriptionAndStatus(description, "created");
+    }
+
+    public List<Mto> getMtoByLocationCreated(String locationName) {
+        return mtoRepository.findByLocationNameAndStatus(locationName, "created");
+    }
+
+    public List<Mto> getMtoByTransferDateCreated(LocalDate transferDate) {
+        return mtoRepository.findByTransferDateAndStatus(transferDate, "created");
+    }
+
+    public List<Mto> getAllMtoByStatus(String status) {
+        return mtoRepository.findByStatus(status);
+    }
+
 }
 

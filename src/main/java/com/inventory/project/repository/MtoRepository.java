@@ -134,4 +134,16 @@ public interface MtoRepository extends JpaRepository<Mto,Long> {
     List<Mto> findByDescriptionAndLocationNameAndRepairServiceAndStatusAndTransferDateBetween(String description, String locationName, boolean repairService, String status, LocalDate startDate, LocalDate endDate);
 
     List<Mto> findByDescriptionAndRepairServiceAndStatusAndTransferDateBetween(String description, boolean repairService, String status, LocalDate startDate, LocalDate endDate);
+
+
+    List<Mto> findByDescriptionAndLocationNameAndTransferDateAndStatus(String description, String locationName, LocalDate transferDate, String status);
+
+
+    List<Mto> findByDescriptionAndTransferDateAndStatus(String description, LocalDate transferDate, String status);
+
+    List<Mto> findByLocationNameAndTransferDateAndStatus(String locationName, LocalDate transferDate, String status);
+
+
+    List<Mto> findByTransferDateAndStatus(LocalDate transferDate, String status);
+
 }
