@@ -40,7 +40,7 @@ public class CiplService {
         return ciplRepository.findByItemAndLocationNameAndStatus(item, locationName, "created");
     }
 
-    public List<Cipl> getCiplByItemAndTransferDate(String item, LocalDate transferDate) {
+    public List<Cipl> getCiplByItemAndTransferDateCreated(String item, LocalDate transferDate) {
         return ciplRepository.findByItemAndTransferDateAndStatus(item, transferDate, "created");
     }
 
@@ -58,6 +58,11 @@ public class CiplService {
 
     public List<Cipl> getCiplByTransferDateCreated(LocalDate transferDate) {
         return ciplRepository.findByTransferDateAndStatus(transferDate, "created");
+    }
+
+    public List<Cipl> getAllCiplByStatus(String status) {
+        // Implement this method to fetch all Cipl entries with the specified status
+        return ciplRepository.findByStatus(status);
     }
 
     public List<Cipl> getAllCipl() {

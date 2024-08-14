@@ -272,9 +272,10 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
     @PostMapping("/ciplCreatedSearch")
     public ResponseEntity<List<Cipl>> searchCiplByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {
-        if (criteria == null) {
-            List<Cipl> allCipl = ciplService.getAllCipl();
-            return ResponseEntity.ok(allCipl);
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all Cipl with status "created"
+            List<Cipl> allCreatedCipl = ciplService.getAllCiplByStatus("created");
+            return ResponseEntity.ok(allCreatedCipl);
         }
 
         List<Cipl> ciplList = new ArrayList<>();
@@ -291,7 +292,7 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
         } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
                 && criteria.getTransferDate() != null) {
-            ciplList = ciplService.getCiplByItemAndTransferDate(criteria.getItem(), criteria.getTransferDate());
+            ciplList = ciplService.getCiplByItemAndTransferDateCreated(criteria.getItem(), criteria.getTransferDate());
 
         } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
                 && criteria.getTransferDate() != null) {
@@ -316,6 +317,13 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
         return ResponseEntity.ok(ciplList);
     }
+
+    private boolean isCriteriaEmpty(SearchCriteria criteria) {
+        return (criteria.getItem() == null || criteria.getItem().isEmpty())
+                && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
+                && criteria.getTransferDate() == null;
+    }
+
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER')")
 
