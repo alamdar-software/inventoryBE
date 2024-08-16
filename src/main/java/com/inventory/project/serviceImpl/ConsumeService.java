@@ -9,6 +9,7 @@ import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 //import org.apache.pdfbox.pdmodel.font.PDType1Font;
 //import java.io.ByteArrayOutputStream;
 @Service
+@Transactional
+
 public class ConsumeService {
     @Autowired
     private InventoryRepository inventoryRepo;
@@ -263,4 +266,19 @@ public class ConsumeService {
     public List<ConsumedItem> getConsumedByTransferDateCreated(LocalDate transferDate) {
         return consumedItemRepo.findByTransferDateAndStatus(transferDate, "created");
     }
+
+    public void updateStatusForAll(String newStatus, String oldStatus, LocalDate transferDate, String verifierComments) {
+        // Fetch ConsumedItem by transferDate and oldStatus
+        List<ConsumedItem> consumedItems = consumedItemRepo.findByTransferDateAndStatus(transferDate, oldStatus);
+
+        // Update the status and comments
+        consumedItems.forEach(item -> {
+            item.setStatus(newStatus);
+            item.setVerifierComments(verifierComments);
+        });
+
+        // Save the updated consumed items
+        consumedItemRepo.saveAll(consumedItems);
+    }
+
 }

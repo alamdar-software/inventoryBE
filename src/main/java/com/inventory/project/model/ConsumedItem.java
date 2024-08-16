@@ -43,6 +43,7 @@ public class ConsumedItem {
 @ManyToOne
 private Inventory inventory;
 
+private String verifierComments;
 //    public ConsumedItem() {
 //        this.item = new ArrayList<>();
 //    }
@@ -63,6 +64,14 @@ private String status;
 //        this.itemDescription = itemDescription;
 //    }
 
+
+    public String getVerifierComments() {
+        return verifierComments;
+    }
+
+    public void setVerifierComments(String verifierComments) {
+        this.verifierComments = verifierComments;
+    }
 
     public LocalDate getTransferDate() {
         return transferDate;

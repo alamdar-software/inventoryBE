@@ -627,5 +627,41 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
                 && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
                 && criteria.getTransferDate() == null;
     }
+    @PostMapping("/searchDate")
+    public ResponseEntity<List<ConsumedItem>> searchCiplByDate(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getTransferDate() == null) {
+            // If no criteria or no transferDate is provided, return bad request
+            return ResponseEntity.badRequest().body(null);
+        }
 
+        // Fetch items based on transferDate
+        List<ConsumedItem> ciplList = consumeService.getCiplByTransferDate(criteria.getTransferDate());
+
+        if (ciplList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ciplList);
+    }
+
+
+    @PostMapping("/updateByDate")
+    public ResponseEntity<String> updateByDate(@RequestBody UpdateStatusRequest updateStatusRequest) {
+        LocalDate transferDate = updateStatusRequest.getTransferDate();
+        String status = updateStatusRequest.getStatus();
+        String verifierComments = updateStatusRequest.getVerifierComments();
+
+        // Ensure the status is valid
+        if (!"verifyAll".equalsIgnoreCase(status) && !"rejectAll".equalsIgnoreCase(status)) {
+            return ResponseEntity.badRequest().body("Invalid status");
+        }
+
+        // Determine new status value
+        String newStatus = "verifyAll".equalsIgnoreCase(status) ? "verified" : "rejected";
+
+        // Update status based on the provided date and status
+        consumeService.updateStatusForAll(newStatus, "created", transferDate, verifierComments);
+
+        return ResponseEntity.ok("Status updated successfully");
+    }
 }

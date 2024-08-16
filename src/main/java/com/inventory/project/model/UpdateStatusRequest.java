@@ -1,9 +1,13 @@
 package com.inventory.project.model;
 
+import java.time.LocalDate;
+
 public class UpdateStatusRequest {
     private String purchaseOrder;
     private String status;
     private String verifierComments;
+
+    private LocalDate transferDate;
 
     public String getPurchaseOrder() {
         return purchaseOrder;
@@ -15,6 +19,14 @@ public class UpdateStatusRequest {
 
     public String getStatus() {
         return status;
+    }
+
+    public LocalDate getTransferDate() {
+        return transferDate;
+    }
+
+    public void setTransferDate(LocalDate transferDate) {
+        this.transferDate = transferDate;
     }
 
     public void setStatus(String status) {
