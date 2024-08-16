@@ -535,17 +535,21 @@ public class IncomingStockService {
     }
 
     public List<BulkStock> searchByPurchaseOrderForBulk(String purchaseOrder) {
-        return bulkStockRepo.findByPurchaseOrder(purchaseOrder);
+        return bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, "created");
+    }
+
+    public List<IncomingStock> searchByPurchaseOrderForIncoming(String purchaseOrder) {
+        return incomingStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, "created");
     }
     public List<StockViewDto> searchPurchaseOrderIncomingStock(SearchCriteria searchCriteria) {
-        List<IncomingStock> incomingStocks;
-        List<BulkStock> bulkStocks;
+        List<IncomingStock> incomingStocks = Collections.emptyList();
+        List<BulkStock> bulkStocks = Collections.emptyList();
 
         if (StringUtils.isNotEmpty(searchCriteria.getPurchaseOrder())) {
-            incomingStocks = incomingStockRepo.findByPurchaseOrder(searchCriteria.getPurchaseOrder());
+            incomingStocks = searchByPurchaseOrderForIncoming(searchCriteria.getPurchaseOrder());
             bulkStocks = searchByPurchaseOrderForBulk(searchCriteria.getPurchaseOrder());
         } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
-            incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
+            incomingStocks = incomingStockRepo.findByItemDescriptionAndStatus(searchCriteria.getDescription(), "created");
             bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
         } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) &&
                 StringUtils.isNotEmpty(searchCriteria.getLocationName()) &&
@@ -554,35 +558,61 @@ public class IncomingStockService {
                 incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
                         searchCriteria.getEntityName(),
                         searchCriteria.getStartDate(),
-                        searchCriteria.getEndDate());
+                        searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "created".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
                 bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
                         searchCriteria.getEntityName(),
                         searchCriteria.getStartDate(),
-                        searchCriteria.getEndDate());
-            } else {
-                incomingStocks = Collections.emptyList();
-                bulkStocks = Collections.emptyList();
+                        searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "created".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
             }
         } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
-            incomingStocks = searchByEntityName(searchCriteria.getEntityName());
-            bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName());
+            incomingStocks = searchByEntityName(searchCriteria.getEntityName())
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName())
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
         } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
             if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
-                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
-                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
-            } else {
-                incomingStocks = Collections.emptyList();
-                bulkStocks = Collections.emptyList();
+                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "created".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "created".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
             }
         } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
-            incomingStocks = searchByLocation(searchCriteria.getLocationName());
-            bulkStocks = searchBulkByLocation(searchCriteria.getLocationName());
+            incomingStocks = searchByLocation(searchCriteria.getLocationName())
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchBulkByLocation(searchCriteria.getLocationName())
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
         } else if (StringUtils.isNotEmpty(searchCriteria.getStatus())) {
-            incomingStocks = searchByStatus(searchCriteria.getStatus());
-            bulkStocks = searchBulkByStatus(searchCriteria.getStatus());
+            if ("created".equals(searchCriteria.getStatus())) {
+                incomingStocks = searchByStatus(searchCriteria.getStatus());
+                bulkStocks = searchBulkByStatus(searchCriteria.getStatus());
+            }
         } else {
-            incomingStocks = getAllIncomingStocks();
-            bulkStocks = getAllBulkStocks();
+            incomingStocks = getAllIncomingStocks()
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = getAllBulkStocks()
+                    .stream()
+                    .filter(stock -> "created".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
         }
 
         List<StockViewDto> stockViewList = new ArrayList<>();
@@ -601,6 +631,5 @@ public class IncomingStockService {
 
         return stockViewList;
     }
-
 }
 
