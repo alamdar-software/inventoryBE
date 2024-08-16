@@ -502,4 +502,10 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         return ciplRepository.findByReferenceNoContaining(referenceNumber);
     }
 
+    public List<Cipl> getRejectedByApprover() {
+        // Hardcoded status for rejected items
+        String rejectedStatus = "rejected";
+        return ciplRepository.findByStatus(rejectedStatus);
+    }
+
 }

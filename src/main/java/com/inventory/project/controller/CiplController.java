@@ -522,14 +522,6 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
-    @GetMapping("/testVerifiedRejected")
-    public ResponseEntity<String> testVerifiedRejected() {
-        List<Cipl> result = ciplRepository.findByStatus("verifiedRejected");
-        if (result.isEmpty()) {
-            return ResponseEntity.ok("No items with status 'verifiedRejected'.");
-        }
-        return ResponseEntity.ok("Found items with status 'verifiedRejected'.");
-    }
 
     @GetMapping("/approved")
     public ResponseEntity<List<Cipl>>getVerifiedCipl(){
@@ -675,5 +667,8 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
 
-
+    @GetMapping("/rejectedApprover")
+    public List<Cipl> getRejectedCipls() {
+        return ciplService.getRejectedByApprover();
+    }
 }
