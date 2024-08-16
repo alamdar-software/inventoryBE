@@ -634,8 +634,8 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
             return ResponseEntity.badRequest().body(null);
         }
 
-        // Fetch items based on transferDate
-        List<ConsumedItem> ciplList = consumeService.getCiplByTransferDate(criteria.getTransferDate());
+        // Fetch items based on transferDate and status 'created'
+        List<ConsumedItem> ciplList = consumeService.getCiplByTransferDateAndStatus(criteria.getTransferDate(), "created");
 
         if (ciplList.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -643,6 +643,7 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
 
         return ResponseEntity.ok(ciplList);
     }
+
 
 
     @PostMapping("/updateByDate")
@@ -659,9 +660,24 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
         // Determine new status value
         String newStatus = "verifyAll".equalsIgnoreCase(status) ? "verified" : "rejected";
 
-        // Update status based on the provided date and status
-        consumeService.updateStatusForAll(newStatus, "created", transferDate, verifierComments);
+        // Update status based on the provided transferDate and status
+        updateStatusForAllConsumedItems(newStatus, "created", transferDate, verifierComments);
 
         return ResponseEntity.ok("Status updated successfully");
     }
+
+    public void updateStatusForAllConsumedItems(String newStatus, String oldStatus, LocalDate transferDate, String verifierComments) {
+        // Fetch ConsumedItem by transferDate and oldStatus
+        List<ConsumedItem> consumedItems = consumedItemRepo.findByTransferDateAndStatus(transferDate, oldStatus);
+
+        // Update the status and comments
+        consumedItems.forEach(item -> {
+            item.setStatus(newStatus);
+            item.setVerifierComments(verifierComments);
+        });
+
+        // Save the updated items
+        consumedItemRepo.saveAll(consumedItems);
+    }
+
 }
