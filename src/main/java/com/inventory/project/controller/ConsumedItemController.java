@@ -446,7 +446,7 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
     @GetMapping("/rejected")
     public ResponseEntity<List<ConsumedItem>> getRejectedConsumedItems() {
         try {
-            List<ConsumedItem> rejectedItems = consumedItemRepo.findByStatus("rejected");
+            List<ConsumedItem> rejectedItems = consumedItemRepo.findByStatus("verifierRejected");
             if (rejectedItems.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

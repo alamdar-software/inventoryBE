@@ -253,7 +253,7 @@ public class InternalTransferController {
     @GetMapping("/rejected")
     public ResponseEntity<List<InternalTransfer>> getRejectedInternalTransfers() {
         try {
-            List<InternalTransfer> rejectedTransfers = internalTransferRepo.findByStatus("Rejected");
+            List<InternalTransfer> rejectedTransfers = internalTransferRepo.findByStatus("verifierRejected");
             if (rejectedTransfers.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

@@ -319,7 +319,7 @@ public class ScrappedItemController {
     @GetMapping("/rejected")
     public ResponseEntity<List<ScrappedItem>> getRejectedScrappedItems() {
         try {
-            List<ScrappedItem> rejectedItems = scrappedItemRepository.findByStatus("rejected");
+            List<ScrappedItem> rejectedItems = scrappedItemRepository.findByStatus("verifierRejected");
             if (rejectedItems.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

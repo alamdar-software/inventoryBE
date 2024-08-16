@@ -407,7 +407,7 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
     @GetMapping("/rejected")
     public ResponseEntity<List<Mto>> getRejectedMtos() {
         try {
-            List<Mto> rejectedMtos = mtoRepository.findByStatus("Rejected");
+            List<Mto> rejectedMtos = mtoRepository.findByStatus("verifierRejected");
             if (rejectedMtos.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

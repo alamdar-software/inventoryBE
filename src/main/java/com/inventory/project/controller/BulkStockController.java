@@ -650,8 +650,8 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
 
     @GetMapping("/rejected")
     public ResponseEntity<StockViewResponse> getRejectedStockView() {
-        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("rejected");
-        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("rejected");
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByStatus("verifierRejected");
+        List<BulkStock> bulkStocks = bulkStockRepo.findByStatus("verifierRejected");
 
         int incomingStockCount = incomingStocks.size();
         int bulkStockCount = bulkStocks.size();

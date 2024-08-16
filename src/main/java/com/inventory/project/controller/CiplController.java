@@ -510,16 +510,25 @@ public ResponseEntity<Cipl> addCiplItem(@RequestBody Cipl ciplItem) {
         }
     }
     @GetMapping("/rejected")
-    public ResponseEntity<List<Cipl>> getRejectedCiplItems() {
+    public ResponseEntity<List<Cipl>> getVerifiedRejectedCiplItems() {
         try {
-            List<Cipl> rejectedCiplItems = ciplRepository.findByStatus("Rejected");
-            if (rejectedCiplItems.isEmpty()) {
+            List<Cipl> verifiedRejectedCiplItems = ciplRepository.findByStatusIgnoreCase("verifierRejected");
+            if (verifiedRejectedCiplItems.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(rejectedCiplItems, HttpStatus.OK);
+            return new ResponseEntity<>(verifiedRejectedCiplItems, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/testVerifiedRejected")
+    public ResponseEntity<String> testVerifiedRejected() {
+        List<Cipl> result = ciplRepository.findByStatus("verifiedRejected");
+        if (result.isEmpty()) {
+            return ResponseEntity.ok("No items with status 'verifiedRejected'.");
+        }
+        return ResponseEntity.ok("Found items with status 'verifiedRejected'.");
     }
 
     @GetMapping("/approved")
