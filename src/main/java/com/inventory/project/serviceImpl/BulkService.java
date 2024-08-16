@@ -408,6 +408,23 @@ public class BulkService {
                 && !nonEmpty(searchRequest.getEntityName());
     }
 
+    public List<String> getAllPurchaseOrders() {
+        List<String> incomingPurchaseOrders = incomingStockRepo.findAll()
+                .stream()
+                .map(IncomingStock::getPurchaseOrder)
+                .collect(Collectors.toList());
 
+        List<String> bulkPurchaseOrders = bulkStockRepo.findAll()
+                .stream()
+                .map(BulkStock::getPurchaseOrder)
+                .collect(Collectors.toList());
+
+        // Combine both lists
+        List<String> allPurchaseOrders = new ArrayList<>();
+        allPurchaseOrders.addAll(incomingPurchaseOrders);
+        allPurchaseOrders.addAll(bulkPurchaseOrders);
+
+        return allPurchaseOrders;
+    }
 
 }

@@ -142,6 +142,11 @@ IncomingStockRepo incomingStockRepo;
         }
     }
 
+    @GetMapping("/view/purchaseOrders")
+    public ResponseEntity<List<String>> getPurchaseOrders() {
+        List<String> purchaseOrders = bulkStockService.getAllPurchaseOrders();
+        return ResponseEntity.ok(purchaseOrders);
+    }
 
     @PreAuthorize("hasAnyRole('SUPERADMIN','PREPARER','APPROVER','VERIFIER','OTHER')")
     @GetMapping("/view")
