@@ -76,6 +76,7 @@ public class BulkStock {
    private List<String> description = new ArrayList<>();
 
    private  String status;
+    private String verifierComments; // Add this field
 
     public BulkStock() {
 
@@ -255,5 +256,13 @@ public class BulkStock {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getVerifierComments() {
+        return verifierComments;
+    }
+
+    public void setVerifierComments(String verifierComments) {
+        this.verifierComments = verifierComments;
     }
 }

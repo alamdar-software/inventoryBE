@@ -105,6 +105,9 @@ public class IncomingStock {
 @JoinColumn(name = "mto_id")
 
 private Mto  mto;
+
+    private String verifierComments; // Add this field
+
     public IncomingStock() {
     }
     public IncomingStock(String itemDescription, Location location, LocalDate date, Entity entity, String purchaseOrder) {
@@ -131,6 +134,14 @@ private Mto  mto;
     }
     public String getItemDescription() {
         return itemDescription;
+    }
+
+    public String getVerifierComments() {
+        return verifierComments;
+    }
+
+    public void setVerifierComments(String verifierComments) {
+        this.verifierComments = verifierComments;
     }
 
     public void setItemDescription(String itemDescription) {

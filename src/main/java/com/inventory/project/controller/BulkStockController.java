@@ -967,4 +967,46 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         }
     }
 
+    @PostMapping("/updateByPurchaseOrder")
+    public ResponseEntity<String> updateByPurchaseOrder(@RequestBody UpdateStatusRequest updateStatusRequest) {
+        String purchaseOrder = updateStatusRequest.getPurchaseOrder();
+        String status = updateStatusRequest.getStatus();
+        String verifierComments = updateStatusRequest.getVerifierComments();
+
+        // Ensure the status is valid
+        if (!"verifyAll".equalsIgnoreCase(status) && !"rejectAll".equalsIgnoreCase(status)) {
+            return ResponseEntity.badRequest().body("Invalid status");
+        }
+
+        // Update status based on the provided purchaseOrder and status
+        if ("verifyAll".equalsIgnoreCase(status)) {
+            updateStatusForAll("verified", "created", purchaseOrder, verifierComments);
+        } else if ("rejectAll".equalsIgnoreCase(status)) {
+            updateStatusForAll("rejected", "created", purchaseOrder, verifierComments);
+        }
+
+        return ResponseEntity.ok("Status updated successfully");
+    }
+
+    public void updateStatusForAll(String newStatus, String oldStatus, String purchaseOrder, String verifierComments) {
+        // Fetch IncomingStock and BulkStock by purchaseOrder and oldStatus
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+        List<BulkStock> bulkStocks = bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+
+        // Update the status and comments
+        incomingStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setVerifierComments(verifierComments);
+        });
+        bulkStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setVerifierComments(verifierComments);
+        });
+
+        // Save the updated stocks
+        incomingStockRepo.saveAll(incomingStocks);
+        bulkStockRepo.saveAll(bulkStocks);
+    }
+
+
 }

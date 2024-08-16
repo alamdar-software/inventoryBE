@@ -427,4 +427,35 @@ public class BulkService {
         return allPurchaseOrders;
     }
 
+    public void updateStatusByPurchaseOrder(String purchaseOrder, String oldStatus, String action, String verifierComments) {
+        // Ensure that only 'created' status is processed
+        if (!"created".equalsIgnoreCase(oldStatus)) {
+            throw new IllegalArgumentException("Only 'created' status can be updated.");
+        }
+
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+        List<BulkStock> bulkStocks = bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+
+        String newStatus;
+        if ("verifyAll".equalsIgnoreCase(action)) {
+            newStatus = "verified";
+        } else if ("rejectAll".equalsIgnoreCase(action)) {
+            newStatus = "rejected";
+        } else {
+            throw new IllegalArgumentException("Invalid action. Use 'verifyAll' or 'rejectAll'.");
+        }
+
+        incomingStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setVerifierComments(verifierComments); // Set verifier comments
+        });
+
+        bulkStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setVerifierComments(verifierComments); // Set verifier comments
+        });
+
+        incomingStockRepo.saveAll(incomingStocks);
+        bulkStockRepo.saveAll(bulkStocks);
+    }
 }
