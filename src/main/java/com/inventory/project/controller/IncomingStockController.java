@@ -976,6 +976,11 @@ public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody Searc
     }
 
 
+    @PostMapping("/searchPo")
+    public ResponseEntity<List<StockViewDto>> searchPoIncomingStock(@RequestBody SearchCriteria searchCriteria) {
+        List<StockViewDto> result = incomingStockService.searchPurchaseOrderIncomingStock(searchCriteria);
+        return ResponseEntity.ok(result);
+    }
 
 
 }

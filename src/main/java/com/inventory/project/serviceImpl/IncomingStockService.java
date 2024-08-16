@@ -534,5 +534,73 @@ public class IncomingStockService {
         return incomingStockRepo.findByItemId(itemId);
     }
 
+    public List<BulkStock> searchByPurchaseOrderForBulk(String purchaseOrder) {
+        return bulkStockRepo.findByPurchaseOrder(purchaseOrder);
+    }
+    public List<StockViewDto> searchPurchaseOrderIncomingStock(SearchCriteria searchCriteria) {
+        List<IncomingStock> incomingStocks;
+        List<BulkStock> bulkStocks;
+
+        if (StringUtils.isNotEmpty(searchCriteria.getPurchaseOrder())) {
+            incomingStocks = incomingStockRepo.findByPurchaseOrder(searchCriteria.getPurchaseOrder());
+            bulkStocks = searchByPurchaseOrderForBulk(searchCriteria.getPurchaseOrder());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
+            incomingStocks = incomingStockRepo.findByItemDescription(searchCriteria.getDescription());
+            bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) &&
+                StringUtils.isNotEmpty(searchCriteria.getLocationName()) &&
+                searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate());
+                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate());
+            } else {
+                incomingStocks = Collections.emptyList();
+                bulkStocks = Collections.emptyList();
+            }
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
+            incomingStocks = searchByEntityName(searchCriteria.getEntityName());
+            bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName());
+        } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate());
+            } else {
+                incomingStocks = Collections.emptyList();
+                bulkStocks = Collections.emptyList();
+            }
+        } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
+            incomingStocks = searchByLocation(searchCriteria.getLocationName());
+            bulkStocks = searchBulkByLocation(searchCriteria.getLocationName());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getStatus())) {
+            incomingStocks = searchByStatus(searchCriteria.getStatus());
+            bulkStocks = searchBulkByStatus(searchCriteria.getStatus());
+        } else {
+            incomingStocks = getAllIncomingStocks();
+            bulkStocks = getAllBulkStocks();
+        }
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapIncomingStockToDTO(incomingStock);
+            stockView.setDataType("Incoming");
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapBulkStockToDTO(bulkStock);
+            stockView.setDataType("Bulk");
+            stockViewList.add(stockView);
+        }
+
+        return stockViewList;
+    }
+
 }
 
