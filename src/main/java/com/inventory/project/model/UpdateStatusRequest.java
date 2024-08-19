@@ -7,6 +7,8 @@ public class UpdateStatusRequest {
     private String status;
     private String verifierComments;
 
+    private String approverComments;
+
     private LocalDate transferDate;
 
     public String getPurchaseOrder() {
@@ -39,5 +41,13 @@ public class UpdateStatusRequest {
 
     public void setVerifierComments(String verifierComments) {
         this.verifierComments = verifierComments;
+    }
+
+    public String getApproverComments() {
+        return approverComments;
+    }
+
+    public void setApproverComments(String approverComments) {
+        this.approverComments = approverComments;
     }
 }

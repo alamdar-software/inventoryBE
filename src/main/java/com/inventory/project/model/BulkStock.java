@@ -78,8 +78,17 @@ public class BulkStock {
    private  String status;
     private String verifierComments; // Add this field
 
+    private String approverComments;
     public BulkStock() {
 
+    }
+
+    public String getApproverComments() {
+        return approverComments;
+    }
+
+    public void setApproverComments(String approverComments) {
+        this.approverComments = approverComments;
     }
 
     public Long getId() {

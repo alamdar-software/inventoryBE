@@ -1018,5 +1018,44 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         bulkStockRepo.saveAll(bulkStocks);
     }
 
+    @PostMapping("/updateByPoVerified")
+    public ResponseEntity<String> updateByPurchaseOrderVerifier(@RequestBody UpdateStatusRequest updateStatusRequest) {
+        String purchaseOrder = updateStatusRequest.getPurchaseOrder();
+        String status = updateStatusRequest.getStatus();
+        String approverComments = updateStatusRequest.getApproverComments();  // Updated field name
+
+        // Ensure the status is valid
+        if (!"approveAll".equalsIgnoreCase(status) && !"rejectAll".equalsIgnoreCase(status)) {
+            return ResponseEntity.badRequest().body("Invalid status");
+        }
+
+        // Update status based on the provided purchaseOrder and status
+        if ("approveAll".equalsIgnoreCase(status)) {
+            updateStatusAll("approved", "verified", purchaseOrder, approverComments);
+        } else if ("rejectAll".equalsIgnoreCase(status)) {
+            updateStatusAll("rejected", "verified", purchaseOrder, approverComments);
+        }
+
+        return ResponseEntity.ok("Status updated successfully");
+    }
+    public void updateStatusAll(String newStatus, String oldStatus, String purchaseOrder, String approverComments) {
+        // Fetch IncomingStock and BulkStock by purchaseOrder and oldStatus
+        List<IncomingStock> incomingStocks = incomingStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+        List<BulkStock> bulkStocks = bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, oldStatus);
+
+        // Update the status and comments
+        incomingStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setApproverComments(approverComments);  // Updated field name
+        });
+        bulkStocks.forEach(stock -> {
+            stock.setStatus(newStatus);
+            stock.setApproverComments(approverComments);  // Updated field name
+        });
+
+        // Save the updated stocks
+        incomingStockRepo.saveAll(incomingStocks);
+        bulkStockRepo.saveAll(bulkStocks);
+    }
 
 }

@@ -631,5 +631,117 @@ public class IncomingStockService {
 
         return stockViewList;
     }
+
+
+    public List<StockViewDto> searchPurchaseOrderIncomingStockVerified(SearchCriteria searchCriteria) {
+        List<IncomingStock> incomingStocks = Collections.emptyList();
+        List<BulkStock> bulkStocks = Collections.emptyList();
+
+        if (StringUtils.isNotEmpty(searchCriteria.getPurchaseOrder())) {
+            incomingStocks = searchByPurchaseOrderForIncoming(searchCriteria.getPurchaseOrder())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchByPurchaseOrderForBulk(searchCriteria.getPurchaseOrder())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
+            incomingStocks = searchByItemDescriptionForIncoming(searchCriteria.getDescription())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) &&
+                StringUtils.isNotEmpty(searchCriteria.getLocationName()) &&
+                searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
+                        searchCriteria.getEntityName(),
+                        searchCriteria.getStartDate(),
+                        searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+            }
+        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
+            incomingStocks = searchByEntityName(searchCriteria.getEntityName())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+        } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
+            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
+                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+            }
+        } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
+            incomingStocks = searchByLocation(searchCriteria.getLocationName())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = searchBulkByLocation(searchCriteria.getLocationName())
+                    .stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+        } else if (StringUtils.isNotEmpty(searchCriteria.getStatus())) {
+            if ("verified".equals(searchCriteria.getStatus())) {
+                incomingStocks = searchByStatus(searchCriteria.getStatus())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+                bulkStocks = searchBulkByStatus(searchCriteria.getStatus())
+                        .stream()
+                        .filter(stock -> "verified".equals(stock.getStatus()))
+                        .collect(Collectors.toList());
+            }
+        } else {
+            incomingStocks = getAllIncomingStocks().stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+            bulkStocks = getAllBulkStocks().stream()
+                    .filter(stock -> "verified".equals(stock.getStatus()))
+                    .collect(Collectors.toList());
+        }
+
+        List<StockViewDto> stockViewList = new ArrayList<>();
+
+        for (IncomingStock incomingStock : incomingStocks) {
+            StockViewDto stockView = mapIncomingStockToDTO(incomingStock);
+            stockView.setDataType("Incoming");
+            stockViewList.add(stockView);
+        }
+
+        for (BulkStock bulkStock : bulkStocks) {
+            StockViewDto stockView = mapBulkStockToDTO(bulkStock);
+            stockView.setDataType("Bulk");
+            stockViewList.add(stockView);
+        }
+
+        return stockViewList;
+    }
+
+    public List<IncomingStock> searchByItemDescriptionForIncoming(String description) {
+        return incomingStockRepo.findByItemDescriptionAndStatus(description, "verified");
+    }
 }
 

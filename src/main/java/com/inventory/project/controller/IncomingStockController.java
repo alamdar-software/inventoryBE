@@ -981,6 +981,11 @@ public ResponseEntity<List<StockViewDto>> searchIncomingStock(@RequestBody Searc
         List<StockViewDto> result = incomingStockService.searchPurchaseOrderIncomingStock(searchCriteria);
         return ResponseEntity.ok(result);
     }
+    @PostMapping("/searchPoVerified")
+    public ResponseEntity<List<StockViewDto>> searchPoIncomingStockVerified(@RequestBody SearchCriteria searchCriteria) {
+        List<StockViewDto> result = incomingStockService.searchPurchaseOrderIncomingStockVerified(searchCriteria);
+        return ResponseEntity.ok(result);
+    }
 
 
 }
