@@ -219,6 +219,9 @@ public class ConsumeService {
     public List<ConsumedItem> getCiplByTransferDateAndStatus(LocalDate transferDate, String status) {
         return consumedItemRepo.findByTransferDateAndStatus(transferDate, status);
     }
+    public List<ConsumedItem> getCiplByTransferDateAndStatusVerified(LocalDate transferDate, String status) {
+        return consumedItemRepo.findByTransferDateAndStatus(transferDate, status);
+    }
 
     public List<ConsumedItem> getCiplByStatus(String status) {
         return consumedItemRepo.findByStatus(status);

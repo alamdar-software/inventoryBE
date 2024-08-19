@@ -44,6 +44,9 @@ public class ConsumedItem {
 private Inventory inventory;
 
 private String verifierComments;
+
+    private String approverComments;
+
 //    public ConsumedItem() {
 //        this.item = new ArrayList<>();
 //    }
@@ -56,6 +59,13 @@ private String status;
         this.id = id;
     }
 
+    public String getApproverComments() {
+        return approverComments;
+    }
+
+    public void setApproverComments(String approverComments) {
+        this.approverComments = approverComments;
+    }
 //    public String getItemDescription() {
 //        return itemDescription;
 //    }

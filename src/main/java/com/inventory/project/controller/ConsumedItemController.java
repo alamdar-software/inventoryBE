@@ -692,6 +692,22 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
         return ResponseEntity.ok(ciplList);
     }
 
+    @PostMapping("/searchDateVerified")
+    public ResponseEntity<List<ConsumedItem>> searchCiplByDateVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || criteria.getTransferDate() == null) {
+            // If no criteria or no transferDate is provided, return bad request
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // Fetch items based on transferDate and status 'verified'
+        List<ConsumedItem> ciplList = consumeService.getCiplByTransferDateAndStatusVerified(criteria.getTransferDate(), "verified");
+
+        if (ciplList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ciplList);
+    }
 
 
     @PostMapping("/updateByDate")
@@ -722,6 +738,39 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
         consumedItems.forEach(item -> {
             item.setStatus(newStatus);
             item.setVerifierComments(verifierComments);
+        });
+
+        // Save the updated items
+        consumedItemRepo.saveAll(consumedItems);
+    }
+    @PostMapping("/updateByDateVerifer")
+    public ResponseEntity<String> updateByDateVerifierApprover(@RequestBody UpdateStatusRequest updateStatusRequest) {
+        LocalDate transferDate = updateStatusRequest.getTransferDate();
+        String status = updateStatusRequest.getStatus();
+        String approverComments = updateStatusRequest.getApproverComments(); // Updated field name
+
+        // Ensure the status is valid
+        if (!"approveAll".equalsIgnoreCase(status) && !"rejectAll".equalsIgnoreCase(status)) {
+            return ResponseEntity.badRequest().body("Invalid status");
+        }
+
+        // Determine new status value
+        String newStatus = "approveAll".equalsIgnoreCase(status) ? "approved" : "rejected";
+
+        // Update status based on the provided transferDate and status
+        updateStatusForConsumedItems(newStatus, "verified", transferDate, approverComments);
+
+        return ResponseEntity.ok("Status updated successfully");
+    }
+
+    public void updateStatusForConsumedItems(String newStatus, String oldStatus, LocalDate transferDate, String approverComments) {
+        // Fetch ConsumedItem by transferDate and oldStatus
+        List<ConsumedItem> consumedItems = consumedItemRepo.findByTransferDateAndStatus(transferDate, oldStatus);
+
+        // Update the status and comments
+        consumedItems.forEach(item -> {
+            item.setStatus(newStatus);
+            item.setApproverComments(approverComments); // Updated field name
         });
 
         // Save the updated items
