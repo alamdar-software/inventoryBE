@@ -504,5 +504,53 @@ public class ScrappedItemController {
                 && criteria.getTransferDate() == null;
     }
 
+    @PostMapping("/searchScrappedVerified")
+    public ResponseEntity<List<ScrappedItem>> searchScrappedByCriteriaVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all ScrappedItems with status "verified"
+            List<ScrappedItem> allVerifiedScrappedItems = scrappedItemService.getAllScrappedItemsByStatus("verified");
+            return ResponseEntity.ok(allVerifiedScrappedItems);
+        }
+
+        List<ScrappedItem> scrappedItemList = new ArrayList<>();
+
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByDescriptionLocationAndDate(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByDescriptionAndLocation(criteria.getDescription(), criteria.getLocationName());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByDescriptionAndDate(criteria.getDescription(), criteria.getDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByLocationAndDate(criteria.getLocationName(), criteria.getDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByDescription(criteria.getDescription());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            scrappedItemList = scrappedItemService.getScrappedByLocation(criteria.getLocationName());
+
+        } else if (criteria.getDate() != null) {
+            scrappedItemList = scrappedItemService.getScrappedByDate(criteria.getDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (scrappedItemList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(scrappedItemList);
+    }
+
 
 }

@@ -269,6 +269,55 @@ public ResponseEntity<List<Cipl>> searchCiplByCriteria(@RequestBody(required = f
 
     return ResponseEntity.ok(ciplList);
 }
+    @PostMapping("/ciplVerifiedSearch")
+    public ResponseEntity<List<Cipl>> searchCiplByCriteriaVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all Cipl with status "verified"
+            List<Cipl> allVerifiedCipl = ciplService.getAllCiplByStatus("verified");
+            return ResponseEntity.ok(allVerifiedCipl);
+        }
+
+        List<Cipl> ciplList = new ArrayList<>();
+
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByItemLocationAndTransferDateVerified(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            ciplList = ciplService.getCiplByItemAndLocationVerified(criteria.getItem(), criteria.getLocationName());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByItemAndTransferDateVerified(criteria.getItem(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByLocationAndTransferDateVerified(criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+            ciplList = ciplService.getCiplByVerifiedItem(criteria.getItem());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            ciplList = ciplService.getCiplByLocationVerified(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            ciplList = ciplService.getCiplByTransferDateVerified(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (ciplList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ciplList);
+    }
+
+
 
     @PostMapping("/ciplCreatedSearch")
     public ResponseEntity<List<Cipl>> searchCiplByCriteriaCreated(@RequestBody(required = false) SearchCriteria criteria) {

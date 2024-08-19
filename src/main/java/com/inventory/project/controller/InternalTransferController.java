@@ -420,4 +420,54 @@ public class InternalTransferController {
                 && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
                 && criteria.getTransferDate() == null;
     }
+    @PostMapping("/searchInternalVerified")
+    public ResponseEntity<List<InternalTransfer>> searchInternalTransferByCriteriaVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all InternalTransfers with status "verified"
+            List<InternalTransfer> allVerifiedTransfers = internalTransferService.getAllInternalTransferByStatus("verified");
+            return ResponseEntity.ok(allVerifiedTransfers);
+        }
+
+        List<InternalTransfer> transferList = new ArrayList<>();
+
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByDescriptionLocationAndTransferDateVerified(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByDescriptionAndLocationVerified(
+                    criteria.getDescription(), criteria.getLocationName());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByDescriptionAndTransferDateVerified(
+                    criteria.getDescription(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByLocationAndTransferDateVerified(
+                    criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByVerifiedDescription(criteria.getDescription());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            transferList = internalTransferService.getInternalTransferByLocationVerified(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            transferList = internalTransferService.getInternalTransferByTransferDateVerified(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (transferList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(transferList);
+    }
 }

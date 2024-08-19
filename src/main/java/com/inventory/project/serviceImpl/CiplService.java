@@ -508,4 +508,36 @@ public List<Cipl> getMtoByDateRange(String item, String shipperName, String cons
         return ciplRepository.findByStatus(rejectedStatus);
     }
 
+
+
+    public List<Cipl> getCiplByItemLocationAndTransferDateVerified(String item, String locationName, LocalDate transferDate) {
+        return ciplRepository.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, "verified");
+    }
+
+    public List<Cipl> getCiplByItemAndLocationVerified(String item, String locationName) {
+        return ciplRepository.findByItemAndLocationNameAndStatus(item, locationName, "verified");
+    }
+
+    public List<Cipl> getCiplByItemAndTransferDateVerified(String item, LocalDate transferDate) {
+        return ciplRepository.findByItemAndTransferDateAndStatus(item, transferDate, "verified");
+    }
+
+    public List<Cipl> getCiplByLocationAndTransferDateVerified(String locationName, LocalDate transferDate) {
+        return ciplRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "verified");
+    }
+
+    public List<Cipl> getCiplByVerifiedItem(String item) {
+        return ciplRepository.findByItemAndStatus(item, "verified");
+    }
+
+    public List<Cipl> getCiplByLocationVerified(String locationName) {
+        return ciplRepository.findByLocationNameAndStatus(locationName, "verified");
+    }
+
+    public List<Cipl> getCiplByTransferDateVerified(LocalDate transferDate) {
+        return ciplRepository.findByTransferDateAndStatus(transferDate, "verified");
+    }
+
+
+
 }

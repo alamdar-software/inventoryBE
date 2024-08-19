@@ -627,6 +627,54 @@ public ResponseEntity<List<ConsumedItem>> searchConsumedItems(@RequestBody Searc
                 && (criteria.getLocationName() == null || criteria.getLocationName().isEmpty())
                 && criteria.getTransferDate() == null;
     }
+
+    @PostMapping("/verifiedConsumedSearch")
+    public ResponseEntity<List<ConsumedItem>> searchConsumedByCriteriaVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all ConsumedItems with status "verified"
+            List<ConsumedItem> allVerifiedConsumedItems = consumeService.getAllConsumedItemsByStatus("verified");
+            return ResponseEntity.ok(allVerifiedConsumedItems);
+        }
+
+        List<ConsumedItem> consumedItemList = new ArrayList<>();
+
+        if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByItemLocationAndTransferDateAndStatus(
+                    criteria.getItem(), criteria.getLocationName(), criteria.getTransferDate(), "verified");
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByItemAndLocationAndStatus(criteria.getItem(), criteria.getLocationName(), "verified");
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByItemAndTransferDateAndStatus(criteria.getItem(), criteria.getTransferDate(), "verified");
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByLocationAndTransferDateAndStatus(criteria.getLocationName(), criteria.getTransferDate(), "verified");
+
+        } else if (criteria.getItem() != null && !criteria.getItem().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByItemAndStatus(criteria.getItem(), "verified");
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            consumedItemList = consumeService.getConsumedByLocationAndStatus(criteria.getLocationName(), "verified");
+
+        } else if (criteria.getTransferDate() != null) {
+            consumedItemList = consumeService.getConsumedByTransferDateAndStatus(criteria.getTransferDate(), "verified");
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (consumedItemList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(consumedItemList);
+    }
     @PostMapping("/searchDate")
     public ResponseEntity<List<ConsumedItem>> searchCiplByDate(@RequestBody(required = false) SearchCriteria criteria) {
         if (criteria == null || criteria.getTransferDate() == null) {

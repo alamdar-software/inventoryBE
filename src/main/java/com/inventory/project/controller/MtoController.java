@@ -576,4 +576,55 @@ public ResponseEntity<List<Mto>> searchMtoReportByCriteria(@RequestBody SearchCr
                 && criteria.getTransferDate() == null;
     }
 
+
+    @PostMapping("/mtoVerifiedSearch")
+    public ResponseEntity<List<Mto>> searchMtoByCriteriaVerified(@RequestBody(required = false) SearchCriteria criteria) {
+        if (criteria == null || isCriteriaEmpty(criteria)) {
+            // If criteria is null or all fields are empty, return all Mto with status "verified"
+            List<Mto> allVerifiedMto = mtoService.getAllMtoByStatus("verified");
+            return ResponseEntity.ok(allVerifiedMto);
+        }
+
+        List<Mto> mtoList = new ArrayList<>();
+
+        if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByDescriptionLocationAndTransferDateVerified(
+                    criteria.getDescription(), criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            mtoList = mtoService.getMtoByDescriptionAndLocationVerified(criteria.getDescription(), criteria.getLocationName());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByDescriptionAndTransferDateVerified(criteria.getDescription(), criteria.getTransferDate());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()
+                && criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByLocationAndTransferDateVerified(criteria.getLocationName(), criteria.getTransferDate());
+
+        } else if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
+            mtoList = mtoService.getMtoByVerifiedDescription(criteria.getDescription());
+
+        } else if (criteria.getLocationName() != null && !criteria.getLocationName().isEmpty()) {
+            mtoList = mtoService.getMtoByLocationVerified(criteria.getLocationName());
+
+        } else if (criteria.getTransferDate() != null) {
+            mtoList = mtoService.getMtoByTransferDateVerified(criteria.getTransferDate());
+
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (mtoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(mtoList);
+    }
+
+
+
 }

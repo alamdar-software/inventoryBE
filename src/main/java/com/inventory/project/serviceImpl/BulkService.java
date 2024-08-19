@@ -458,4 +458,153 @@ public class BulkService {
         incomingStockRepo.saveAll(incomingStocks);
         bulkStockRepo.saveAll(bulkStocks);
     }
+
+
+    public List<Object> searchBySingleFieldVerified(SearchCriteria searchRequest) {
+        List<Object> results = Stream.of(
+                        searchBulkStockBySingleFieldVerified(searchRequest),
+                        searchIncomingStockBySingleFieldVerified(searchRequest))
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        return results.isEmpty() ? Collections.emptyList() : results;
+    }
+
+    private List<BulkStock> searchBulkStockBySingleFieldVerified(SearchCriteria searchRequest) {
+        if (isEmptyCriteriaVerified(searchRequest)) {
+            return bulkStockRepo.findByStatus("verified"); // Fetch all bulk stocks with status "verified"
+        }
+        if (isAllFieldsSpecifiedVerified(searchRequest)) {
+            return bulkStockRepo.findByDescriptionAndLocationNameAndDateAndEntityNameAndPurchaseOrderAndStatus(
+                    searchRequest.getDescription(),
+                    searchRequest.getLocationName(),
+                    searchRequest.getDate(),
+                    searchRequest.getEntityName(),
+                    searchRequest.getPurchaseOrder(),
+                    "verified"
+            );
+        } else if (atLeastTwoFieldsSpecifiedVerified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription()) && nonEmpty(searchRequest.getLocationName())) {
+                return bulkStockRepo.findByDescriptionAndLocationNameAndStatus(
+                        searchRequest.getDescription(), searchRequest.getLocationName(), "verified");
+            } else if (nonEmpty(searchRequest.getDescription()) && searchRequest.getDate() != null) {
+                return bulkStockRepo.findByDescriptionAndDateAndStatus(
+                        searchRequest.getDescription(), searchRequest.getDate(), "verified");
+            } else if (nonEmpty(searchRequest.getLocationName()) && searchRequest.getDate() != null) {
+                return bulkStockRepo.findByLocationNameAndDateAndStatus(
+                        searchRequest.getLocationName(), searchRequest.getDate(), "verified");
+            }
+        } else if (isSingleFieldSpecifiedVerified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription())) {
+                return bulkStockRepo.findByDescriptionAndStatus(searchRequest.getDescription(), "verified");
+            } else if (nonEmpty(searchRequest.getLocationName())) {
+                return bulkStockRepo.findByLocationNameAndStatus(searchRequest.getLocationName(), "verified");
+            } else if (searchRequest.getDate() != null) {
+                return bulkStockRepo.findByDateAndStatus(searchRequest.getDate(), "verified");
+            } else if (nonEmpty(searchRequest.getPurchaseOrder())) {
+                return bulkStockRepo.findByPurchaseOrderAndStatus(searchRequest.getPurchaseOrder(), "verified");
+            } else if (nonEmpty(searchRequest.getEntityName())) {
+                return bulkStockRepo.findByEntityNameAndStatus(searchRequest.getEntityName(), "verified");
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private List<IncomingStock> searchIncomingStockBySingleFieldVerified(SearchCriteria searchRequest) {
+        if (isEmptyCriteriaVerified(searchRequest)) {
+            return incomingStockRepo.findByStatus("verified"); // Fetch all incoming stocks with status "verified"
+        }
+        if (isAllFieldsSpecifiedVerified(searchRequest)) {
+            return incomingStockRepo.findByItemDescriptionAndLocation_LocationNameAndDateAndEntity_EntityNameAndPurchaseOrderAndStatus(
+                    searchRequest.getDescription(),
+                    searchRequest.getLocationName(),
+                    searchRequest.getDate(),
+                    searchRequest.getEntityName(),
+                    searchRequest.getPurchaseOrder(),
+                    "verified"
+            );
+        } else if (atLeastTwoFieldsSpecifiedVerified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription()) && nonEmpty(searchRequest.getLocationName())) {
+                return incomingStockRepo.findByItemDescriptionAndLocation_LocationNameAndStatus(
+                        searchRequest.getDescription(), searchRequest.getLocationName(), "verified");
+            } else if (nonEmpty(searchRequest.getDescription()) && searchRequest.getDate() != null) {
+                return incomingStockRepo.findByItemDescriptionAndDateAndStatus(
+                        searchRequest.getDescription(), searchRequest.getDate(), "verified");
+            } else if (nonEmpty(searchRequest.getLocationName()) && searchRequest.getDate() != null) {
+                return incomingStockRepo.findByLocation_LocationNameAndDateAndStatus(
+                        searchRequest.getLocationName(), searchRequest.getDate(), "verified");
+            }
+        } else if (isSingleFieldSpecifiedVerified(searchRequest)) {
+            if (nonEmpty(searchRequest.getDescription())) {
+                return incomingStockRepo.findByItemDescriptionAndStatus(searchRequest.getDescription(), "verified");
+            } else if (nonEmpty(searchRequest.getLocationName())) {
+                return incomingStockRepo.findByLocation_LocationNameAndStatus(searchRequest.getLocationName(), "verified");
+            } else if (searchRequest.getDate() != null) {
+                return incomingStockRepo.findByDateAndStatus(searchRequest.getDate(), "verified");
+            } else if (nonEmpty(searchRequest.getPurchaseOrder())) {
+                return incomingStockRepo.findByPurchaseOrderAndStatus(searchRequest.getPurchaseOrder(), "verified");
+            } else if (nonEmpty(searchRequest.getEntityName())) {
+                return incomingStockRepo.findByEntity_EntityNameAndStatus(searchRequest.getEntityName(), "verified");
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private boolean isAllFieldsSpecifiedVerified(SearchCriteria searchRequest) {
+        return nonEmpty(searchRequest.getDescription())
+                && nonEmpty(searchRequest.getLocationName())
+                && searchRequest.getDate() != null
+                && nonEmpty(searchRequest.getPurchaseOrder())
+                && nonEmpty(searchRequest.getEntityName());
+    }
+
+    private boolean isSingleFieldSpecifiedVerified(SearchCriteria searchRequest) {
+        int count = 0;
+        if (nonEmpty(searchRequest.getDescription())) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getLocationName())) {
+            count++;
+        }
+        if (searchRequest.getDate() != null) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getPurchaseOrder())) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getEntityName())) {
+            count++;
+        }
+        return count >= 1 && count <= 2;
+    }
+
+    private boolean atLeastTwoFieldsSpecifiedVerified(SearchCriteria searchRequest) {
+        int count = 0;
+        if (nonEmpty(searchRequest.getDescription())) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getLocationName())) {
+            count++;
+        }
+        if (searchRequest.getDate() != null) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getPurchaseOrder())) {
+            count++;
+        }
+        if (nonEmpty(searchRequest.getEntityName())) {
+            count++;
+        }
+        return count >= 2;
+    }
+
+    private boolean isEmptyCriteriaVerified(SearchCriteria searchRequest) {
+        return !nonEmpty(searchRequest.getDescription())
+                && !nonEmpty(searchRequest.getLocationName())
+                && searchRequest.getDate() == null
+                && !nonEmpty(searchRequest.getPurchaseOrder())
+                && !nonEmpty(searchRequest.getEntityName());
+    }
+
+
 }

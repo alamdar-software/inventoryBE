@@ -501,4 +501,32 @@ public List<InternalTransfer> searchByLocationAndDescriptionAndDateRange(
     public List<InternalTransfer> getAllInternalTransferByStatus(String status) {
         return internalTransferRepository.findByStatus(status);
     }
+
+    public List<InternalTransfer> getInternalTransferByDescriptionLocationAndTransferDateVerified(String description, String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByDescriptionAndLocationNameAndTransferDateAndStatus(description, locationName, transferDate, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByDescriptionAndLocationVerified(String description, String locationName) {
+        return internalTransferRepository.findByDescriptionAndLocationNameAndStatus(description, locationName, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByDescriptionAndTransferDateVerified(String description, LocalDate transferDate) {
+        return internalTransferRepository.findByDescriptionAndTransferDateAndStatus(description, transferDate, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByLocationAndTransferDateVerified(String locationName, LocalDate transferDate) {
+        return internalTransferRepository.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByVerifiedDescription(String description) {
+        return internalTransferRepository.findByDescriptionAndStatus(description, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByLocationVerified(String locationName) {
+        return internalTransferRepository.findByLocationNameAndStatus(locationName, "verified");
+    }
+
+    public List<InternalTransfer> getInternalTransferByTransferDateVerified(LocalDate transferDate) {
+        return internalTransferRepository.findByTransferDateAndStatus(transferDate, "verified");
+    }
 }

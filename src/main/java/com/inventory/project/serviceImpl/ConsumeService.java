@@ -280,5 +280,36 @@ public class ConsumeService {
         // Save the updated consumed items
         consumedItemRepo.saveAll(consumedItems);
     }
+    public List<ConsumedItem> getConsumedByItemLocationAndTransferDateAndStatus(String item, String locationName, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByItemAndLocationNameAndTransferDateAndStatus(item, locationName, transferDate, status);
+    }
 
+
+    public List<ConsumedItem> getConsumedByItemAndLocationAndStatus(String item, String locationName, String status) {
+        return consumedItemRepo.findByItemAndLocationNameAndStatus(item, locationName, status);
+    }
+
+
+    public List<ConsumedItem> getConsumedByItemAndTransferDateAndStatus(String item, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByItemAndTransferDateAndStatus(item, transferDate, status);
+    }
+
+
+    public List<ConsumedItem> getConsumedByLocationAndTransferDateAndStatus(String locationName, LocalDate transferDate, String status) {
+        return consumedItemRepo.findByLocationNameAndTransferDateAndStatus(locationName, transferDate, status);
+    }
+
+
+    public List<ConsumedItem> getConsumedByItemAndStatus(String item, String status) {
+        return consumedItemRepo.findByItemAndStatus(item, status);
+    }
+
+
+    public List<ConsumedItem> getConsumedByLocationAndStatus(String locationName, String status) {
+        return consumedItemRepo.findByLocationNameAndStatus(locationName, status);
+    }
+
+    public List<ConsumedItem> getConsumedByTransferDateAndStatus(LocalDate transferDate, String status) {
+        return consumedItemRepo.findByTransferDateAndStatus(transferDate, status);
+    }
 }

@@ -967,6 +967,16 @@ private void updateBulkStock(BulkStock bulkStock, Map<String, Object> updates, S
         }
     }
 
+    @PostMapping("/searchVerified")
+    public ResponseEntity<List<?>> searchStocksVerified(@RequestBody SearchCriteria searchCriteria) {
+        List<?> results = bulkStockService.searchBySingleFieldVerified(searchCriteria);
+
+        if (!results.isEmpty()) {
+            return ResponseEntity.ok(results);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     @PostMapping("/updateByPurchaseOrder")
     public ResponseEntity<String> updateByPurchaseOrder(@RequestBody UpdateStatusRequest updateStatusRequest) {
         String purchaseOrder = updateStatusRequest.getPurchaseOrder();

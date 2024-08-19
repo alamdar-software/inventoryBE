@@ -244,4 +244,33 @@ public class ScrappedItemService {
     public List<ScrappedItem> getScrappedByTransferDateCreated(LocalDate transferDate) {
         return scrappedItemRepository.findByTransferDateAndStatus(transferDate, "created");
     }
+
+
+    public List<ScrappedItem> getScrappedByDescriptionLocationAndDate(String description, String locationName, LocalDate date) {
+        return scrappedItemRepository.findByItemAndLocationNameAndTransferDateAndStatus(description, locationName, date, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByDescriptionAndLocation(String description, String locationName) {
+        return scrappedItemRepository.findByItemAndLocationNameAndStatus(description, locationName, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByDescriptionAndDate(String description, LocalDate date) {
+        return scrappedItemRepository.findByItemAndTransferDateAndStatus(description, date, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByLocationAndDate(String locationName, LocalDate date) {
+        return scrappedItemRepository.findByLocationNameAndTransferDateAndStatus(locationName, date, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByDescription(String description) {
+        return scrappedItemRepository.findByItemAndStatus(description, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByLocation(String locationName) {
+        return scrappedItemRepository.findByLocationNameAndStatus(locationName, "verified");
+    }
+
+    public List<ScrappedItem> getScrappedByDate(LocalDate date) {
+        return scrappedItemRepository.findByTransferDateAndStatus(date, "verified");
+    }
 }
