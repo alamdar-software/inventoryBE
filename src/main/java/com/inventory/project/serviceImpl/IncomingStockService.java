@@ -7,6 +7,8 @@ import com.inventory.project.repository.*;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,7 @@ public class IncomingStockService {
     private BulkStockRepo bulkStockRepo;
     @Autowired
     private EntityRepository entityRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncomingStockService.class);
 
     @Autowired
     public IncomingStockService(IncomingStockRepo incomingStockRepo, BulkStockRepo bulkStockRepo) {
@@ -638,87 +641,12 @@ public class IncomingStockService {
         List<BulkStock> bulkStocks = Collections.emptyList();
 
         if (StringUtils.isNotEmpty(searchCriteria.getPurchaseOrder())) {
-            incomingStocks = searchByPurchaseOrderForIncoming(searchCriteria.getPurchaseOrder())
+            incomingStocks = searchByPurchaseOrderForIncomingVerified(searchCriteria.getPurchaseOrder())
                     .stream()
                     .filter(stock -> "verified".equals(stock.getStatus()))
                     .collect(Collectors.toList());
-            bulkStocks = searchByPurchaseOrderForBulk(searchCriteria.getPurchaseOrder())
+            bulkStocks = searchByPurchaseOrderForBulkVerified(searchCriteria.getPurchaseOrder())
                     .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-        } else if (StringUtils.isNotEmpty(searchCriteria.getDescription())) {
-            incomingStocks = searchByItemDescriptionForIncoming(searchCriteria.getDescription())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-            bulkStocks = searchByDescriptionForBulk(searchCriteria.getDescription())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName()) &&
-                StringUtils.isNotEmpty(searchCriteria.getLocationName()) &&
-                searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
-            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
-                incomingStocks = searchByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
-                        searchCriteria.getEntityName(),
-                        searchCriteria.getStartDate(),
-                        searchCriteria.getEndDate())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-                bulkStocks = searchBulkByLocationAndEntityNameAndDateRange(searchCriteria.getLocationName(),
-                        searchCriteria.getEntityName(),
-                        searchCriteria.getStartDate(),
-                        searchCriteria.getEndDate())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-            }
-        } else if (StringUtils.isNotEmpty(searchCriteria.getEntityName())) {
-            incomingStocks = searchByEntityName(searchCriteria.getEntityName())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-            bulkStocks = searchBulkByEntityName(searchCriteria.getEntityName())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-        } else if (searchCriteria.getStartDate() != null && searchCriteria.getEndDate() != null) {
-            if (searchCriteria.getStartDate().isBefore(searchCriteria.getEndDate())) {
-                incomingStocks = searchByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-                bulkStocks = searchBulkByDateRange(searchCriteria.getStartDate(), searchCriteria.getEndDate())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-            }
-        } else if (StringUtils.isNotEmpty(searchCriteria.getLocationName())) {
-            incomingStocks = searchByLocation(searchCriteria.getLocationName())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-            bulkStocks = searchBulkByLocation(searchCriteria.getLocationName())
-                    .stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-        } else if (StringUtils.isNotEmpty(searchCriteria.getStatus())) {
-            if ("verified".equals(searchCriteria.getStatus())) {
-                incomingStocks = searchByStatus(searchCriteria.getStatus())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-                bulkStocks = searchBulkByStatus(searchCriteria.getStatus())
-                        .stream()
-                        .filter(stock -> "verified".equals(stock.getStatus()))
-                        .collect(Collectors.toList());
-            }
-        } else {
-            incomingStocks = getAllIncomingStocks().stream()
-                    .filter(stock -> "verified".equals(stock.getStatus()))
-                    .collect(Collectors.toList());
-            bulkStocks = getAllBulkStocks().stream()
                     .filter(stock -> "verified".equals(stock.getStatus()))
                     .collect(Collectors.toList());
         }
@@ -740,8 +668,14 @@ public class IncomingStockService {
         return stockViewList;
     }
 
-    public List<IncomingStock> searchByItemDescriptionForIncoming(String description) {
-        return incomingStockRepo.findByItemDescriptionAndStatus(description, "verified");
+    private List<IncomingStock> searchByPurchaseOrderForIncomingVerified(String purchaseOrder) {
+        LOGGER.info("Searching for IncomingStock with purchaseOrder: {}", purchaseOrder);
+        return incomingStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, "verified");
+    }
+
+    private List<BulkStock> searchByPurchaseOrderForBulkVerified(String purchaseOrder) {
+        LOGGER.info("Searching for BulkStock with purchaseOrder: {}", purchaseOrder);
+        return bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, "verified");
     }
 }
 

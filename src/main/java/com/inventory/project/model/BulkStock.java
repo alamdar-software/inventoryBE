@@ -274,4 +274,5 @@ public class BulkStock {
     public void setVerifierComments(String verifierComments) {
         this.verifierComments = verifierComments;
     }
+    
 }
