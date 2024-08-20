@@ -302,6 +302,26 @@ public class IncomingStockController {
 //        return ResponseEntity.badRequest().body("Location not found.");
 //    }
 //}
+
+@PostMapping("/dailyCount")
+public ResponseEntity<Map<String, Long>> incrementAndGetDailyStockCount() {
+    try {
+        incomingStockService.incrementDailyCount();
+        long todayCount = incomingStockService.getTodayCount();
+
+        // Create a response map with "DailyCount" as the key and the count as the value
+        Map<String, Long> response = new HashMap<>();
+        response.put("DailyCount", todayCount);
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        Map<String, Long> errorResponse = new HashMap<>();
+        errorResponse.put("DailyCount", 0L);  // Returning 0 to indicate an error
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(errorResponse);
+    }
+}
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
     try {

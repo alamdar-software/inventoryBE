@@ -10,10 +10,12 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +40,8 @@ public class IncomingStockService {
     @Autowired
     private EntityRepository entityRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(IncomingStockService.class);
+
+    private ConcurrentHashMap<LocalDate, Long> dailyCountMap = new ConcurrentHashMap<>();
 
     @Autowired
     public IncomingStockService(IncomingStockRepo incomingStockRepo, BulkStockRepo bulkStockRepo) {
@@ -676,6 +680,22 @@ public class IncomingStockService {
     private List<BulkStock> searchByPurchaseOrderForBulkVerified(String purchaseOrder) {
         LOGGER.info("Searching for BulkStock with purchaseOrder: {}", purchaseOrder);
         return bulkStockRepo.findByPurchaseOrderAndStatus(purchaseOrder, "verified");
+    }
+
+    public void incrementDailyCount() {
+        LocalDate today = LocalDate.now();
+        dailyCountMap.merge(today, 1L, Long::sum);
+    }
+
+    // Method to get today's count
+    public long getTodayCount() {
+        return dailyCountMap.getOrDefault(LocalDate.now(), 0L);
+    }
+
+    // Scheduled task to reset the daily count at midnight
+    @Scheduled(cron = "0 0 0 * * ?")
+    private void resetDailyCount() {
+        dailyCountMap.clear();
     }
 }
 
