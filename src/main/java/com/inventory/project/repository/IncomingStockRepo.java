@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -130,4 +131,6 @@ public interface IncomingStockRepo extends JpaRepository<IncomingStock,Long> {
     List<IncomingStock> findByItemDescriptionAndLocation_LocationNameAndStatus(String description, String locationName, String status);
 
     List<IncomingStock> findByItemDescriptionAndLocation_LocationNameAndDateAndEntity_EntityNameAndPurchaseOrderAndStatus(String description, String locationName, LocalDate date, String entityName, String purchaseOrder, String status);
+
+    List<IncomingStock> findAllByDateAfter(LocalDate date);
 }

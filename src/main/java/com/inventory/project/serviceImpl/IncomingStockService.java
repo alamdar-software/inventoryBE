@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -696,6 +697,12 @@ public class IncomingStockService {
     @Scheduled(cron = "0 0 0 * * ?")
     private void resetDailyCount() {
         dailyCountMap.clear();
+    }
+
+    public List<IncomingStock> getIncomingStockLast24Hours() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime twentyFourHoursAgo = now.minusDays(1);
+        return incomingStockRepo.findAllByDateAfter(twentyFourHoursAgo.toLocalDate());
     }
 }
 

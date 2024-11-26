@@ -303,25 +303,35 @@ public class IncomingStockController {
 //    }
 //}
 
-@PostMapping("/dailyCount")
-public ResponseEntity<Map<String, Long>> incrementAndGetDailyStockCount() {
+@PostMapping("/dailyCountAndView")
+public ResponseEntity<Map<String, Object>> incrementAndViewDailyStock() {
     try {
+        // Increment the daily count
         incomingStockService.incrementDailyCount();
+
+        // Get today's count
         long todayCount = incomingStockService.getTodayCount();
 
-        // Create a response map with "DailyCount" as the key and the count as the value
-        Map<String, Long> response = new HashMap<>();
+        // Get the incoming stock added in the last 24 hours
+        List<IncomingStock> stocks = incomingStockService.getIncomingStockLast24Hours();
+
+        // Prepare the response map
+        Map<String, Object> response = new HashMap<>();
         response.put("DailyCount", todayCount);
+        response.put("IncomingStockLast24Hours", stocks);
 
         return ResponseEntity.ok(response);
     } catch (Exception e) {
-        Map<String, Long> errorResponse = new HashMap<>();
-        errorResponse.put("DailyCount", 0L);  // Returning 0 to indicate an error
+        // In case of an error, prepare an error response
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("DailyCount", 0L);
+        errorResponse.put("IncomingStockLast24Hours", null);  // Indicating no stocks available due to error
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorResponse);
     }
 }
+
 @PostMapping("/add")
 public ResponseEntity<?> addIncomingStock(@RequestBody IncomingStockRequest incomingStockRequest) {
     try {
